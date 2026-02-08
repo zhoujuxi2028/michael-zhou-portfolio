@@ -1,0 +1,195 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://aep.ctwing.cn/schemas/device-list-response.json",
+  "title": "AEP Device List Response Schema",
+  "description": "Schema for AEP device management API response containing device list",
+  "type": "object",
+  "properties": {
+    "code": {
+      "type": "string",
+      "description": "Response status code",
+      "enum": ["0"],
+      "examples": ["0"]
+    },
+    "msg": {
+      "type": "string",
+      "description": "Response message",
+      "examples": ["ok"]
+    },
+    "result": {
+      "type": "object",
+      "description": "Response result containing paginated device list",
+      "properties": {
+        "pageNum": {
+          "type": "integer",
+          "description": "Current page number (1-based)",
+          "minimum": 1,
+          "examples": [1]
+        },
+        "pageSize": {
+          "type": "integer",
+          "description": "Number of records per page",
+          "minimum": 1,
+          "maximum": 100,
+          "examples": [100]
+        },
+        "total": {
+          "type": "integer",
+          "description": "Total number of devices",
+          "minimum": 0,
+          "examples": [892]
+        },
+        "list": {
+          "type": "array",
+          "description": "Array of device objects",
+          "items": {
+            "$ref": "#/$defs/device"
+          }
+        }
+      },
+      "required": ["pageNum", "pageSize", "total", "list"],
+      "additionalProperties": false
+    }
+  },
+  "required": ["code", "msg", "result"],
+  "additionalProperties": false,
+  "$defs": {
+    "device": {
+      "type": "object",
+      "description": "Device object containing device information",
+      "properties": {
+        "deviceId": {
+          "type": "string",
+          "description": "Unique device identifier",
+          "pattern": "^[0-9a-fA-F]+$",
+          "minLength": 1,
+          "examples": ["16857118866877072647385"]
+        },
+        "deviceName": {
+          "type": "string",
+          "description": "Device display name",
+          "minLength": 1,
+          "examples": ["866877072647385"]
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "Tenant identifier",
+          "pattern": "^[0-9]+$",
+          "examples": ["10433748"]
+        },
+        "productId": {
+          "type": "integer",
+          "description": "Product identifier",
+          "minimum": 1,
+          "examples": [16857118]
+        },
+        "deviceSn": {
+          "type": "string",
+          "description": "Device serial number",
+          "examples": ["866877072647385"]
+        },
+        "firmwareVersion": {
+          "type": ["string", "null"],
+          "description": "Device firmware version",
+          "examples": ["", "v1.0.0", null]
+        },
+        "deviceStatus": {
+          "type": "integer",
+          "description": "Device status",
+          "enum": [0, 1, 2],
+          "examples": [1],
+          "_enumDescriptions": {
+            "0": "已注册 (Registered)",
+            "1": "已激活 (Activated)",
+            "2": "已注销 (Deactivated)"
+          }
+        },
+        "createTime": {
+          "type": "integer",
+          "description": "Device creation timestamp (milliseconds)",
+          "minimum": 0,
+          "examples": [1763523187257]
+        },
+        "updateTime": {
+          "type": ["integer", "null"],
+          "description": "Last update timestamp (milliseconds)",
+          "minimum": 0,
+          "examples": [1763525221000, null]
+        },
+        "activeTime": {
+          "type": ["integer", "null"],
+          "description": "Device activation timestamp (milliseconds)",
+          "minimum": 0,
+          "examples": [1763525221000, null]
+        },
+        "logoutTime": {
+          "type": ["integer", "null"],
+          "description": "Device logout timestamp (milliseconds)",
+          "minimum": 0,
+          "examples": [null]
+        },
+        "netStatus": {
+          "type": ["integer", "null"],
+          "description": "Network status",
+          "enum": [1, 2, null],
+          "examples": [1, 2, null],
+          "_enumDescriptions": {
+            "1": "在线 (Online)",
+            "2": "离线 (Offline)",
+            "null": "未知 (Unknown)"
+          }
+        },
+        "onlineAt": {
+          "type": ["integer", "null"],
+          "description": "Last online timestamp (milliseconds)",
+          "minimum": 0,
+          "examples": [1766754209912, null]
+        },
+        "offlineAt": {
+          "type": ["integer", "null"],
+          "description": "Last offline timestamp (milliseconds)",
+          "minimum": 0,
+          "examples": [1766753670143, null]
+        },
+        "productProtocol": {
+          "type": "integer",
+          "description": "Product protocol type",
+          "enum": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+          "examples": [2],
+          "_enumDescriptions": {
+            "1": "T-LINK协议",
+            "2": "MQTT协议",
+            "3": "LWM2M协议",
+            "4": "TUP协议",
+            "5": "HTTP协议",
+            "6": "JT/T808协议",
+            "7": "TCP协议",
+            "8": "私有TCP(网关子设备协议)",
+            "9": "私有UDP(网关子设备协议)",
+            "10": "网关产品MQTT(网关产品协议)",
+            "11": "南向云"
+          }
+        }
+      },
+      "required": [
+        "deviceId",
+        "deviceName",
+        "tenantId",
+        "productId",
+        "deviceSn",
+        "deviceStatus",
+        "createTime",
+        "productProtocol"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "_metadata": {
+    "version": "1.0",
+    "lastUpdated": "2024-12-29",
+    "source": "AEP Device Management API",
+    "tenant": "10433748",
+    "product": "16857118",
+    "protocol": "MQTT (主要)"
+  }
+}

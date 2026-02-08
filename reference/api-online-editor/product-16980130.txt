@@ -1,0 +1,90 @@
+/**
+ * 单个产品详情API响应数据
+ * Single Product Detail API Response
+ * 产品ID: 16980130 (RepeaterLTE01 - 4G通信模组)
+ * 更新时间: 2024-12-26
+ */
+{
+  // 响应状态码 (0=成功)
+  "code": "0",
+
+  // 响应消息
+  "msg": "ok",
+
+  // 产品详细信息
+  "result": {
+    // === 产品基本信息 ===
+    "productId": 16980130,                    // 产品ID
+    "productName": "RepeaterLTE01",           // 产品名称 (LTE中继器01版)
+    "tenantId": "10433748",                   // 租户ID (众成科技)
+    "productDesc": "",                        // 产品描述 (空)
+
+    // === 产品分类信息 ===
+    "productType": 6001,                      // 主分类代码: 6001
+    "secondaryType": 5002,                    // 次分类代码: 5002
+    "thirdType": 113271,                      // 三级分类代码: 113271
+    "productTypeValue": "智慧城市",            // 主分类名称
+    "secondaryTypeValue": "公共服务",          // 次分类名称
+    "thirdTypeValue": "4G通信模组",            // 三级分类名称
+
+    // === 网络与通信协议 ===
+    "productProtocol": 2,                     // 产品协议类型 (2=自定义协议)
+    "authType": 1,                           // 认证类型 (1=密钥认证)
+    "payloadFormat": 2,                      // 负载数据格式 (2=二进制)
+    "networkType": 2,                        // 网络类型 (2=蜂窝网络)
+    "encryptionType": 1,                     // 加密类型 (1=AES)
+    "dataEncryption": 5,                     // 数据加密方式 (5=端到端加密)
+
+    // === 设备统计信息 ===
+    "deviceCount": 532,                      // 设备总数
+    "onlineDeviceCount": 325,                // 在线设备数量
+    "apiKey": "7f1417fbecad4934bdcfe301c302fa3f",  // API访问密钥
+
+    // === 设备型号与配置 ===
+    "tupDeviceModel": "Repeater4G_BIN",      // 设备型号 (4G中继器二进制版本)
+    "tupDeviceType": "",                     // 设备类型 (空)
+    "accessType": 1,                         // 接入类型 (1=直连接入)
+    "nodeType": 1,                           // 节点类型 (1=终端节点)
+    "tupIsThrough": 1,                       // 透传模式 (1=启用)
+
+    // === 时间戳信息 ===
+    "createTime": 1698715794000,             // 创建时间: 2023-10-31 02:09:54 UTC
+    "updateTime": 1699583349000,             // 更新时间: 2023-11-10 03:09:09 UTC
+
+    // === 管理员信息 ===
+    "createBy": "jszc13305144841",           // 创建者账号
+    "updateBy": null,                        // 最后更新者 (空)
+
+    // === 高级配置 ===
+    "endpointFormat": null,                  // 端点格式配置 (空)
+    "powerModel": null,                      // 功耗模型 (空)
+    "rootCert": null,                        // 根证书 (空)
+    "lwm2mEdrxTime": null,                   // LWM2M eDRX周期时间 (空)
+
+    // === 分类管理 ===
+    "categoryId": null,                      // 自定义分类ID (空)
+    "categoryName": null,                    // 自定义分类名称 (空)
+
+    // === 消息处理 ===
+    "msgParserMode": null,                   // 消息解析模式 (空)
+    "accessRouteMode": null                  // 接入路由模式 (空)
+  }
+}
+
+/**
+ * 字段说明 (Field Descriptions)
+ *
+ * - productId: 产品的唯一标识符
+ * - deviceCount vs onlineDeviceCount: 总设备数 vs 当前在线设备数
+ * - tupDeviceModel: "Tuple Device Model" - 三元组设备模型，这里是4G版本
+ * - tupIsThrough: 是否启用数据透传功能
+ * - networkType: 2表示使用蜂窝网络(4G)进行通信
+ * - authType: 1表示使用API密钥进行设备认证
+ * - dataEncryption: 5表示使用端到端加密保护数据传输
+ *
+ * 设备状态: 532台设备中有325台在线 (在线率: 61.1%)
+ *
+ * 产品对比:
+ * - RepeaterLTE01 (本产品): 4G通信模组，532台设备，61.1%在线率
+ * - RepeaterLTE (产品16857118): 5G通信模组，892台设备，78.8%在线率
+ */
