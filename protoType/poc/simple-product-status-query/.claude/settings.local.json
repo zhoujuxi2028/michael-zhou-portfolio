@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat:*)",
+      "Bash(chmod:*)",
+      "Bash(javac:*)",
+      "Bash(java:*)",
+      "Bash(find:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(source:*)",
+      "Bash(./load_env.sh)",
+      "Bash(./run_query.sh:*)",
+      "Bash(jar:*)",
+      "Bash(curl:*)",
+      "Bash(./run_enhanced.sh:*)",
+      "Bash(./scripts/run_query.sh:*)",
+      "Bash(./scripts/run_enhanced.sh:*)",
+      "Bash(git log:*)",
+      "Bash(git stash push:*)",
+      "Bash(git rebase:*)",
+      "Bash(git show:*)",
+      "Bash(git stash:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nchore: 更新Claude配置并添加项目参考材料\n\n- 更新.claude/settings.local.json允许git命令和思维链工具\n- 更新protoType/.claude/settings.local.json允许更多开发命令\n- 添加设备数据分析参考文件和数据库脚本\n- 添加云监控系统项目选择分析报告\n- 移除5G兼容需求的source.zip压缩文件\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push:*)",
+      "Bash(tree:*)",
+      "Bash(rm:*)",
+      "Bash(mkdir:*)",
+      "Bash(python3:*)",
+      "Bash(pip3 install:*)",
+      "Bash(curl -X POST \"https://device.api.ct10649.com:8743/iocm/app/sec/v1.1.0/login\" )",
+      "Bash(git commit:*)",
+      "Bash(mv:*)",
+      "Bash(git checkout:*)",
+      "Bash(find:*)",
+      "Bash(git init:*)",
+      "Bash(git config:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

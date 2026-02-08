@@ -1,0 +1,71 @@
+# 混合部署方案 - ARM64兼容版本
+services:
+  # Redis缓存服务
+  redis:
+    image: redis:7-alpine
+    container_name: cloud-monitoring-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --requirepass "redis123"
+    networks:
+      - cloud-monitoring-network
+
+  # Spring Boot应用服务
+  app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: cloud-monitoring-app
+    restart: unless-stopped
+    depends_on:
+      - redis
+    environment:
+      # 数据库配置（连接本地MySQL）
+      DB_HOST: host.docker.internal  # 连接宿主机的MySQL
+      DB_PORT: 3306
+      DB_NAME: cloud_monitoring_phase1
+      DB_USERNAME: root
+      DB_PASSWORD: 123456
+
+      # Redis配置
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: redis123
+
+      # 应用配置
+      SPRING_PROFILES_ACTIVE: hybrid
+      TZ: Asia/Shanghai
+
+      # JVM参数
+      JAVA_OPTS: "-Xms256m -Xmx512m -Dfile.encoding=UTF-8"
+    ports:
+      - "8080:8080"
+    volumes:
+      - app_logs:/opt/logs
+      - app_uploads:/opt/uploads
+    networks:
+      - cloud-monitoring-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/health/check"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+# 网络配置
+networks:
+  cloud-monitoring-network:
+    driver: bridge
+    name: cloud-monitoring-hybrid-net
+
+# 数据卷配置
+volumes:
+  redis_data:
+    name: cloud-monitoring-redis-data
+  app_logs:
+    name: cloud-monitoring-app-logs
+  app_uploads:
+    name: cloud-monitoring-app-uploads

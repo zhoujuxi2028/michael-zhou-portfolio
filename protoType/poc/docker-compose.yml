@@ -1,0 +1,93 @@
+services:
+  # MySQL数据库服务
+  mysql:
+    image: mysql:8.0.35
+    container_name: cloud-monitoring-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: cloud_monitoring_phase1
+      MYSQL_USER: cloudapp
+      MYSQL_PASSWORD: cloudapp123
+      TZ: Asia/Shanghai
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docs/database-design-phase1-v1.0.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    command: --default-authentication-plugin=mysql_native_password
+    networks:
+      - cloud-monitoring-network
+
+  # Redis缓存服务（可选，用于Session存储等）
+  redis:
+    image: redis:7-alpine
+    container_name: cloud-monitoring-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --requirepass "redis123"
+    networks:
+      - cloud-monitoring-network
+
+  # Spring Boot应用服务
+  app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: cloud-monitoring-app
+    restart: unless-stopped
+    depends_on:
+      - mysql
+      - redis
+    environment:
+      # 数据库配置
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: cloud_monitoring_phase1
+      DB_USERNAME: cloudapp
+      DB_PASSWORD: cloudapp123
+
+      # Redis配置
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: redis123
+
+      # 应用配置
+      SPRING_PROFILES_ACTIVE: docker
+      TZ: Asia/Shanghai
+
+      # JVM参数
+      JAVA_OPTS: "-Xms256m -Xmx512m -Dfile.encoding=UTF-8"
+    ports:
+      - "8080:8080"
+    volumes:
+      - app_logs:/opt/logs
+      - app_uploads:/opt/uploads
+    networks:
+      - cloud-monitoring-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/health/check"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+# 网络配置
+networks:
+  cloud-monitoring-network:
+    driver: bridge
+    name: cloud-monitoring-net
+
+# 数据卷配置
+volumes:
+  mysql_data:
+    name: cloud-monitoring-mysql-data
+  redis_data:
+    name: cloud-monitoring-redis-data
+  app_logs:
+    name: cloud-monitoring-app-logs
+  app_uploads:
+    name: cloud-monitoring-app-uploads
