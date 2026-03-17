@@ -20,7 +20,8 @@
       "Bash(xargs -I{} sed -i '' 's/Vendor C/Vendor C/g' \"{}\")",
       "Bash(xargs -I{} sed -i '' 's/vendor-b/vendor-b/g' \"{}\")",
       "Bash(xargs -I{} sed -i '' 's/vendor-a/vendor-a/g' \"{}\")",
-      "Bash(git mv:*)"
+      "Bash(git mv:*)",
+      "Bash(git rm:*)"
     ],
     "deny": [],
     "ask": []
