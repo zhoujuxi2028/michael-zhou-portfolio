@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(if [ -f \"config/.env\" ])",
+      "Bash(then echo \"✅ config/.env 文件存在\")",
+      "Bash(else echo \"❌ config/.env 文件不存在\")",
+      "Bash(fi)",
+      "Bash(CONFIG_DIR=\"./config\")",
+      "Bash(echo:*)",
+      "Bash(if [ -f \"$CONFIG_DIR/.env\" ])",
+      "Bash(then echo \"✅ 使用脚本路径可以找到配置文件\")",
+      "Bash(else echo \"❌ 使用脚本路径找不到配置文件\")",
+      "Bash(then echo \"📂 加载 .env 文件...\")",
+      "Bash(set -a)",
+      "Bash(source \"$CONFIG_DIR/.env\")",
+      "Bash(set +a)",
+      "Bash(else echo \"❌ 配置文件不存在\")",
+      "Bash(./scripts/run_query.sh:*)",
+      "Bash(tree:*)",
+      "Bash(mv:*)",
+      "Bash(rm:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

@@ -1,6 +1,0 @@
-[0;32m[SUCCESS][0m 目录结构创建完成
-[0;34m[INFO][0m 检查运行环境...
-[0;32m[SUCCESS][0m Java版本: 21.0.8
-[0;34m[INFO][0m 检查业务依赖库...
-[0;31m[ERROR][0m 业务依赖库未找到: ctg-ag-sdk-core-2.9.0-20251210.111829-4.jar
-[0;31m[ERROR][0m 请确认路径: /Users/michael_zhou/Documents/ZCT/github/Cloud-Monitoring-Platform/protoType/lib/ctg-ag-sdk-core-2.9.0-20251210.111829-4.jar

@@ -1,0 +1,38 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat:*)",
+      "Bash(find:*)",
+      "Bash(git add:*)",
+      "Bash(mkdir:*)",
+      "Bash(chmod:*)",
+      "Bash(open:*)",
+      "Bash(docker --version)",
+      "Bash(docker info:*)",
+      "Bash(docker-compose:*)",
+      "Bash(git commit:*)",
+      "Bash(docker pull:*)",
+      "Bash(git ls-tree:*)",
+      "Bash(git push:*)",
+      "Bash(mvn clean compile:*)",
+      "Bash(docker system prune:*)",
+      "Bash(timeout 300s docker pull mysql:8-debian)",
+      "Bash(docker version:*)",
+      "Bash(docker exec:*)",
+      "Bash(mvn spring-boot:run:*)",
+      "Bash(curl:*)",
+      "Bash(tree:*)",
+      "Bash(./run.sh:*)",
+      "Bash(mvn exec:java:*)",
+      "Bash(jar:*)",
+      "Bash(javap:*)",
+      "Bash(java:*)",
+      "Bash(mvn:*)",
+      "Bash(./test-scenarios.sh:*)",
+      "mcp__thinking__sequentialthinking",
+      "Bash(javac:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

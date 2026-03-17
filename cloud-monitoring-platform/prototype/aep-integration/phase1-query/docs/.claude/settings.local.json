@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git rm:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\ndocs: 合并AEP SDK文档为单一README\n\n将三个文档（PROJECT_SUMMARY.md, README.md, SECURITY_CONFIG.md）合并为一个精简的README.md文档：\n- 使用.env文件配置环境变量（替代~/.bashrc）\n- 保留核心功能说明和快速开始指南\n- 移除冗余内容，只保留重点信息\n- 删除独立的安全配置和项目总结文档\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push:*)",
+      "Bash(git checkout:*)",
+      "Bash(git commit:*)",
+      "Bash(javac:*)",
+      "Bash(java:*)",
+      "Bash(source:*)",
+      "Bash(echo:*)",
+      "Bash(export AEP_APP_KEY=CIj7aTFV1R9)",
+      "Bash(export AEP_APP_SECRET=zGEm97sb5M)",
+      "Bash(find:*)",
+      "Bash(AEP_APP_KEY=test_key AEP_APP_SECRET=test_secret AEP_API_HOST=test.api.ctwing.cn AEP_APP_ID=267848 java:*)",
+      "Bash(jar:*)",
+      "Bash(chmod:*)",
+      "Bash(./run.sh:*)",
+      "mcp__thinking__sequentialthinking",
+      "Bash(./scripts/run_enhanced.sh:*)",
+      "Bash(./scripts/build.sh:*)",
+      "Bash(git tag:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

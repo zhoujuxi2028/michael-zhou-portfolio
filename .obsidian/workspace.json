@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "protoType/aep-integration/phase1.1-export/docs/deployment/WINDOWS_GUIDE.md",
+                "file": "README.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "WINDOWS_GUIDE"
+              "title": "README"
             }
           }
         ]
@@ -44,7 +44,7 @@
                 "autoReveal": false
               },
               "icon": "lucide-folder-closed",
-              "title": "文件列表"
+              "title": "Files"
             }
           },
           {
@@ -174,51 +174,52 @@
   },
   "left-ribbon": {
     "hiddenItems": {
-      "bases:新建数据库": false,
-      "switcher:打开快速切换": false,
-      "graph:查看关系图谱": false,
-      "canvas:新建白板": false,
-      "daily-notes:打开/创建今天的日记": false,
-      "templates:插入模板": false,
-      "command-palette:打开命令面板": false
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
     }
   },
   "active": "0d6626f27455e73d",
   "lastOpenFiles": [
-    "protoType/aep-integration/phase1.1-export/docs/development/SETUP.md",
-    "protoType/aep-integration/phase1.1-export/docs/testing/GUIDE.md",
-    "protoType/aep-integration/phase1.1-export/docs/CHANGELOG.md",
-    "protoType/aep-integration/phase1.1-export/docs/README.md",
-    "protoType/aep-integration/phase1.1-export/logs/aep-export-20260126-103407.log",
-    "protoType/aep-integration/phase1.1-export/logs/aep-export-20260126-103400.log",
-    "protoType/aep-integration/phase1.1-export/target/aep-data-exporter-1.0.0.jar",
-    "protoType/aep-integration/phase1.1-export/target/maven-archiver/pom.properties",
-    "protoType/aep-integration/phase1.1-export/target/maven-archiver",
-    "protoType/aep-integration/phase1.1-export/target/test-classes/sdk/SDKMethodTest.class",
-    "protoType/aep-integration/phase1.1-export/target/test-classes/sdk",
-    "protoType/aep-integration/phase1.1-export/target/test-classes/com/aep/export/AepDataExporterConfigTest.class",
-    "protoType/aep-integration/phase1.1-export/target/test-classes/com/aep/export/model/ProductInfoTest.class",
-    "protoType/aep-integration/phase1.1-export/target/test-classes/com/aep/export/model/SimpleProductInfoTest.class",
-    "protoType/aep-integration/phase2-registration/docs/API_TESTING_RESULTS.md",
-    "protoType/aep-integration/phase1.1-export/reports/test_execution_report_20260126_095745.md",
-    "protoType/aep-integration/phase1.1-export/reports/test_execution_report_20260126_094423.md",
-    "protoType/aep-integration/phase2-registration/docs/MYSQL_96_FEATURES.md",
-    "protoType/aep-integration/phase2-registration/CLEANUP_INSTRUCTIONS.md",
-    "protoType/aep-integration/phase2-registration/docs/REAL_AEP_TEST_OPERATIONS_LOG.md",
-    "protoType/aep-integration/phase2-registration/docs/DATABASE_DEPLOYMENT_GUIDE.md",
-    "protoType/aep-integration/phase2-registration/docs/DATABASE_DESIGN.md",
-    "protoType/aep-integration/phase2-registration/DELIVERABLES_SUMMARY.md",
-    "protoType/aep-integration/phase1.1-export/docs/bugs/WIN_ERRORS.md",
-    "protoType/aep-integration/phase2-registration/docs/user-manual.md",
-    "protoType/aep-integration/phase2-registration/docs/test-design.md",
-    "protoType/aep-integration/phase2-registration/docs/DATABASE_GUIDE.md",
-    "protoType/aep-integration/phase1.1-export/docs/UPGRADES.md",
-    "protoType/aep-integration/phase1.1-export/docs/archive/BUGS_SUMMARY.md",
-    "protoType/aep-integration/phase1.1-export/docs/development/TROUBLESHOOTING.md",
-    "protoType/aep-integration/phase2-registration/docs/development-guide.md",
-    "protoType/aep-integration/phase1.1-export/docs/WINDOWS_DEPLOYMENT_GUIDE.md",
-    "protoType/aep-integration/phase1.1-export/docs/deployment/WINDOWS_GUIDE.md",
-    "protoType/aep-integration/phase2-registration/docs/integration-specification.md",
-    "protoType/aep-integration/phase2-registration/docs/architecture-design.md"
+    "cloud-monitoring-platform/README.md",
+    "cloud-monitoring-platform/CLAUDE.md",
+    "cloud-monitoring-platform/docs/云监控系统项目选择分析报告.md",
+    "cloud-monitoring-platform/docs",
+    "cloud-monitoring-platform/reference/data/devices/2025-12-23/设备注册1765251714464-2025-12-23.xlsx",
+    "cloud-monitoring-platform/reference/data/devices/2025-12-23/excel_imei_analysis_corrected_20251223.md",
+    "cloud-monitoring-platform/reference/api-online-editor/deviceList-organized/examples/usage-demo.js",
+    "cloud-monitoring-platform/reference/api-online-editor/deviceList-organized/examples/stats.js",
+    "cloud-monitoring-platform/reference/api-online-editor/deviceList-organized/examples/parser.js",
+    "cloud-monitoring-platform/reference/api-online-editor/deviceList-organized/examples/filter.js",
+    "cloud-monitoring-platform/reference/api-online-editor/deviceList-organized/docs/status-codes.md",
+    "cloud-monitoring-platform/reference/api-online-editor/deviceList-organized/docs/field-reference.md",
+    "cloud-monitoring-platform/reference/analysis/gap_analysis/working/imei_wu_sorted.txt",
+    "cloud-monitoring-platform/reference/analysis/gap_analysis/working/imei_lte_sorted.txt",
+    "cloud-monitoring-platform/reference/analysis/gap_analysis/working/imei_from_wu.txt",
+    "cloud-monitoring-platform/reference/analysis/gap_analysis/working/imei_from_lte.txt",
+    "cloud-monitoring-platform/reference/analysis/gap_analysis/working/imei_duplicate_analysis_20241222.md",
+    "cloud-monitoring-platform/reference/api-online-editor/deviceList-organized/SUMMARY.md",
+    "cloud-monitoring-platform/reference/api-online-editor/deviceList-organized/README.md",
+    "cloud-monitoring-platform/reference/267848_sdk/src/Readme.md",
+    "cloud-monitoring-platform/reference/267848_sdk/doc/ApiDocument_物联网应用数据分析_tenant_app_statistics.md",
+    "cloud-monitoring-platform/reference/267848_sdk/doc/ApiDocument_感知终端数据分析_tenant_device_statistics.md",
+    "cloud-monitoring-platform/reference/267848_sdk/doc/ApiDocument_MQ订阅推送管理_aep_mq_sub.md",
+    "cloud-monitoring-platform/reference/267848_sdk/doc/ApiDocument_AEP远程控制_aep_device_control.md",
+    "cloud-monitoring-platform/reference/267848_sdk/doc/ApiDocument_AEP边缘网关接入_aep_edge_gateway.md",
+    "cloud-monitoring-platform/reference/267848_sdk/doc/ApiDocument_AEP软件升级管理_aep_software_upgrade_management.md",
+    "cloud-monitoring-platform/reference/267848_sdk/doc/ApiDocument_AEP设备管理_modbus_aep_modbus_device_management.md",
+    "cloud-monitoring-platform/reference/267848_sdk/doc/ApiDocument_AEP设备管理_aep_device_management.md",
+    "cloud-monitoring-platform/reference/267848_sdk/doc/ApiDocument_AEP设备档案_device_archives.md",
+    "cloud-monitoring-platform/reference/267848_sdk/doc/ApiDocument_AEP订阅管理_aep_subscribe_north.md",
+    "cloud-monitoring-platform/reference/267848_sdk/doc/ApiDocument_AEP规则引擎_aep_rule_engine.md",
+    "cloud-monitoring-platform/reference/267848_sdk/doc/ApiDocument_AEP物模型管理_aep_device_model.md",
+    "cloud-monitoring-platform/reference/267848_sdk/doc/ApiDocument_AEP标准物模型管理_aep_standard_management.md",
+    "cloud-monitoring-platform/reference/267848_sdk/doc/ApiDocument_AEP数据查询_aep_device_status.md",
+    "cloud-monitoring-platform/reference/267848_sdk/doc/ApiDocument_AEP指令下发_指令取消_aep_device_command_cancel.md",
+    "cloud-monitoring-platform/reference/267848_sdk/doc/ApiDocument_AEP指令下发_modbus_aep_command_modbus.md"
   ]
 }

@@ -1,0 +1,125 @@
+/**
+ * 产品列表API响应数据
+ * Product List API Response
+ * 更新时间: 2024-12-26
+ */
+{
+  // 响应状态码 (0=成功)
+  "code": "0",
+
+  // 响应消息
+  "msg": "ok",
+
+  // 分页和产品列表数据
+  "result": {
+    "pageNum": 1,           // 当前页码
+    "pageSize": 100,        // 每页大小
+    "total": 2,             // 总记录数
+
+    // 产品列表
+    "list": [
+      {
+        // === 产品基本信息 ===
+        "productId": 16980130,                    // 产品ID
+        "productName": "RepeaterLTE01",           // 产品名称
+        "tenantId": "10433748",                   // 租户ID
+        "productDesc": "",                        // 产品描述
+
+        // === 产品分类 ===
+        "productType": 6001,                      // 主分类: 智慧城市
+        "secondaryType": 5002,                    // 次分类: 公共服务
+        "thirdType": 113271,                      // 三级分类: 4G通信模组
+        "productTypeValue": "智慧城市",
+        "secondaryTypeValue": "公共服务",
+        "thirdTypeValue": "4G通信模组",
+
+        // === 通信协议配置 ===
+        "productProtocol": 2,                     // 产品协议类型
+        "authType": 1,                           // 认证类型
+        "payloadFormat": 2,                      // 负载格式
+        "networkType": 2,                        // 网络类型
+        "encryptionType": 1,                     // 加密类型
+        "dataEncryption": 5,                     // 数据加密方式
+
+        // === 设备管理 ===
+        "deviceCount": 532,                      // 设备总数
+        "apiKey": "7f1417fbecad4934bdcfe301c302fa3f",  // API密钥
+        "tupDeviceModel": "Repeater4G_BIN",      // 设备型号
+
+        // === 访问配置 ===
+        "accessType": 1,                         // 接入类型
+        "nodeType": 1,                           // 节点类型
+        "tupIsThrough": 1,                       // 是否透传
+
+        // === 时间戳 ===
+        "createTime": 1698715794000,             // 创建时间 (Unix时间戳)
+        "updateTime": 1699583349000,             // 更新时间 (Unix时间戳)
+
+        // === 创建者信息 ===
+        "createBy": "jszc13305144841",           // 创建者
+        "updateBy": null,                        // 更新者
+
+        // === 其他配置 ===
+        "endpointFormat": null,                  // 端点格式
+        "powerModel": null,                      // 功耗模型
+        "rootCert": null,                        // 根证书
+        "tupDeviceType": "",                     // 设备类型
+        "lwm2mEdrxTime": null,                   // LWM2M eDRX时间
+        "categoryId": null,                      // 分类ID
+        "categoryName": null,                    // 分类名称
+        "msgParserMode": null                    // 消息解析模式
+      },
+      {
+        // === 产品基本信息 ===
+        "productId": 16857118,                    // 产品ID
+        "productName": "RepeaterLTE",             // 产品名称
+        "tenantId": "10433748",                   // 租户ID
+        "productDesc": "",                        // 产品描述
+
+        // === 产品分类 ===
+        "productType": 6001,                      // 主分类: 智慧城市
+        "secondaryType": 5002,                    // 次分类: 公共服务
+        "thirdType": 13079,                       // 三级分类: 5G通信模组
+        "productTypeValue": "智慧城市",
+        "secondaryTypeValue": "公共服务",
+        "thirdTypeValue": "5G通信模组",
+
+        // === 通信协议配置 ===
+        "productProtocol": 2,                     // 产品协议类型
+        "authType": 1,                           // 认证类型
+        "payloadFormat": 2,                      // 负载格式
+        "networkType": 2,                        // 网络类型
+        "encryptionType": 1,                     // 加密类型
+        "dataEncryption": 5,                     // 数据加密方式
+
+        // === 设备管理 ===
+        "deviceCount": 892,                      // 设备总数
+        "apiKey": "521e0d76d0024539a9718abb3e4f64cc",  // API密钥
+        "tupDeviceModel": "RepeaterLTE_BIN",     // 设备型号
+
+        // === 访问配置 ===
+        "accessType": 1,                         // 接入类型
+        "nodeType": 1,                           // 节点类型
+        "tupIsThrough": 1,                       // 是否透传
+
+        // === 时间戳 ===
+        "createTime": 1689162273000,             // 创建时间 (Unix时间戳)
+        "updateTime": 1689216294000,             // 更新时间 (Unix时间戳)
+
+        // === 创建者信息 ===
+        "createBy": "jszc13305144841",           // 创建者
+        "updateBy": null,                        // 更新者
+
+        // === 其他配置 ===
+        "endpointFormat": null,                  // 端点格式
+        "powerModel": null,                      // 功耗模型
+        "rootCert": null,                        // 根证书
+        "tupDeviceType": "",                     // 设备类型
+        "lwm2mEdrxTime": null,                   // LWM2M eDRX时间
+        "categoryId": null,                      // 分类ID
+        "categoryName": null,                    // 分类名称
+        "msgParserMode": null                    // 消息解析模式
+      }
+    ]
+  }
+}

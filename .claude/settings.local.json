@@ -15,7 +15,12 @@
       "Bash(git checkout:*)",
       "Bash(find:*)",
       "Bash(git init:*)",
-      "Bash(git config:*)"
+      "Bash(git config:*)",
+      "Bash(xargs -I{} sed -i '' 's/Vendor C/Vendor C/g' \"{}\")",
+      "Bash(xargs -I{} sed -i '' 's/Vendor C/Vendor C/g' \"{}\")",
+      "Bash(xargs -I{} sed -i '' 's/vendor-b/vendor-b/g' \"{}\")",
+      "Bash(xargs -I{} sed -i '' 's/vendor-a/vendor-a/g' \"{}\")",
+      "Bash(git mv:*)"
     ],
     "deny": [],
     "ask": []
