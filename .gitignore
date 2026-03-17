@@ -1,0 +1,13 @@
+# IDE / Editor
+.obsidian/
+.vscode/
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# OS
+.DS_Store
+
+# Swap files
+*.swp
+*.swo
