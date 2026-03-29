@@ -39,10 +39,10 @@ CRC32/大小对比（`jar tvf` 差异输出）：
 
 ## 4. 密码兼容性验证
 
-| 测试 | 结果 |
-|------|------|
-| 用 `Huawei@123` 读取新 ca.jks | **成功** — 正常列出证书内容 |
-| 用错误密码读取新 ca.jks | **失败** — `Keystore was tampered with, or password was incorrect` |
+| 测试                        | 结果                                                               |
+| ------------------------- | ---------------------------------------------------------------- |
+| 用 `Huawei@123` 读取新 ca.jks | **成功** — 正常列出证书内容                                                |
+| 用错误密码读取新 ca.jks           | **失败** — `Keystore was tampered with, or password was incorrect` |
 
 密码 `Huawei@123` 与代码中 `Constant.TRUSTCAPWD` 硬编码值一致，**不存在密码不可用问题**。
 
@@ -57,25 +57,6 @@ CRC32/大小对比（`jar tvf` 差异输出）：
 | SKI | `70:6A:B2:E7:DA:1A:C0:B1:20:32:5D:B5:FF:FE:C5:E5:1C:80:06:9C` | **相同** |
 | 有效期 | 2016-05-04 ~ **2026-05-02** | 2026-01-27 ~ **2036-01-25** |
 | 条目数 | 2（含已过期 GlobalSign） | 1（仅 Huawei IOT） |
-
-## 6. 替换操作记录
-
-```bash
-# Step 1: 复制原始 JAR
-cp zhongcheng-1.0.2-SNAPSHOT.jar zhongcheng-1.0.2-SNAPSHOT-new-ca.jar
-
-# Step 2: 准备新证书目录结构
-mkdir -p patch/BOOT-INF/classes/cert
-cp 新CA证书及新SDK/ca.jks patch/BOOT-INF/classes/cert/ca.jks
-
-# Step 3: 执行替换（无输出 = 成功，exit code 0）
-cd patch && jar uf ../zhongcheng-1.0.2-SNAPSHOT-new-ca.jar BOOT-INF/classes/cert/ca.jks
-
-# Step 4: 验证
-jar xf zhongcheng-1.0.2-SNAPSHOT-new-ca.jar BOOT-INF/classes/cert/ca.jks
-md5 -q BOOT-INF/classes/cert/ca.jks
-keytool -list -v -keystore BOOT-INF/classes/cert/ca.jks -storepass 'Huawei@123'
-```
 
 ## 7. 结论
 
