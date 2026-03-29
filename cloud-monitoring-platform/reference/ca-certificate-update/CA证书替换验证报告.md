@@ -14,7 +14,7 @@
 | 文件名 | `zhongcheng-1.0.2-SNAPSHOT.jar` | `zhongcheng-1.0.2-SNAPSHOT-new-ca.jar` |
 | 大小 | 69MB | 69MB |
 | 条目数 | 682 | 682 |
-| MD5 | `f03181145dc0ea064184ccc7948ca0f5` | 替换后生成 |
+| MD5 | `f03181145dc0ea064184ccc7948ca0f5` | `eb3bbdd6386ae558dc61bbbb6453095a` |
 
 ## 2. 唯一差异：仅 ca.jks 被替换
 
