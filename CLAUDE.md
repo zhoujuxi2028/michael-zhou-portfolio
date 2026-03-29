@@ -17,3 +17,9 @@ This is a multi-project portfolio repository. Each subdirectory is an independen
 - Each project has its own `CLAUDE.md` with project-specific build commands and architecture details
 - Vendor references use anonymized names (Vendor A, Vendor B, Vendor C) for information security
 - Navigate to the specific project directory before running any build/dev commands
+
+## Python Usage
+
+- This macOS environment is externally managed (PEP 668), do NOT use `pip install` directly
+- Always use a virtual environment (`python3 -m venv`) for any Python dependencies
+- Recommended venv location: `/tmp/<purpose>_env` for temporary/one-off scripts
