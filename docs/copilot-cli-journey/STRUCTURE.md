@@ -14,10 +14,10 @@ docs/learning/
 │  │  ├── M1-copilot-cli-basics.md
 │  │  ├── M2-prompting-fundamentals.md
 │  │  └── M3-cli-ecosystem.md
-│  ├── phase2/                       🔨 占位符
-│  │  ├── M4-test-generation.md
-│  │  ├── M5-doc-generation.md
-│  │  └── M6-code-review-workflow.md
+│  ├── phase2/                       ✅ M4 完成 / 🔨 M5-M6 进行中
+│  │  ├── M4-test-generation.md      ✅ COMPLETE (41 tests, 100% coverage)
+│  │  ├── M5-doc-generation.md       👷 IN PREPARATION
+│  │  └── M6-code-review-workflow.md 📋 PLANNED
 │  ├── phase3/                       🔨 占位符
 │  │  ├── M7-context-management.md
 │  │  ├── M8-workflow-integration.md
@@ -39,14 +39,21 @@ docs/learning/
 │  │  ├── PHASE1-REVIEW-REQUEST.md
 │  │  ├── PHASE1-REVIEW-FEEDBACK-LOG.md
 │  │  └── PRE-REVIEW-CHECKLIST.md
-│  ├── phase2/                       📋 占位符
+│  ├── phase2/                       ✅ M4 完成 / 🔨 M5-M6 进行中
+│  │  ├── M4-RESOURCE-INDEX.md       新文件：M4 资源导航索引
+│  │  ├── M4-COMPLETION-SUMMARY.md
+│  │  ├── M4-MIGRATION-COMPLETE.md
+│  │  ├── prompts/                   Copilot 提示词库
+│  │  └── ...其他文档
 │  ├── phase3/                       📋 占位符
 │  ├── phase4/                       📋 占位符
 │  └── phase5/                       📋 占位符
 │
 └── 📁 examples/                     ← 代码示例和脚本
    ├── phase1/                       📝 待补充
-   ├── phase2/                       📝 占位符
+   ├── phase2/                       ✅ M4 完成
+   │  ├── jest-demo/                41 tests, 100% coverage
+   │  └── pytest-demo/              20 tests, 100% coverage
    ├── phase3/                       📝 占位符
    ├── phase4/                       📝 占位符
    └── phase5/                       📝 占位符
@@ -78,4 +85,4 @@ docs/learning/
 
 ---
 
-*最后更新：2026-04-14*
+*最后更新：2026-04-15* — M4 完成，资源整合

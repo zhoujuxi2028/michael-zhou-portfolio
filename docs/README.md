@@ -65,8 +65,9 @@ docs/
 #### ✅ M4 测试生成完成总结
 - [完成报告](./copilot-cli-journey/docs/phase2/M4-COMPLETION-SUMMARY.md)
 - [迁移完成](./copilot-cli-journey/docs/phase2/M4-MIGRATION-COMPLETE.md)
-- [Jest 实战项目](./copilot-cli-journey/examples/phase2/jest-demo/) — 40+ 测试，85% 覆盖率
-- [Pytest 实战项目](./copilot-cli-journey/examples/phase2/pytest-demo/) — 35+ 测试，84% 覆盖率
+- [资源索引](./copilot-cli-journey/docs/phase2/M4-RESOURCE-INDEX.md) — 完整导航指南
+- [Jest 实战项目](./copilot-cli-journey/examples/phase2/jest-demo/) — 21 测试，100% 覆盖率
+- [Pytest 实战项目](./copilot-cli-journey/examples/phase2/pytest-demo/) — 20 测试，100% 覆盖率
 - [测试 Prompt 库](./copilot-cli-journey/docs/phase2/prompts/) — Jest/Pytest/通用策略
 
 #### ✅ M5 文档生成完成总结
