@@ -1,0 +1,43 @@
+场景 3: 代码重构 - 工具函数整合
+
+Modified files:
+- src/utils/validators.js (MODIFIED)
+- src/utils/formatters.js (MODIFIED)
+- src/utils/helpers.js (DELETED)
+- src/utils/index.js (NEW)
+
+重构目标:
+- 消除 3 个工具文件中的代码重复
+- 提高代码可复用性
+- 改善代码组织和可维护性
+
+修改详情:
+
+原始状态:
+- src/utils/validators.js: 45 行，8 个验证函数，重复代码 5 行
+- src/utils/formatters.js: 38 行，6 个格式化函数，重复代码 4 行
+- src/utils/helpers.js: 32 行，5 个辅助函数，重复代码 3 行
+- 总计: 115 行，代码重复率 15%
+
+新增: src/utils/index.js
+- 统一导出所有工具函数
+- 12 个函数按功能分类
+- 代码重复率降低到 8%
+- 减少行数 8%（从 115 行降到 105 行）
+
+变更内容:
+- 提取 12 个通用工具函数
+- 删除了 5 个重复的 helper 函数
+- 统一了错误处理的方式
+- 改进了函数命名和参数规范
+
+影响评估:
+✓ 所有 22 个既有单元测试仍然通过
+✓ 代码行数减少 8%
+✓ 代码重复率从 15% 降到 8%
+✓ 模块间依赖关系更清晰
+✓ 新开发人员理解成本降低 20%
+
+注意:
+- 这是一个纯重构，无功能变更
+- 向后兼容，所有导出的 API 保持不变

@@ -1,0 +1,47 @@
+场景 4: 文档更新 - API 文档和部署指南
+
+Modified files:
+- docs/API.md (MODIFIED)
+- docs/SETUP.md (MODIFIED)
+- README.md (MODIFIED)
+
+更新目标:
+- 补充 OpenAPI/Swagger 规范
+- 增强部署指南的完整性
+- 改进新用户入门体验
+
+修改详情:
+
+文件: docs/API.md
++ 添加了完整的 OpenAPI 3.0 规范
++ 文档从 25 行扩展到 120 行
++ 记录了 8 个 REST 端点的详细信息:
+  - GET /api/users - 获取用户列表
+  - POST /api/auth/login - 用户登录
+  - POST /api/auth/logout - 用户登出
+  - GET /api/auth/profile - 获取用户信息
+  - 等等...
++ 每个端点包含:
+  - 请求/响应格式
+  - 错误代码说明
+  - 使用示例
+  - 认证要求
+
+文件: docs/SETUP.md
++ 添加了 Docker 容器化部署说明
++ 添加了 npm 和 Docker 两种安装方法
++ 新增：环境变量配置指南
++ 新增：数据库初始化步骤
++ 新增：常见问题 (FAQ) 部分
+
+文件: README.md
++ 添加了认证流程的 UML 图表
++ 添加了快速开始指南链接
++ 改进了功能列表的清晰度
++ 添加了贡献指南链接
+
+总结:
+- 文档行数增加 200+ 行
+- 覆盖了用户从安装到认证的全流程
+- 包含实际的代码示例和错误排查指南
+- 提高了项目的可用性和可维护性
