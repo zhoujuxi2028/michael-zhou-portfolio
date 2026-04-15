@@ -15,7 +15,7 @@ docs/learning/
 │  │  ├── M2-prompting-fundamentals.md
 │  │  └── M3-cli-ecosystem.md
 │  ├── phase2/                       ✅ M4 完成 / 🔨 M5-M6 进行中
-│  │  ├── M4-test-generation.md      ✅ COMPLETE (41 tests, 95%+ coverage)
+│  │  ├── M4-test-generation.md      ✅ COMPLETE (41 tests total: Jest 95%+, Pytest 82-85%+)
 │  │  ├── M5-doc-generation.md       👷 IN PREPARATION
 │  │  └── M6-code-review-workflow.md 📋 PLANNED
 │  ├── phase3/                       🔨 占位符
