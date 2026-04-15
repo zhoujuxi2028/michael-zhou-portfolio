@@ -13,8 +13,8 @@
 - `docs/phase2/M4-MIGRATION-COMPLETE.md` - 迁移状态 (Migration status)
 
 ### 代码示例 (Code Examples)
-- `examples/phase2/jest-demo/` - Jest 项目 (21 tests, 100% coverage)
-- `examples/phase2/pytest-demo/` - Pytest 项目 (20 tests, 100% coverage)
+- `examples/phase2/jest-demo/` - Jest 项目 (21 tests, 95%+ coverage)
+- `examples/phase2/pytest-demo/` - Pytest 项目 (20 tests, 82-85%+ coverage)
 
 ### Copilot 提示词库 (Copilot Prompts Library)
 - `docs/phase2/prompts/M4-jest-prompts.md`

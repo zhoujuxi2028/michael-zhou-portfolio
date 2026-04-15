@@ -15,7 +15,7 @@ docs/learning/
 │  │  ├── M2-prompting-fundamentals.md
 │  │  └── M3-cli-ecosystem.md
 │  ├── phase2/                       ✅ M4 完成 / 🔨 M5-M6 进行中
-│  │  ├── M4-test-generation.md      ✅ COMPLETE (41 tests, 100% coverage)
+│  │  ├── M4-test-generation.md      ✅ COMPLETE (41 tests, 95%+ coverage)
 │  │  ├── M5-doc-generation.md       👷 IN PREPARATION
 │  │  └── M6-code-review-workflow.md 📋 PLANNED
 │  ├── phase3/                       🔨 占位符
@@ -52,8 +52,8 @@ docs/learning/
 └── 📁 examples/                     ← 代码示例和脚本
    ├── phase1/                       📝 待补充
    ├── phase2/                       ✅ M4 完成
-   │  ├── jest-demo/                41 tests, 100% coverage
-   │  └── pytest-demo/              20 tests, 100% coverage
+   │  ├── jest-demo/                21 tests, 95%+ coverage
+   │  └── pytest-demo/              20 tests, 82-85%+ coverage
    ├── phase3/                       📝 占位符
    ├── phase4/                       📝 占位符
    └── phase5/                       📝 占位符
