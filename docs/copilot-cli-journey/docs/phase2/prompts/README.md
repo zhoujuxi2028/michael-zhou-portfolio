@@ -1,77 +1,169 @@
-# Prompt 模板库
+# Phase 2 Prompt 模板库
 
-**位置**: Phase 2 — M5 文档生成工作流的 Prompt 实战  
-**当前覆盖**: Python Google Docstring  
-**模板数量**: 6 个  
-**状态**: ✅ M5 完成
+> GitHub Copilot CLI 深度学习路径 Phase 2 的所有 Prompt 模板和最佳实践
 
 ---
 
-## 📋 可复用 Prompt 模板
+## 📚 模板库概览
 
-### Python Google Docstring Prompts (6 个)
-
-位置: [`python-google-docstring.md`](./python-google-docstring.md)
-
-| # | 方法 | 功能 | 难度 |
-|---|------|------|------|
-| 1 | `saml_login()` | SAML 2.0 SSO 认证 | 🟡 中 |
-| 2 | `oidc_login()` | OAuth 2.0 + OIDC 认证 | 🟡 中 |
-| 3 | `ldap_search()` | LDAP 目录搜索 | 🟠 高 |
-| 4 | `evaluate_device()` | Zero Trust 设备评估 | 🟠 高 |
-| 5 | `create_session()` | 用户会话管理 | 🟢 低 |
-| 6 | `mfa_verify()` | 多因素认证验证 | 🟡 中 |
-
-**每个 Prompt 包含**:
-- ✅ 完整的函数代码
-- ✅ 详细的 Copilot CLI 调用命令
-- ✅ 生成的 Google 风格 Docstring
-- ✅ 最佳实践注解
+| 模块 | 标题 | 模板数 | 行数 | 说明 |
+|------|------|--------|------|------|
+| **M4** | 测试代码生成 | 12 | 1,000+ | Jest、Pytest、通用策略 |
+| **M5** | 文档生成 | 9 | 734 | Docstring、API、README、测试文档 |
+| **M6** | 代码审查 | - | - | 待启动 |
 
 ---
 
-## 🚀 已计划的 Prompt 库
+## 🎯 M4 测试生成 Prompt 模板
 
-| Module | 类型 | 预计模板数 | 状态 |
-|--------|------|----------|------|
-| **M5** | Python Docstring | 6 | ✅ 完成 |
-| **M4** | Jest 测试生成 | 5 | 🔄 进行中 |
-| **M4** | Pytest 测试生成 | 5 | 🔄 进行中 |
-| **M6** | 代码审查 | 5+ | ⏳ 筹划中 |
-| **M6** | PR 描述生成 | 3+ | ⏳ 筹划中 |
+### 文件列表
+1. **M4-jest-prompts.md** (5 个 Jest 测试模板)
+   - T1: 简单函数测试
+   - T2: 异步函数测试
+   - T3: 错误处理测试
+   - T4: 集成测试
+   - T5: 覆盖率优化
+
+2. **M4-pytest-prompts.md** (5 个 Pytest 测试模板)
+   - T1: 简单函数测试
+   - T2: Fixture 使用
+   - T3: 参数化测试
+   - T4: Mock 和补丁
+   - T5: 异常测试
+
+3. **M4-prompting-strategy.md** (通用测试生成策略)
+   - 核心提示模板结构
+   - 常见错误及改进
+   - 快速参考表
+   - 质量评估清单
 
 ---
 
-## 💡 使用指南
+## 🎯 M5 文档生成 Prompt 模板
 
-### 快速使用
-1. 选择对应的 Prompt 文件
-2. 复制 Prompt 模板
-3. 根据你的代码调整参数
-4. 在 Copilot CLI 中运行
+### 文件列表
+**M5-doc-generation-prompts.md** (9 个文档生成模板)
 
-### 示例
-```bash
-# 使用 M5 Python Docstring Prompt
-copilot /code "你的代码" < prompt.md
+| 模板 | 名称 | 适用场景 | 风格 |
+|------|------|----------|------|
+| **T1** | 函数 Docstring | 单个函数 | Google |
+| **T2** | 类和方法 Docstring | Python 类 | Google |
+| **T3** | 多语言 Docstring | 中英文并注 | Google |
+| **T4** | FastAPI 路由 | REST API | OpenAPI |
+| **T5** | Flask 路由 | REST API | OpenAPI |
+| **T6** | README 快速版 | 项目介绍 | Markdown |
+| **T7** | README 完整版 | 完整文档 | Markdown |
+| **T8** | 测试文档 | 测试说明 | Google |
+| **T9** | 变更日志 | CHANGELOG | Markdown |
 
-# 或在 Copilot 对话中粘贴 Prompt
+### 特色
+- 9 个实用模板，即插即用
+- 包含预期输出示例
+- 高级模式：错误恢复策略
+- 快速参考表和质量检查清单
+
+---
+
+## 📁 完整文件结构
+
+```
+prompts/
+├── README.md                          ← 本文件
+├── M4-jest-prompts.md                 ✅ Jest 测试模板
+├── M4-pytest-prompts.md               ✅ Pytest 测试模板
+├── M4-prompting-strategy.md           ✅ 通用测试策略
+├── M5-doc-generation-prompts.md       ✅ 文档生成模板（9 个）
+└── M6-code-review-prompts.md          ⏳ 代码审查模板（筹划中）
 ```
 
-### 扩展
-- 可根据项目特点定制新的 Prompt
-- 建议维护项目内的 Prompt 库文件
+---
+
+## 🚀 快速开始
+
+### 选择你的任务
+
+**需要生成测试代码？**
+→ 查看 `M4-*` 系列文件
+
+**需要生成文档？**
+→ 查看 `M5-doc-generation-prompts.md`
+
+**需要进行代码审查？**
+→ 待 M6 启动
+
+### 使用 Prompt 模板
+
+1. **选择合适的模板** — 根据你的需求选择 T1-T9
+2. **定制 Prompt** — 将模板中的 [占位符] 替换为你的具体代码
+3. **在 Copilot CLI 中执行** — 使用 `copilot /generate` 或 `copilot /explain`
+4. **验证输出** — 检查生成结果是否满足要求
+5. **迭代改进** — 如果需要，调整 Prompt 并重试
 
 ---
 
-## 📚 相关文档
+## 📖 推荐阅读顺序
 
-- [M5 完成总结](../M5-COMPLETION-SUMMARY.md) — 学习成果总览
-- [Python Docstring Prompts](./python-google-docstring.md) — 完整 Prompt 库
-- [回到 Phase 2](../README.md)
+### 初学者
+1. `M4-prompting-strategy.md` — 理解通用的 Prompt 结构
+2. `M4-jest-prompts.md` 或 `M4-pytest-prompts.md` — 选择你用的框架
+3. `M5-doc-generation-prompts.md` — 学习文档生成
+
+### 进阶使用者
+1. 快速浏览所有 Prompt 模板的"常见错误"部分
+2. 学习"高级模式"和"错误恢复"部分
+3. 参考快速参考表快速查找
+
+---
+
+## 📊 Prompt 统计
+
+| 指标 | M4 | M5 | 总计 |
+|------|-----|-----|------|
+| 模板数量 | 12 | 9 | 21 |
+| 总行数 | 1,000+ | 734 | 1,734+ |
+| 包含示例 | 是 | 是 | - |
+| 包含错误恢复 | 是 | 是 | - |
+| 包含快速参考 | 是 | 是 | - |
+
+---
+
+## 💡 最佳实践
+
+### DO ✅
+- ✅ 在 Prompt 中明确指定输出格式
+- ✅ 提供具体的代码示例，不要泛泛而谈
+- ✅ 列出所有的边界情况或特殊场景
+- ✅ 验证 Copilot 的输出，不要无脑接受
+- ✅ 遇到问题时查看"常见错误"部分
+
+### DON'T ❌
+- ❌ 给出过于宽泛的 Prompt（如"写测试"）
+- ❌ 用占位符代替具体代码
+- ❌ 一个 Prompt 生成过多的代码
+- ❌ 忽视生成结果的质量
+- ❌ 对第一次失败放弃
+
+---
+
+## 🔗 相关资源
+
+### 理论学习
+- [M4 理论文档](../modules/phase2/M4-test-generation.md)
+- [M5 理论文档](../modules/phase2/M5-doc-generation.md)
+
+### 实战项目
+- [Jest 实战项目](../../examples/phase2/jest-demo/)
+- [Pytest 实战项目](../../examples/phase2/pytest-demo/)
+- [M5 Python 文档演示](../../examples/phase2/M5-python-doc-demo/)
+
+### 外部参考
+- [Google 风格指南](https://google.github.io/styleguide/pyguide.html)
+- [Jest 文档](https://jestjs.io/)
+- [Pytest 文档](https://docs.pytest.org/)
+- [OpenAPI 规范](https://swagger.io/specification/)
 
 ---
 
 **最后更新**: 2026-04-15  
-**维护者**: Michael Zhou  
-**版本**: 1.0
+**版本**: 1.0  
+**状态**: M4 ✅ + M5 ✅ + M6 ⏳
