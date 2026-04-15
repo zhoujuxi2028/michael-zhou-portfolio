@@ -38,6 +38,25 @@
 
 ---
 
+## ✅ M5 完成资源（✅ 100%）
+
+### 📄 完成报告
+- [M5 完成总结](./M5-COMPLETION-SUMMARY.md) — 文档生成工作流（556 行理论 + 734 行 Prompt + 575 行代码）
+
+### 🎯 Prompt 模板库
+位置: `./prompts/`
+
+- [M5 文档生成 Prompts](./prompts/M5-doc-generation-prompts.md) — 9 个文档生成 Prompt 模板（T1-T9）
+
+### 💻 实战项目
+位置: `../../examples/phase2/`
+
+| 项目 | 类型 | 代码行数 | Docstring 行数 | 描述 |
+|------|------|--------|--------|------|
+| [M5-python-doc-demo](../../examples/phase2/M5-python-doc-demo/) | Python | 575 | 165 | 电商折扣系统 + Docstring 演示 |
+
+---
+
 ## 🔄 M4 完成（✅ 100%）
 
 ### ✅ 完成项目
