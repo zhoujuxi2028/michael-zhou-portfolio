@@ -1,244 +1,150 @@
-# GitHub Copilot CLI 深度学习路径
+# GitHub Copilot CLI 学习资料总览
 
-🚀 **一套系统化的 Copilot CLI 学习知识库**，专为 QA 工程师和开发者设计。
-
-## 📖 学习计划概览
-
-| 方面 | 说明 |
-|------|------|
-| **目标** | 掌握 Copilot CLI 的进阶使用技能，将其集成到日常 QA 工作流 |
-| **周期** | 6 个月 (Week 1 - Week 12+) |
-| **模块数** | 15 个核心学习模块 |
-| **方向** | 30% 理论 + 70% 实战 |
-| **范围** | 聚焦 Copilot CLI 特有特性（不含 IDE 插件） |
+这里是仓库中 **GitHub Copilot CLI 深度学习路径** 的主入口，目标是把分散的学习材料整理成一套“**先看什么、再学什么、遇到问题去哪里找**”都很清楚的知识库。
 
 ---
 
-## 📚 学习路线图
+## 1. 这套资料适合谁
 
-### Phase 1: 核心基础 (Week 1-2)
-建立 Copilot CLI 的基础认知和操作能力。
-
-- **M1**: [Copilot CLI 基础](./modules/phase1/M1-copilot-cli-basics.md)
-  - 安装、认证、基础命令速查
-  - CLI vs IDE 插件的核心差异
-  
-- **M2**: [提示工程基础](./modules/phase1/M2-prompting-fundamentals.md)
-  - 指令格式、上下文提供方式
-  - 常见反模式 vs 最佳实践
-  
-- **M3**: [Copilot CLI 生态初探](./modules/phase1/M3-cli-ecosystem.md)
-  - Git 集成特性
-  - Shell 命令和文件操作
-
-### Phase 2: QA 工作流优化 (Week 3-4)
-将 Copilot 应用到测试、文档、审查工作中。
-
-- **M4**: [测试代码生成最佳实践](./modules/phase2/M4-test-generation.md)
-  - Pytest / Jest / Cypress 测试快速生成
-  - 测试覆盖率提升
-  
-- **M5**: [文档和注释生成工作流](./modules/phase2/M5-doc-generation.md)
-  - Docstring 和 API 文档自动化
-  - 测试用例文档补全
-  
-- **M6**: [代码审查加速](./modules/phase2/M6-code-review-workflow.md)
-  - 审查建议自动生成
-  - Git Workflow 集成
-
-### Phase 3: 高阶提示工程 (Week 5-6)
-掌握高级技巧，提升建议质量。
-
-- **M7**: [上下文管理与多文件交互](./modules/phase3/M7-context-management.md)
-  - 文件引用机制深度理解
-  - 跨文件推理优化
-  
-- **M8**: [自定义工作流与脚本集成](./modules/phase3/M8-workflow-integration.md)
-  - 编写辅助脚本
-  - CI/CD 系统集成
-  
-- **M9**: [调试与故障排查](./modules/phase3/M9-debugging.md)
-  - 识别和改进低质建议
-  - 提示优化的迭代方法
-
-### Phase 4: 项目集成案例 (Week 7-8)
-在真实项目中应用所学技能。
-
-- **M10**: [API 测试项目集成](./modules/phase4/M10-api-testing-integration.md)
-  - Newman / Postman 脚本自动化
-  - 案例：`api-testing-demo` 项目优化
-  
-- **M11**: [E2E 测试项目集成](./modules/phase4/M11-e2e-testing-integration.md)
-  - Cypress / Playwright 测试快速补全
-  - 案例：`playwright-demo` 或 `iwsva-cypress-e2e` 优化
-  
-- **M12**: [性能/稳定性测试集成](./modules/phase4/M12-perf-testing-integration.md)
-  - k6 / JMeter 脚本生成
-  - 案例：`performance-testing-platform` 优化
-
-### Phase 5: 进阶与扩展 (Week 9-12)
-探索前沿特性并总结最佳实践。
-
-- **M13**: [Copilot Workspace 探索](./modules/phase5/M13-copilot-workspace.md)
-  - Workspace 协作特性
-  - Git 深度集成
-  
-- **M14**: [团队工作流标准化](./modules/phase5/M14-team-standards.md)
-  - 内部最佳实践汇总
-  - 快速参考指南编写
-  
-- **M15**: [个人知识库总结与迭代](./modules/phase5/M15-knowledge-summary.md)
-  - CLI vs IDE 对比总结
-  - 长期使用反馈和改进方向
+- 想系统学习 **GitHub Copilot CLI** 的开发者或 QA
+- 想把 Copilot 用到 **测试生成、文档生成、代码审查、工作流集成** 中的人
+- 想把零散笔记沉淀为 **可复用学习路径** 的个人学习者
 
 ---
 
-## 🎯 每个模块的结构
+## 2. 先看这 3 个入口
 
-每个学习模块遵循统一格式，确保可操作性和一致性：
+### 如果你第一次进入这个文件夹
+1. 先看本文件：了解整体结构和当前完成度
+2. 再看 [INDEX.md](./INDEX.md)：按目标选择学习路径
+3. 最后进入 `modules/`：开始具体模块学习
 
-```
-核心概念 (理论 ~ 30-40%)
-├─ 2-3 个关键概念简明解释
-├─ 信息图或对比表
-└─ 原理剖析（如有必要）
+### 如果你只想快速开始
+- 从 [M1：Copilot CLI 基础](./modules/phase1/M1-copilot-cli-basics.md) 开始
+- 然后看 [M2：提示工程基础](./modules/phase1/M2-prompting-fundamentals.md)
+- 再看 [M3：Copilot CLI 生态初探](./modules/phase1/M3-cli-ecosystem.md)
 
-实战应用 (70% 以上)
-├─ 场景 1: 具体用例
-│  ├─ 问题描述
-│  ├─ Copilot CLI 解决方案（代码示例）
-│  ├─ 结果与验证
-│  └─ 常见陷阱与对策
-├─ 场景 2: 另一个用例
-└─ 场景 3: 可选
-
-最佳实践速查表
-├─ 常用命令总结
-├─ 参数快速参考
-└─ 性能优化建议
-
-与其他模块的关系
-├─ 前置模块
-├─ 相关模块
-└─ 后续模块
-```
-
-详见 [模板文件](./template.md)。
+### 如果你想看已经比较完整的成果
+- [Phase 1 模块](./modules/phase1/)
+- [M5 完成总结](./M5-COMPLETION-SUMMARY.md)
+- [M5 深化学习总结](./M5-DEEPDIVE-COMPLETE.md)
 
 ---
 
-## 📋 使用指南
+## 3. 当前资料完成度
 
-### 按顺序学习
-从 **M1 开始**，按阶段顺序推进。每个模块建立在前置模块的基础上。
-
-### 边学边练
-每个实战场景都可以**立即执行**。使用你已有的 QA 项目或创建临时项目测试。
-
-### 日常参考
-完成学习后，**速查表** 部分是你日常工作的快速手册。
-
-### 定期迭代
-根据实际应用经验更新模块内容。记录你遇到的问题和解决方案。
+| 区域 | 状态 | 说明 |
+|------|------|------|
+| Phase 1（M1-M3） | ✅ 已完成 | 基础概念、提示工程、CLI 生态已形成完整学习内容 |
+| Phase 2（M4-M6） | 🟡 部分完成 | 模块首页仍是占位，但 M5 已补充完成总结和专题资料 |
+| Phase 3（M7-M9） | 🟡 待扩展 | 已有模块骨架，便于后续继续填充 |
+| Phase 4（M10-M12） | 🟡 待扩展 | 已有项目集成主题，但正文仍需完善 |
+| Phase 5（M13-M15） | 🟡 待扩展 | 已建立长期演进方向和占位结构 |
+| 支持文档 `docs/` | 🟡 Phase 1 较完整 | 评审、总结、清单类资料主要集中在 Phase 1 |
+| 示例资料 `examples/` | 🟡 以占位为主 | 已按阶段分目录，后续可持续补充 |
 
 ---
 
-## ✅ 质量标准
+## 4. 学习材料怎么分层看
 
-我们承诺每个模块符合以下标准：
+### A. 主学习内容：`modules/`
+这是最重要的部分，按 Phase 划分 15 个模块。
 
-- ✅ **准确性**：所有代码示例都经过 Copilot CLI 验证且可实际运行
-- ✅ **可操作性**：每个实战案例包含完整的可复现步骤
-- ✅ **一致性**：所有模块遵循统一的结构、术语和格式
-- ✅ **实用性**：每个技巧都直接应用于 QA 工作场景
+- `phase1/`：基础入门
+- `phase2/`：测试、文档、审查工作流
+- `phase3/`：上下文、脚本、调试
+- `phase4/`：真实项目集成
+- `phase5/`：团队规范与知识沉淀
+
+### B. 支持资料：`docs/`
+这里放的是学习过程中的辅助文档，例如：
+
+- 阶段完成报告
+- 评审请求
+- 自检清单
+- 阶段总结
+
+### C. 示例与脚本：`examples/`
+这里放可运行示例、演示代码或阶段性的实验结果，适合“边看边练”。
+
+### D. 专题补充资料：当前根目录下的 `M5-*`
+这些文件是对某些模块的深入展开，尤其是 M5 文档生成主题，已经形成了较多可直接复用的材料，例如：
+
+- [M5 完成总结](./M5-COMPLETION-SUMMARY.md)
+- [M5 深化学习总结](./M5-DEEPDIVE-COMPLETE.md)
+- [M5 FastAPI 专题](./M5-TECH1-FastAPI.md)
+- [M5 gRPC 专题](./M5-TECH2-gRPC.md)
+- [M5 GraphQL 专题](./M5-TECH3-GraphQL.md)
+- [M5 Python Docstring Prompt 集](./M5-python-google-docstring-prompts.md)
 
 ---
 
-## 🗂️ 项目结构
+## 5. 推荐阅读顺序
 
-```
-docs/learning/
-├── README.md                    ← 你在这里
-├── INDEX.md                     ← 导航指南
-├── template.md                  ← 每个模块的标准模板
-│
-├── 📁 modules/                  ← 学习模块（按阶段分类）
-│  ├── phase1/
-│  │  ├── M1-copilot-cli-basics.md
-│  │  ├── M2-prompting-fundamentals.md
-│  │  └── M3-cli-ecosystem.md
-│  ├── phase2/
-│  │  ├── M4-test-generation.md
-│  │  ├── M5-doc-generation.md
-│  │  └── M6-code-review-workflow.md
-│  ├── phase3/
-│  │  ├── M7-context-management.md
-│  │  ├── M8-workflow-integration.md
-│  │  └── M9-debugging.md
-│  ├── phase4/
-│  │  ├── M10-api-testing-integration.md
-│  │  ├── M11-e2e-testing-integration.md
-│  │  └── M12-perf-testing-integration.md
-│  └── phase5/
-│     ├── M13-copilot-workspace.md
-│     ├── M14-team-standards.md
-│     └── M15-knowledge-summary.md
-│
-├── 📁 docs/                     ← 支持文档（报告、清单等）
-│  ├── phase1/
-│  │  ├── PHASE1-COMPLETION-REPORT.md
-│  │  ├── PHASE1-FINAL-SUMMARY.md
-│  │  ├── PHASE1-REVIEW-REQUEST.md
-│  │  ├── PHASE1-REVIEW-FEEDBACK-LOG.md
-│  │  └── PRE-REVIEW-CHECKLIST.md
-│  ├── phase2/ ... (待创建)
-│  ├── phase3/ ... (待创建)
-│  ├── phase4/ ... (待创建)
-│  └── phase5/ ... (待创建)
-│
-└── 📁 examples/                 ← 可选：代码示例和脚本
-   ├── phase1/
-   ├── phase2/
-   ├── phase3/
-   ├── phase4/
-   └── phase5/
+### 路线 1：从零开始的标准路径
+`M1 → M2 → M3 → M4 → M5 → M6`
+
+适合第一次系统学习 Copilot CLI 的读者。
+
+### 路线 2：直接聚焦“文档生成”
+1. [M2：提示工程基础](./modules/phase1/M2-prompting-fundamentals.md)
+2. [M5：文档和注释生成工作流（模块页）](./modules/phase2/M5-doc-generation.md)
+3. [M5 完成总结](./M5-COMPLETION-SUMMARY.md)
+4. [M5 深化学习总结](./M5-DEEPDIVE-COMPLETE.md)
+
+### 路线 3：只看已经较成熟的资料
+1. Phase 1 全部模块
+2. Phase 1 支持文档
+3. M5 相关专题文件
+
+---
+
+## 6. 每类文件分别解决什么问题
+
+| 你现在的需求 | 优先看哪里 |
+|--------------|-----------|
+| 我想知道这套资料讲什么 | 本文件 `README.md` |
+| 我不知道该从哪里开始 | [INDEX.md](./INDEX.md) |
+| 我想按模块系统学习 | `modules/` |
+| 我想看阶段总结和过程记录 | `docs/phase*/` |
+| 我想找具体示例或实验材料 | `examples/` |
+| 我想深入看 M5 文档生成专题 | `M5-*` 文件 |
+
+---
+
+## 7. 文件夹快速地图
+
+```text
+docs/copilot-cli-journey/
+├── README.md                    # 学习资料总入口
+├── INDEX.md                     # 学习路径导航
+├── STRUCTURE.md                 # 文件夹结构说明
+├── template.md                  # 模块模板
+├── modules/                     # 15 个学习模块
+├── docs/                        # 阶段报告、清单、总结
+├── examples/                    # 示例和脚本
+├── M5-COMPLETION-SUMMARY.md     # M5 完成总结
+├── M5-DEEPDIVE-COMPLETE.md      # M5 深化学习总结
+└── M5-TECH*.md                  # M5 专题资料
 ```
 
 ---
 
-## 🚀 快速开始
+## 8. 这套资料当前最值得继续完善的地方
 
-1. **选择学习模块**：从 [M1 基础](./M1-copilot-cli-basics.md) 开始
-2. **阅读核心概念**：理解 ~30-40% 的理论背景
-3. **动手实践**：选择一个实战场景，按步骤执行
-4. **保存笔记**：在模块的"反思与迭代"部分记录你的学习心得
-5. **进展到下一个**：完成后移进 Phase 2 的模块
-
----
-
-## 💡 学习建议
-
-- **持之以恒**：每周投入 2-3 小时，比一次性学习更有效
-- **项目驱动**：优先选择能解决你当前 QA 工作问题的模块
-- **社区反馈**：如果发现错误或有改进建议，欢迎提 Issue
-- **知识共享**：学完后，考虑分享给团队成员或社区
+1. 把 Phase 2-Phase 5 的模块正文从“占位”补成“可学习内容”
+2. 把已经完成的 M5 成果回填到模块页中，减少信息分散
+3. 为各 Phase 增补对应的支持文档与示例
+4. 统一历史文档中的旧路径表述，避免 `docs/learning/` 与当前目录混淆
 
 ---
 
-## 📞 反馈与更新
+## 9. 下一步建议
 
-- **内容有误？** 提出 Issue
-- **想增加新模块？** 讨论和建议欢迎
-- **长期使用反馈？** 帮助我们迭代和改进
-
----
-
-## 📄 许可证
-
-本学习路径为 Michael Zhou QA 作品集的一部分，遵循项目许可证。
+- 想继续学习：去看 [INDEX.md](./INDEX.md)
+- 想快速进入实质内容：去看 [modules/phase1/](./modules/phase1/)
+- 想优先看最有成果的专题：去看 [M5 完成总结](./M5-COMPLETION-SUMMARY.md)
 
 ---
 
-**祝学习愉快！** 🎓
-
-*最后更新：2026-04-10*
+*最后更新：2026-04-28*
