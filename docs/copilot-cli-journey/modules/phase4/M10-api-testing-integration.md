@@ -89,6 +89,8 @@ GET /api/orders/{id}
 EOF
 ```
 
+> ⚠️ 注意：生成后需要检查 fixture 结构是否与项目的 `conftest.py` 一致，包括 fixture 的 scope（function/module/session）、放置路径，以及是否需要在 `conftest.py` 中注册。
+
 **生成后的文件结构建议**
 
 ```
