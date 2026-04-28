@@ -73,12 +73,15 @@ fi
 
 echo "🤖 正在分析改动并生成 commit message..."
 
-# 获取 Copilot 建议
+# 获取 Copilot 建议（加入基本错误处理）
 SUGGESTED_MSG=$(git diff --staged | gh copilot suggest \
   "根据以上 Git diff 生成一行 Conventional Commits 格式的 commit message。
   格式：<type>(<scope>): <description>
   type 只能是：feat, fix, docs, test, refactor, chore
-  只输出一行 commit message，不需要说明。")
+  只输出一行 commit message，不需要说明。") || {
+  echo "❌ Copilot 生成失败，请手动输入 commit message"
+  exit 1
+}
 
 echo ""
 echo "💡 建议的 commit message:"
