@@ -26,8 +26,8 @@
 
 ### 如果你想看已经比较完整的成果
 - [Phase 1 模块](./modules/phase1/)
-- [M5 完成总结](./M5-COMPLETION-SUMMARY.md)
-- [M5 深化学习总结](./M5-DEEPDIVE-COMPLETE.md)
+- [M5 学习资料导航](./modules/phase2/m5/README.md)
+- [M5 完成总结](./modules/phase2/m5/summaries/completion-summary.md)
 
 ---
 
@@ -67,15 +67,14 @@
 ### C. 示例与脚本：`examples/`
 这里放可运行示例、演示代码或阶段性的实验结果，适合“边看边练”。
 
-### D. 专题补充资料：当前根目录下的 `M5-*`
-这些文件是对某些模块的深入展开，尤其是 M5 文档生成主题，已经形成了较多可直接复用的材料，例如：
+### D. 专题补充资料：`modules/phase2/m5/`
+M5 文档生成主题的补充材料已经集中到独立目录，避免与总导航文件混放。这里按“总结 / 技术专题 / Prompt / 示例”分层，适合边学边查：
 
-- [M5 完成总结](./M5-COMPLETION-SUMMARY.md)
-- [M5 深化学习总结](./M5-DEEPDIVE-COMPLETE.md)
-- [M5 FastAPI 专题](./M5-TECH1-FastAPI.md)
-- [M5 gRPC 专题](./M5-TECH2-gRPC.md)
-- [M5 GraphQL 专题](./M5-TECH3-GraphQL.md)
-- [M5 Python Docstring Prompt 集](./M5-python-google-docstring-prompts.md)
+- [M5 学习资料导航](./modules/phase2/m5/README.md)
+- [M5 完成总结](./modules/phase2/m5/summaries/completion-summary.md)
+- [M5 深化学习总结](./modules/phase2/m5/summaries/deep-dive.md)
+- [M5 技术栈对比](./modules/phase2/m5/tech-stacks/stack-comparison.md)
+- [M5 Python Docstring Prompt 集](./modules/phase2/m5/prompts/python-google-docstring-prompts.md)
 
 ---
 
@@ -89,13 +88,13 @@
 ### 路线 2：直接聚焦“文档生成”
 1. [M2：提示工程基础](./modules/phase1/M2-prompting-fundamentals.md)
 2. [M5：文档和注释生成工作流（模块页）](./modules/phase2/M5-doc-generation.md)
-3. [M5 完成总结](./M5-COMPLETION-SUMMARY.md)
-4. [M5 深化学习总结](./M5-DEEPDIVE-COMPLETE.md)
+3. [M5 完成总结](./modules/phase2/m5/summaries/completion-summary.md)
+4. [M5 学习资料导航](./modules/phase2/m5/README.md)
 
 ### 路线 3：只看已经较成熟的资料
 1. Phase 1 全部模块
 2. Phase 1 支持文档
-3. M5 相关专题文件
+3. M5 专题目录
 
 ---
 
@@ -108,7 +107,7 @@
 | 我想按模块系统学习 | `modules/` |
 | 我想看阶段总结和过程记录 | `docs/phase*/` |
 | 我想找具体示例或实验材料 | `examples/` |
-| 我想深入看 M5 文档生成专题 | `M5-*` 文件 |
+| 我想深入看 M5 文档生成专题 | `modules/phase2/m5/` |
 
 ---
 
@@ -121,11 +120,10 @@ docs/copilot-cli-journey/
 ├── STRUCTURE.md                 # 文件夹结构说明
 ├── template.md                  # 模块模板
 ├── modules/                     # 15 个学习模块
+│   └── phase2/
+│       └── m5/                  # M5 专题资料目录
 ├── docs/                        # 阶段报告、清单、总结
-├── examples/                    # 示例和脚本
-├── M5-COMPLETION-SUMMARY.md     # M5 完成总结
-├── M5-DEEPDIVE-COMPLETE.md      # M5 深化学习总结
-└── M5-TECH*.md                  # M5 专题资料
+└── examples/                    # 示例和脚本
 ```
 
 ---
@@ -143,8 +141,8 @@ docs/copilot-cli-journey/
 
 - 想继续学习：去看 [INDEX.md](./INDEX.md)
 - 想快速进入实质内容：去看 [modules/phase1/](./modules/phase1/)
-- 想优先看最有成果的专题：去看 [M5 完成总结](./M5-COMPLETION-SUMMARY.md)
+- 想优先看最有成果的专题：去看 [M5 学习资料导航](./modules/phase2/m5/README.md)
 
 ---
 
-*最后更新：2026-04-28*
+*最后更新：2026-05-06*

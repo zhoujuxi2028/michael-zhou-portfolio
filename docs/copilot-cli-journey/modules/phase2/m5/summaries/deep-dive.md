@@ -11,7 +11,7 @@
 
 ### Part 1: FastAPI（30-45 分钟）⚡
 
-**文件**: `M5-TECH1-FastAPI.md`
+**文件**: `../tech-stacks/fastapi.md`
 
 **核心学习**:
 - ✅ FastAPI 自动 OpenAPI 3.0 生成原理
@@ -36,7 +36,7 @@
 
 ### Part 2: gRPC + Protobuf（60-90 分钟）🚀
 
-**文件**: `M5-TECH2-gRPC.md`
+**文件**: `../tech-stacks/grpc.md`
 
 **核心学习**:
 - ✅ Protocol Buffers 语法和概念
@@ -63,7 +63,7 @@
 
 ### Part 3: GraphQL（90-120 分钟）✨
 
-**文件**: `M5-TECH3-GraphQL.md`
+**文件**: `../tech-stacks/graphql.md`
 
 **核心学习**:
 - ✅ GraphQL Schema 定义
@@ -329,10 +329,10 @@ GraphQL Playground / Apollo Studio 渲染
 
 | 文档 | 类型 | 内容 |
 |------|------|------|
-| M5-TECH1-FastAPI.md | 学习指南 | 完整教程 + 最佳实践 |
-| M5-TECH2-gRPC.md | 学习指南 | Proto 示例 + 服务实现 |
-| M5-TECH3-GraphQL.md | 学习指南 | Schema 定义 + 查询示例 |
-| M5-TECH-STACK-COMPARISON.md | 对比表 | 3 个技术栈对比 |
+| `../tech-stacks/fastapi.md` | 学习指南 | 完整教程 + 最佳实践 |
+| `../tech-stacks/grpc.md` | 学习指南 | Proto 示例 + 服务实现 |
+| `../tech-stacks/graphql.md` | 学习指南 | Schema 定义 + 查询示例 |
+| `../tech-stacks/stack-comparison.md` | 对比表 | 3 个技术栈对比 |
 | **总计** | 4 个文档 | ~5000 行 |
 
 ### Copilot Prompts
@@ -436,4 +436,4 @@ GraphQL Playground / Apollo Studio 渲染
 
 **提交日期**: 2026-04-15  
 **状态**: ✅ 完成并已提交  
-**文件位置**: `/docs/learning/M5-TECH*.md`
+**文件位置**: `docs/copilot-cli-journey/modules/phase2/m5/tech-stacks/`

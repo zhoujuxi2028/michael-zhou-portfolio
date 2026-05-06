@@ -4,7 +4,7 @@
 
 好的代码文档能减少沟通成本、降低维护风险。Copilot CLI 可以帮你快速为现有代码补充 Docstring、生成 API 文档、甚至自动化 Swagger/OpenAPI 规范。本模块专注于**从代码生成文档**的完整工作流，让你在不手写一行注释的情况下，产出规范的技术文档。
 
-> 💡 本模块已有深度补充资料，建议配合 [M5 完成总结](../../M5-COMPLETION-SUMMARY.md) 和 [M5 深化学习总结](../../M5-DEEPDIVE-COMPLETE.md) 一起阅读。
+> 💡 本模块的补充材料已统一整理到 [M5 学习资料导航](./m5/README.md)，建议配合 [完成总结](./m5/summaries/completion-summary.md) 和 [深化学习总结](./m5/summaries/deep-dive.md) 一起阅读。
 
 ---
 
@@ -21,12 +21,12 @@
 
 ### 概念 2: 主流 Docstring 标准对比
 
-| 标准 | 适用语言 | 格式风格 | 代表工具 |
-|------|---------|---------|---------|
-| **JSDoc** | JavaScript / TypeScript | `@param`, `@returns`, `@example` | TypeDoc, VS Code |
-| **Google 风格** | Python | `Args:`, `Returns:`, `Raises:` | Sphinx |
-| **NumPy 风格** | Python（科学计算） | `Parameters\n----------` | NumPy, pandas |
-| **Sphinx（reStructuredText）** | Python | `:param name:`, `:rtype:` | Sphinx |
+| 标准                           | 适用语言                    | 格式风格                             | 代表工具             |
+| ---------------------------- | ----------------------- | -------------------------------- | ---------------- |
+| **JSDoc**                    | JavaScript / TypeScript | `@param`, `@returns`, `@example` | TypeDoc, VS Code |
+| **Google 风格**                | Python                  | `Args:`, `Returns:`, `Raises:`   | Sphinx           |
+| **NumPy 风格**                 | Python（科学计算）            | `Parameters\n----------`         | NumPy, pandas    |
+| **Sphinx（reStructuredText）** | Python                  | `:param name:`, `:rtype:`        | Sphinx           |
 
 **建议**：Python 项目用 Google 风格，JavaScript 项目用 JSDoc — 两者可读性强且 Copilot 生成质量最高。
 
@@ -212,7 +212,7 @@ cat src/auth/index.py | gh copilot suggest "为这个 Python 模块生成 README
 - **文档版本控制**：将 OpenAPI 规范文件纳入 Git，配合 Swagger Diff 工具检测 breaking changes
 - **自动化集成**：CI/CD 中自动更新文档（配合 M8 工作流集成）
 - **多语言文档**：让 Copilot 生成中英双语 Docstring（`# 计算折扣 (calculate discount)`）
-- **深度扩展**：参考本模块专题资料 [M5 FastAPI](../../M5-TECH1-FastAPI.md)、[M5 gRPC](../../M5-TECH2-gRPC.md)、[M5 GraphQL](../../M5-TECH3-GraphQL.md)
+- **深度扩展**：参考本模块专题资料 [FastAPI](./m5/tech-stacks/fastapi.md)、[gRPC](./m5/tech-stacks/grpc.md)、[GraphQL](./m5/tech-stacks/graphql.md)
 
 ---
 
@@ -222,7 +222,7 @@ cat src/auth/index.py | gh copilot suggest "为这个 Python 模块生成 README
 - [JSDoc 官方文档](https://jsdoc.app/)
 - [swagger-jsdoc GitHub](https://github.com/Surnet/swagger-jsdoc)
 - [FastAPI 自动文档生成](https://fastapi.tiangolo.com/tutorial/first-steps/)
-- [本项目 M5 完成总结](../../M5-COMPLETION-SUMMARY.md)
+- [本项目 M5 完成总结](./m5/summaries/completion-summary.md)
 
 ---
 
@@ -238,4 +238,4 @@ cat src/auth/index.py | gh copilot suggest "为这个 Python 模块生成 README
 
 **下一步**：[M6: 代码审查加速](./M6-code-review-workflow.md)
 
-*最后更新：2026-04-28*
+*最后更新：2026-05-06*

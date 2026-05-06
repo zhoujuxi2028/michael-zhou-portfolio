@@ -378,7 +378,7 @@ def function_name(arg1, arg2, optional_arg=None):
 
 ---
 
-**保存位置**: `/Users/michaelzhou/Documents/github/michael-zhou-qa-portfolio/docs/learning/M5-python-google-docstring-prompts.md`
+**保存位置**: `docs/copilot-cli-journey/modules/phase2/m5/prompts/python-google-docstring-prompts.md`
 
 **更新日期**: 2026-04-15
 

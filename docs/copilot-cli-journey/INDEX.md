@@ -29,8 +29,9 @@
 4. [M6：代码审查加速](./modules/phase2/M6-code-review-workflow.md)
 
 **补充必看**
-- [M5 完成总结](./M5-COMPLETION-SUMMARY.md)
-- [M5 深化学习总结](./M5-DEEPDIVE-COMPLETE.md)
+- [M5 学习资料导航](./modules/phase2/m5/README.md)
+- [M5 完成总结](./modules/phase2/m5/summaries/completion-summary.md)
+- [M5 深化学习总结](./modules/phase2/m5/summaries/deep-dive.md)
 
 **适合**
 - QA
@@ -44,8 +45,8 @@
 
 1. [Phase 1 模块](./modules/phase1/)
 2. [Phase 1 支持文档](./docs/phase1/README.md)
-3. [M5 完成总结](./M5-COMPLETION-SUMMARY.md)
-4. [M5 FastAPI / gRPC / GraphQL 专题](./M5-TECH-STACK-COMPARISON.md)
+3. [M5 学习资料导航](./modules/phase2/m5/README.md)
+4. [M5 FastAPI / gRPC / GraphQL 专题](./modules/phase2/m5/tech-stacks/stack-comparison.md)
 
 **适合**
 - 想先看“成型内容”，再决定是否深入的人
@@ -58,8 +59,8 @@
 |------------|----------|
 | 完整模块 | `modules/phase1/` |
 | 完整阶段支持资料 | `docs/phase1/` |
-| 完整专题总结 | `M5-COMPLETION-SUMMARY.md`、`M5-DEEPDIVE-COMPLETE.md` |
-| 技术专题对比 | `M5-TECH-STACK-COMPARISON.md`、`M5-TECH1/2/3` |
+| 完整专题总结 | `modules/phase2/m5/summaries/` |
+| 技术专题对比 | `modules/phase2/m5/tech-stacks/` |
 | 占位中的后续规划 | `modules/phase2/` ~ `modules/phase5/` |
 
 ---
@@ -136,13 +137,14 @@
 - [Phase 1 支持文档](./docs/phase1/README.md)
 
 ### 文档生成专题（M5）
-- [M5 完成总结](./M5-COMPLETION-SUMMARY.md)
-- [M5 深化学习总结](./M5-DEEPDIVE-COMPLETE.md)
-- [M5 技术栈对比](./M5-TECH-STACK-COMPARISON.md)
-- [M5 FastAPI 专题](./M5-TECH1-FastAPI.md)
-- [M5 gRPC 专题](./M5-TECH2-gRPC.md)
-- [M5 GraphQL 专题](./M5-TECH3-GraphQL.md)
-- [M5 Python Docstring Prompt 集](./M5-python-google-docstring-prompts.md)
+- [M5 学习资料导航](./modules/phase2/m5/README.md)
+- [M5 完成总结](./modules/phase2/m5/summaries/completion-summary.md)
+- [M5 深化学习总结](./modules/phase2/m5/summaries/deep-dive.md)
+- [M5 技术栈对比](./modules/phase2/m5/tech-stacks/stack-comparison.md)
+- [M5 FastAPI 专题](./modules/phase2/m5/tech-stacks/fastapi.md)
+- [M5 gRPC 专题](./modules/phase2/m5/tech-stacks/grpc.md)
+- [M5 GraphQL 专题](./modules/phase2/m5/tech-stacks/graphql.md)
+- [M5 Python Docstring Prompt 集](./modules/phase2/m5/prompts/python-google-docstring-prompts.md)
 
 ---
 
@@ -155,4 +157,4 @@
 
 ---
 
-*最后更新：2026-04-28*
+*最后更新：2026-05-06*
