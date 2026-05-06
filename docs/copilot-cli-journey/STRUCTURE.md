@@ -13,17 +13,18 @@ docs/copilot-cli-journey/
 ├── STRUCTURE.md
 ├── template.md
 ├── modules/
+│   └── phase2/
+│       ├── M5-doc-generation.md
+│       └── m5/
+│           ├── README.md
+│           ├── summaries/
+│           ├── tech-stacks/
+│           ├── prompts/
+│           └── examples/
 ├── docs/
 ├── examples/
 ├── LEARNING-BRANCH-GUIDE.md
-├── M5-COMPLETION-SUMMARY.md
-├── M5-DEEPDIVE-COMPLETE.md
-├── M5-TECH-STACK-COMPARISON.md
-├── M5-TECH1-FastAPI.md
-├── M5-TECH2-gRPC.md
-├── M5-TECH3-GraphQL.md
-├── M5-python-google-docstring-prompts.md
-└── M5-python-docstring-example.py
+└── ...
 ```
 
 ---
@@ -75,7 +76,7 @@ docs/copilot-cli-journey/
 
 ---
 
-### D. 示例与补充资料：`examples/` 和 `M5-*`
+### D. 示例与补充资料：`examples/` 和 `modules/phase2/m5/`
 
 #### `examples/`
 适合放：
@@ -85,19 +86,16 @@ docs/copilot-cli-journey/
 
 当前已按阶段分目录，方便后续扩展。
 
-#### `M5-*`
-这是当前目录里最明显的“专题增强资料”，主要围绕 M5 文档生成主题展开，已经超出普通模块页的深度。
+#### `modules/phase2/m5/`
+这里集中存放 M5 文档生成主题的补充材料，避免根目录堆放大量专题文件。
 
 | 文件 | 作用 |
 |------|------|
-| `M5-COMPLETION-SUMMARY.md` | M5 主体完成总结 |
-| `M5-DEEPDIVE-COMPLETE.md` | M5 深化学习总览 |
-| `M5-TECH-STACK-COMPARISON.md` | 多技术栈文档方案对比 |
-| `M5-TECH1-FastAPI.md` | FastAPI 文档生成专题 |
-| `M5-TECH2-gRPC.md` | gRPC / Protobuf 文档专题 |
-| `M5-TECH3-GraphQL.md` | GraphQL 文档专题 |
-| `M5-python-google-docstring-prompts.md` | Python Docstring Prompt 模板 |
-| `M5-python-docstring-example.py` | Python Docstring 示例代码 |
+| `m5/README.md` | M5 专题统一导航页 |
+| `m5/summaries/` | M5 完成总结、深化总结 |
+| `m5/tech-stacks/` | FastAPI、gRPC、GraphQL 与技术栈对比 |
+| `m5/prompts/` | Prompt 模板集合 |
+| `m5/examples/` | 示例代码 |
 
 ---
 
@@ -112,7 +110,7 @@ docs/copilot-cli-journey/
 第 2 层：modules/
   → 解决“真正学什么”
 
-第 3 层：docs/ + examples/ + M5 专题
+第 3 层：docs/ + examples/ + M5 专题目录
   → 解决“如何补充理解、复盘和实践”
 ```
 
@@ -130,17 +128,17 @@ docs/copilot-cli-journey/
 → [modules/phase1/](./modules/phase1/)
 
 ### 想先看已成熟专题
-→ [M5-COMPLETION-SUMMARY.md](./M5-COMPLETION-SUMMARY.md)
+→ [modules/phase2/m5/README.md](./modules/phase2/m5/README.md)
 
 ---
 
 ## 5. 后续整理建议
 
 1. 将 Phase 2-Phase 5 的占位模块逐步补全
-2. 把根目录下零散的专题成果，逐步回链到对应模块页
+2. 把专题成果继续回链到对应模块页，减少资料跳转成本
 3. 统一旧文档中的历史路径描述，避免与当前目录名不一致
 4. 为 `examples/` 增加“示例用途说明”和“对应模块链接”
 
 ---
 
-*最后更新：2026-04-28*
+*最后更新：2026-05-06*

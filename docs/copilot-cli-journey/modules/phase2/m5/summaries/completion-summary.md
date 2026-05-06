@@ -67,8 +67,8 @@
    - **Examples** 部分：成功和失败的使用示例
 
 **支持文档**:
-- `docs/learning/M5-python-docstring-example.py` - 示例代码
-- `docs/learning/M5-python-google-docstring-prompts.md` - 6 个可复用的 Python Prompts
+- `modules/phase2/m5/examples/python-docstring-example.py` - 示例代码
+- `modules/phase2/m5/prompts/python-google-docstring-prompts.md` - 6 个可复用的 Python Prompts
 
 ---
 
@@ -109,14 +109,14 @@ Swagger UI/ReDoc 展示
 | 类型 | 数量 | 位置 | 用途 |
 |------|------|------|------|
 | JavaScript API Prompts | 3 | M5-copilot-prompts.md | 为 REST endpoints 生成 JSDoc |
-| Python Method Prompts | 6 | M5-python-google-docstring-prompts.md | 为 Python 方法生成 Google 风格 Docstring |
+| Python Method Prompts | 6 | `../prompts/python-google-docstring-prompts.md` | 为 Python 方法生成 Google 风格 Docstring |
 
 ### 文档和指南
 
 | 文档 | 行数 | 内容 |
 |------|------|------|
 | M5-swagger-ui-guide.md | 200+ | Swagger UI 完整使用指南（5 个场景） |
-| M5-python-google-docstring-prompts.md | 250+ | Python Docstring 生成 Prompts（6 个） |
+| `../prompts/python-google-docstring-prompts.md` | 250+ | Python Docstring 生成 Prompts（6 个） |
 | DESIGN-DECISIONS.md | 127 | 性能测试平台的设计决策说明 |
 
 ---
