@@ -3,11 +3,11 @@
 ## 📂 新的组织结构
 
 ```
-docs/learning/
-├── 📄 README.md                     ← 项目主指南
-├── 📄 INDEX.md                      ← 导航和学习路径
+docs/copilot-cli-journey/
+├── 📄 README.md                     ← 学习中心主入口
+├── 📄 INDEX.md                      ← 学习路径导航
+├── 📄 STRUCTURE.md                  ← 当前结构说明
 ├── 📄 template.md                   ← 模块标准模板
-├── 📄 STRUCTURE.md                  ← 本文件
 │
 ├── 📁 modules/                      ← 所有学习模块（按阶段分类）
 │  ├── phase1/                       ✅ 完成
@@ -43,6 +43,9 @@ docs/learning/
 │  │  ├── M4-RESOURCE-INDEX.md       新文件：M4 资源导航索引
 │  │  ├── M4-COMPLETION-SUMMARY.md
 │  │  ├── M4-MIGRATION-COMPLETE.md
+│  │  ├── archive/                   阶段性状态和迁移记录归档
+│  │  │  ├── BRANCH-STATUS.md
+│  │  │  └── TRANSITION-PROGRESS.md
 │  │  ├── prompts/                   Copilot 提示词库
 │  │  └── ...其他文档
 │  ├── phase3/                       📋 占位符
@@ -85,4 +88,4 @@ docs/learning/
 
 ---
 
-*最后更新：2026-04-15* — M4 完成，资源整合
+*最后更新：2026-05-19* — 根目录瘦身，阶段性过程资料归档到 `docs/phase2/archive/`
