@@ -176,45 +176,8 @@ docs/copilot-cli-journey/
 ├── template.md                  ← 每个模块的标准模板
 │
 ├── 📁 modules/                  ← 学习模块（按阶段分类）
-│  ├── phase1/
-│  │  ├── M1-copilot-cli-basics.md
-│  │  ├── M2-prompting-fundamentals.md
-│  │  └── M3-cli-ecosystem.md
-│  ├── phase2/
-│  │  ├── M4-test-generation.md
-│  │  ├── M5-doc-generation.md
-│  │  └── M6-code-review-workflow.md
-│  ├── phase3/
-│  │  ├── M7-context-management.md
-│  │  ├── M8-workflow-integration.md
-│  │  └── M9-debugging.md
-│  ├── phase4/
-│  │  ├── M10-api-testing-integration.md
-│  │  ├── M11-e2e-testing-integration.md
-│  │  └── M12-perf-testing-integration.md
-│  └── phase5/
-│     ├── M13-copilot-workspace.md
-│     ├── M14-team-standards.md
-│     └── M15-knowledge-summary.md
-│
 ├── 📁 docs/                     ← 支持文档、报告、清单和归档资料
-│  ├── phase1/
-│  │  ├── PHASE1-COMPLETION-REPORT.md
-│  │  ├── PHASE1-FINAL-SUMMARY.md
-│  │  ├── PHASE1-REVIEW-REQUEST.md
-│  │  ├── PHASE1-REVIEW-FEEDBACK-LOG.md
-│  │  └── PRE-REVIEW-CHECKLIST.md
-│  ├── phase2/ ... (待创建)
-│  ├── phase3/ ... (待创建)
-│  ├── phase4/ ... (待创建)
-│  └── phase5/ ... (待创建)
-│
 └── 📁 examples/                 ← 代码示例和练习项目
-   ├── phase1/
-   ├── phase2/
-   ├── phase3/
-   ├── phase4/
-   └── phase5/
 ```
 
 ---
