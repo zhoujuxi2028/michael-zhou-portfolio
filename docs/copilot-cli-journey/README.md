@@ -20,7 +20,7 @@
   - 📁 `experiments/` — /explain, /tests, /diff, /code 的实践案例
   - 📄 `docs/copilot-features-log.md` — 实验日志和总结
   - 🎯 适合需要深入了解 Copilot 功能的学习者
-  - 📖 [使用指南](./LEARNING-BRANCH-GUIDE.md)
+  - 📖 当前分支资料已归档到 [Phase 2 归档资料](./docs/phase2/archive/)
 
 ---
 
@@ -166,10 +166,13 @@
 
 ## 🗂️ 项目结构
 
+根目录只保留学习入口、导航、结构说明和模块模板；阶段报告、迁移记录和过程资料统一放在 `docs/` 子目录。
+
 ```
-docs/learning/
-├── README.md                    ← 你在这里
+docs/copilot-cli-journey/
+├── README.md                    ← 学习中心主入口
 ├── INDEX.md                     ← 导航指南
+├── STRUCTURE.md                 ← 当前目录结构说明
 ├── template.md                  ← 每个模块的标准模板
 │
 ├── 📁 modules/                  ← 学习模块（按阶段分类）
@@ -194,7 +197,7 @@ docs/learning/
 │     ├── M14-team-standards.md
 │     └── M15-knowledge-summary.md
 │
-├── 📁 docs/                     ← 支持文档（报告、清单等）
+├── 📁 docs/                     ← 支持文档、报告、清单和归档资料
 │  ├── phase1/
 │  │  ├── PHASE1-COMPLETION-REPORT.md
 │  │  ├── PHASE1-FINAL-SUMMARY.md
@@ -206,7 +209,7 @@ docs/learning/
 │  ├── phase4/ ... (待创建)
 │  └── phase5/ ... (待创建)
 │
-└── 📁 examples/                 ← 可选：代码示例和脚本
+└── 📁 examples/                 ← 代码示例和练习项目
    ├── phase1/
    ├── phase2/
    ├── phase3/
@@ -218,7 +221,7 @@ docs/learning/
 
 ## 🚀 快速开始
 
-1. **选择学习模块**：从 [M1 基础](./M1-copilot-cli-basics.md) 开始
+1. **选择学习模块**：从 [M1 基础](./modules/phase1/M1-copilot-cli-basics.md) 开始
 2. **阅读核心概念**：理解 ~30-40% 的理论背景
 3. **动手实践**：选择一个实战场景，按步骤执行
 4. **保存笔记**：在模块的"反思与迭代"部分记录你的学习心得
