@@ -83,6 +83,9 @@ docs/copilot-cli-journey/
 ### 📚 我想查看支持文档
 → [docs/phase1/](./docs/phase1/) （评审清单、完成报告等）
 
+### 🗄️ 我想查看 Phase 2 归档资料
+→ [Phase 2 归档资料](./docs/phase2/archive/)（含 [分支状态记录](./docs/phase2/archive/BRANCH-STATUS.md) 和 [M4-M5 转换进度](./docs/phase2/archive/TRANSITION-PROGRESS.md)）
+
 ### 💻 我想看代码示例
 → [examples/phase1/](./examples/phase1/)
 
