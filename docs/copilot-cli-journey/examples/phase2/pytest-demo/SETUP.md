@@ -325,7 +325,7 @@ pytest tests/ -v --timeout=10
    - 打开 `tests/test_string_utils.py` 查看测试基本结构
 
 3. **第三步** — 使用 Copilot 生成更多测试：
-   - 参考 [M4 Pytest Prompts](../../docs/phase2/prompts/M4-pytest-prompts.md)
+   - 参考 [M4 Pytest Prompts](../../../docs/phase2/prompts/M4-pytest-prompts.md)
    - 尝试为新函数生成测试
 
 4. **第四步** — 理解覆盖率指标：
@@ -343,9 +343,9 @@ pytest tests/ -v --timeout=10
 
 - [Pytest 官方文档](https://docs.pytest.org/)
 - [Python 虚拟环境指南](https://docs.python.org/3/tutorial/venv.html)
-- [M4 理论文档](../../modules/phase2/M4-test-generation.md)
-- [M4 完成总结](../../docs/phase2/M4-COMPLETION-SUMMARY.md)
-- [M4 Pytest Prompts](../../docs/phase2/prompts/M4-pytest-prompts.md)
+- [M4 理论文档](../../../modules/phase2/M4-test-generation.md)
+- [M4 完成总结](../../../docs/phase2/M4-COMPLETION-SUMMARY.md)
+- [M4 Pytest Prompts](../../../docs/phase2/prompts/M4-pytest-prompts.md)
 
 ---
 

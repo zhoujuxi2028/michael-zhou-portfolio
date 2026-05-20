@@ -148,13 +148,13 @@ prompts/
 ## 🔗 相关资源
 
 ### 理论学习
-- [M4 理论文档](../modules/phase2/M4-test-generation.md)
-- [M5 理论文档](../modules/phase2/M5-doc-generation.md)
+- [M4 理论文档](../../../modules/phase2/M4-test-generation.md)
+- [M5 理论文档](../../../modules/phase2/M5-doc-generation.md)
 
 ### 实战项目
-- [Jest 实战项目](../../examples/phase2/jest-demo/)
-- [Pytest 实战项目](../../examples/phase2/pytest-demo/)
-- [M5 Python 文档演示](../../examples/phase2/M5-python-doc-demo/)
+- [Jest 实战项目](../../../examples/phase2/jest-demo/)
+- [Pytest 实战项目](../../../examples/phase2/pytest-demo/)
+- [M5 Python 文档演示](../../../examples/phase2/M5-python-docstring-example.py)
 
 ### 外部参考
 - [Google 风格指南](https://google.github.io/styleguide/pyguide.html)

@@ -121,16 +121,16 @@ TOTAL               |    95 |  13 |  84%
 
 使用本项目时的 Copilot Prompts：
 
-- [M4 Pytest Prompts](../../docs/phase2/prompts/M4-pytest-prompts.md) — 5 个可复用 Prompt 模板
+- [M4 Pytest Prompts](../../../docs/phase2/prompts/M4-pytest-prompts.md) — 5 个可复用 Prompt 模板
 
 ---
 
 ## 📖 进一步阅读
 
-- [M4 理论文档](../../modules/phase2/M4-test-generation.md)
-- [M4 完成总结](../../docs/phase2/M4-COMPLETION-SUMMARY.md)
+- [M4 理论文档](../../../modules/phase2/M4-test-generation.md)
+- [M4 完成总结](../../../docs/phase2/M4-COMPLETION-SUMMARY.md)
 - [Pytest 官方文档](https://docs.pytest.org/)
-- [Copilot 测试生成提示策略](../../docs/phase2/prompts/M4-prompting-strategy.md)
+- [Copilot 测试生成提示策略](../../../docs/phase2/prompts/M4-prompting-strategy.md)
 - [详细设置指南](SETUP.md)
 
 ---

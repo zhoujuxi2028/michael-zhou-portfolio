@@ -390,7 +390,7 @@ A: 集成 Git hook 或 CI/CD，每次代码提交时自动生成...
 
 ## 贡献指南
 
-欢迎提交 Issue 和 Pull Request！详见 [CONTRIBUTING.md](./CONTRIBUTING.md)
+欢迎提交 Issue 和 Pull Request！请先参考本学习中心的 [README](../../README.md) 和 [INDEX](../../INDEX.md)。
 
 ## License
 

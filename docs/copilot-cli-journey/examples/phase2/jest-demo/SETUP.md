@@ -240,7 +240,7 @@ npm run test:coverage
    - 识别 AAA 模式（Arrange-Act-Assert）
 
 2. **第二步** — 使用 Copilot 生成更多测试：
-   - 参考 [M4 Jest Prompts](../../docs/phase2/prompts/M4-jest-prompts.md)
+   - 参考 [M4 Jest Prompts](../../../docs/phase2/prompts/M4-jest-prompts.md)
    - 尝试为新函数生成测试
 
 3. **第三步** — 理解覆盖率指标：
@@ -257,8 +257,8 @@ npm run test:coverage
 
 - [Jest 官方文档](https://jestjs.io/docs/getting-started)
 - [Jest 测试技巧](https://jestjs.io/docs/tutorial-react#tips)
-- [M4 理论文档](../../modules/phase2/M4-test-generation.md)
-- [M4 完成总结](../../docs/phase2/M4-COMPLETION-SUMMARY.md)
+- [M4 理论文档](../../../modules/phase2/M4-test-generation.md)
+- [M4 完成总结](../../../docs/phase2/M4-COMPLETION-SUMMARY.md)
 
 ---
 
