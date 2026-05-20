@@ -1,223 +1,160 @@
-# 学习路线图导航
+# Copilot CLI 学习导航
 
-**快速导航指南** —— 帮助你选择正确的学习路径。
+这是 `docs/copilot-cli-journey/` 的快速索引，用来回答三个问题：
 
----
-
-## 🎯 按学习目标选择
-
-### 我想快速上手 Copilot CLI
-**推荐路径**：M1 → M2 → M3 (1-2 周)
-- 学会基础操作
-- 理解 CLI 的独特能力
-- 跑通第一个示例
-
-**跳过的部分**：M7-M9（高阶技巧），M10-M15（深度集成）
+1. 我现在应该学哪个模块？
+2. 我应该去哪里找模块、案例、报告和 Prompt？
+3. 根目录 4 个入口文件分别怎么用？
 
 ---
 
-### 我想优化测试代码生成工作流
-**推荐路径**：M1 → M2 → M3 → M4 → M5 → M10/M11/M12 (4-5 周)
-- 学习提示工程基础
-- 掌握测试代码生成技巧
-- 在真实项目中应用
+## 1. 根目录 4 个文件怎么用
 
-**关键模块**：M4（测试生成）和 M10/M11/M12（项目集成）
+| 文件 | 用途 | 适合什么时候打开 |
+|------|------|------------------|
+| [README.md](./README.md) | 学习中心主入口，查看 M1-M15 总路线和快速开始 | 第一次进入学习中心，或想了解全局规划 |
+| [INDEX.md](./INDEX.md) | 学习路径导航，按目标、时间、角色选择下一步 | 不确定先学什么，或想快速定位资料 |
+| [STRUCTURE.md](./STRUCTURE.md) | 目录结构地图，说明模块、支持文档和示例放在哪里 | 找不到文件、报告、归档资料或示例代码时 |
+| [template.md](./template.md) | 学习模块写作模板，统一新模块的内容结构 | 新增或重写 M 模块时 |
 
----
-
-### 我想成为 Copilot CLI 的高手
-**推荐路径**：按顺序完整学习 M1-M15 (6-12 周)
-- 系统地掌握所有功能
-- 从基础到高阶
-- 实战项目集成
-
-**认证达成**：完成所有 Phase
+一句话记忆：**README 看全局，INDEX 选路径，STRUCTURE 找资料，template 写模块。**
 
 ---
 
-### 我想加速代码审查工作
-**推荐路径**：M1 → M2 → M6 (1 周) + 可选 M8（工作流集成）
-- 学会使用 Copilot 生成审查建议
-- 集成到 Git 工作流
+## 2. 推荐学习方式
 
-**关键模块**：M6（代码审查）
+### 新手入门路径
 
----
+适合目标：先熟悉 Copilot CLI 的基本用法。
 
-## ⏱️ 按时间可用性选择
+1. [M1: Copilot CLI 基础](./modules/phase1/M1-copilot-cli-basics.md)
+2. [M2: 提示工程基础](./modules/phase1/M2-prompting-fundamentals.md)
+3. [M3: Copilot CLI 生态初探](./modules/phase1/M3-cli-ecosystem.md)
+4. 练习：[Phase 1 示例](./examples/phase1/)
 
-### 我只有 1 周
-**最小必学**：M1 + M2 + 一个 M4/M5/M6 中的选项
-- 学 40 分钟理论
-- 做 60 分钟实战
-- 保存速查表
+### QA 工作流路径
 
----
+适合目标：把 Copilot CLI 用到测试、文档和审查工作中。
 
-### 我有 2-3 周
-**推荐**：Phase 1 (M1-M3) + Phase 2 中的 1 个模块 (M4/M5/M6)
-- 系统理解 CLI 能力
-- 选一个工作相关的应用场景深入
+1. [M4: 测试代码生成最佳实践](./modules/phase2/M4-test-generation.md)
+2. [M5: 文档和注释生成工作流](./modules/phase2/M5-doc-generation.md)
+3. [M6: 代码审查加速工作流](./modules/phase2/M6-code-review-workflow.md)
+4. 复盘：[Phase 2 支持文档中心](./docs/phase2/)
+5. 练习：[Phase 2 示例](./examples/phase2/)
 
----
+### 高阶能力路径
 
-### 我有 1 个月
-**推荐**：Phase 1 + Phase 2 全部 + Phase 3 的 M7
-- 完整掌握基础和工作流优化
-- 开始学习高阶技巧
+适合目标：提升多文件上下文、工作流集成和调试能力。
 
----
+1. [M7: 上下文管理与多文件交互](./modules/phase3/M7-context-management.md)
+2. [M8: 自定义工作流与脚本集成](./modules/phase3/M8-workflow-integration.md)
+3. [M9: 调试与故障排查](./modules/phase3/M9-debugging.md)
 
-### 我有 6 个月
-**推荐**：完整学习路径 M1-M15
-- 系统掌握所有知识点
-- 每周完成 2-3 个模块
+### 项目集成路径
 
----
+适合目标：把 Copilot CLI 应用到真实 QA 项目或作品集项目中。
 
-## 🎓 按工作角色选择
+1. [M10: API 测试项目集成](./modules/phase4/M10-api-testing-integration.md)
+2. [M11: E2E 测试项目集成](./modules/phase4/M11-e2e-testing-integration.md)
+3. [M12: 性能/稳定性测试集成](./modules/phase4/M12-perf-testing-integration.md)
 
-### 功能测试工程师 (QA)
-**关键路径**：M1 → M2 → M3 → M4 → M5 → M6 → M10 → M11
+### 总结扩展路径
 
-**原因**：
-- M4 帮助快速生成 E2E 测试用例
-- M5 自动化测试文档
-- M10/M11 在真实项目中应用
+适合目标：沉淀团队规范和个人知识库。
 
-**可跳过**：M12（性能测试不是重点）、M13-M14（高阶）
+1. [M13: Copilot Workspace 探索](./modules/phase5/M13-copilot-workspace.md)
+2. [M14: 团队工作流标准化](./modules/phase5/M14-team-standards.md)
+3. [M15: 个人知识库总结与迭代](./modules/phase5/M15-knowledge-summary.md)
 
 ---
 
-### 测试开发工程师 (SDET)
-**关键路径**：M1 → M2 → M3 → M4 → M7 → M8 → M9 → M10 → M11 → M12
+## 3. 按目标快速选择
 
-**原因**：
-- 需要深入提示工程 (M7-M9)
-- 需要集成 CI/CD 工作流 (M8)
-- 所有项目集成 (M10-M12)
-
-**可跳过**：M13-M14（可选）
-
----
-
-### 后端开发 + API 测试
-**关键路径**：M1 → M2 → M3 → M5 → M6 → M10
-
-**原因**：
-- M5 帮助生成 API 文档
-- M6 加速代码审查
-- M10 生成 API 测试脚本
-
-**可跳过**：M4（E2E 不是重点）、M11-M12
+| 你的目标 | 推荐路径 | 重点产出 |
+|----------|----------|----------|
+| 快速上手 Copilot CLI | M1 → M2 → M3 | 基础命令、提示词、Git/Shell 工作流 |
+| 提升测试生成效率 | M1 → M2 → M4 | Jest/Pytest 测试生成和覆盖率提升 |
+| 自动化文档和注释 | M1 → M2 → M5 | Docstring、API 文档、注释规范 |
+| 加速代码审查 | M1 → M2 → M6 | Review checklist、PR 描述、质量检查 |
+| 提升复杂任务能力 | M7 → M8 → M9 | 多文件上下文、脚本集成、调试策略 |
+| 做作品集实战案例 | M10 → M11 → M12 | API/E2E/性能测试集成案例 |
+| 形成长期方法论 | M13 → M14 → M15 | 团队规范、知识库、长期复盘 |
 
 ---
 
-### DevOps / CI-CD 工程师
-**关键路径**：M1 → M2 → M3 → M8 → M9 → M14
+## 4. 按角色选择
 
-**原因**：
-- M8 深度集成自定义工作流
-- M9 调试和优化
-- M14 团队流程标准化
-
-**可跳过**：M4-M7（测试相关）
-
----
-
-## 📊 学习进度追踪
-
-完成每个模块后，**更新下表**来跟踪进度：
-
-| 模块 | 状态 | 完成日期 | 重要度 | 笔记 |
-|------|------|--------|--------|------|
-| M1 | ⬜ Todo / 🔵 In Progress / ✅ Done | - | ⭐⭐⭐ | - |
-| M2 | ⬜ | - | ⭐⭐⭐ | - |
-| M3 | ⬜ | - | ⭐⭐ | - |
-| M4 | ⬜ | - | ⭐⭐⭐ | - |
-| M5 | ⬜ | - | ⭐⭐ | - |
-| M6 | ⬜ | - | ⭐⭐⭐ | - |
-| M7 | ⬜ | - | ⭐⭐ | - |
-| M8 | ⬜ | - | ⭐⭐ | - |
-| M9 | ⬜ | - | ⭐ | - |
-| M10 | ⬜ | - | ⭐⭐ | - |
-| M11 | ⬜ | - | ⭐⭐ | - |
-| M12 | ⬜ | - | ⭐⭐ | - |
-| M13 | ⬜ | - | ⭐ | - |
-| M14 | ⬜ | - | ⭐ | - |
-| M15 | ⬜ | - | ⭐ | - |
+| 角色 | 建议优先学习 | 可暂缓 |
+|------|--------------|--------|
+| 功能测试工程师 QA | M1 → M2 → M3 → M4 → M5 → M6 → M11 | M12-M15 |
+| 测试开发工程师 SDET | M1 → M2 → M4 → M7 → M8 → M9 → M10 → M11 → M12 | M13-M15 |
+| 后端开发/API 测试 | M1 → M2 → M5 → M6 → M10 | M4、M11、M12 |
+| DevOps/CI-CD 工程师 | M1 → M2 → M3 → M8 → M9 → M14 | M4-M7 |
+| 个人知识库维护者 | M1 → M5 → M14 → M15 | M10-M12 |
 
 ---
 
-## 💬 模块依赖关系
+## 5. 模块总览
 
-```
-M1: Basics
-├─ M2: Prompting (必须先学 M1)
-│  └─ M3: Ecosystem (必须先学 M2)
-│     ├─ M4: Test Generation
-│     ├─ M5: Doc Generation
-│     │  └─ M6: Code Review
-│     │     └─ M7: Context Management
-│     │        └─ M8: Workflow Integration
-│     │           └─ M9: Debugging
-│     │              ├─ M10: API Integration
-│     │              ├─ M11: E2E Integration
-│     │              └─ M12: Perf Integration
-│     │                 └─ M13: Workspace
-│     │                    └─ M14: Team Standards
-│     │                       └─ M15: Summary
-```
+| Phase | 模块 | 状态 | 入口 |
+|-------|------|------|------|
+| Phase 1 核心基础 | M1 | ✅ 已完成 | [Copilot CLI 基础](./modules/phase1/M1-copilot-cli-basics.md) |
+| Phase 1 核心基础 | M2 | ✅ 已完成 | [提示工程基础](./modules/phase1/M2-prompting-fundamentals.md) |
+| Phase 1 核心基础 | M3 | ✅ 已完成 | [Copilot CLI 生态初探](./modules/phase1/M3-cli-ecosystem.md) |
+| Phase 2 QA 工作流 | M4 | ✅ 已完成 | [测试代码生成最佳实践](./modules/phase2/M4-test-generation.md) |
+| Phase 2 QA 工作流 | M5 | ✅ 已完成 | [文档和注释生成工作流](./modules/phase2/M5-doc-generation.md) |
+| Phase 2 QA 工作流 | M6 | ✅ 已完成 | [代码审查加速工作流](./modules/phase2/M6-code-review-workflow.md) |
+| Phase 3 高阶提示工程 | M7 | 🔨 待深化 | [上下文管理与多文件交互](./modules/phase3/M7-context-management.md) |
+| Phase 3 高阶提示工程 | M8 | 🔨 待深化 | [自定义工作流与脚本集成](./modules/phase3/M8-workflow-integration.md) |
+| Phase 3 高阶提示工程 | M9 | 🔨 待深化 | [调试与故障排查](./modules/phase3/M9-debugging.md) |
+| Phase 4 项目集成案例 | M10 | 📋 占位 | [API 测试项目集成](./modules/phase4/M10-api-testing-integration.md) |
+| Phase 4 项目集成案例 | M11 | 📋 占位 | [E2E 测试项目集成](./modules/phase4/M11-e2e-testing-integration.md) |
+| Phase 4 项目集成案例 | M12 | 📋 占位 | [性能/稳定性测试集成](./modules/phase4/M12-perf-testing-integration.md) |
+| Phase 5 进阶与扩展 | M13 | 📋 占位 | [Copilot Workspace 探索](./modules/phase5/M13-copilot-workspace.md) |
+| Phase 5 进阶与扩展 | M14 | 📋 占位 | [团队工作流标准化](./modules/phase5/M14-team-standards.md) |
+| Phase 5 进阶与扩展 | M15 | 📋 占位 | [个人知识库总结与迭代](./modules/phase5/M15-knowledge-summary.md) |
 
----
-
-## 🔗 相关资源
-
-| 资源 | 用途 |
-|------|------|
-| [官方 Copilot 文档](https://docs.github.com/copilot) | 官方参考 |
-| [Copilot CLI 命令参考](https://docs.github.com/copilot/using-github-copilot/using-copilot-in-the-terminal) | 命令速查 |
-| [提示工程指南](https://platform.openai.com/docs/guides/prompt-engineering) | 提示设计原理 |
-| 本项目的 QA 作品集 | 实战项目参考 |
+标记说明：✅ 已完成并可复习；🔨 有骨架或初稿，适合继续深化；📋 占位或规划中。
 
 ---
 
-## 📝 个性化学习计划模板
+## 6. 资源入口
 
-复制以下模板为自己制定学习计划：
-
-```
-# 我的学习计划
-
-## 背景
-- 角色：[你的职位]
-- 主要目标：[想实现什么]
-- 可用时间：[每周/每月]
-- 优先度：[高/中/低]
-
-## 选择的学习路径
-- Phase 1: M1-M3 (Week 1-2)
-  - 完成 □
-- Phase 2: M[X]-M[Y] (Week 3-4)
-  - 完成 □
-- 加速路径：...
-
-## 关键里程碑
-- Week 2 末：完成 M1-M3，能解释 CLI vs IDE 的差异
-- Week 4 末：完成 Phase 2，在一个项目中应用 Copilot
-- Week 8 末：完成 Phase 4，有 2 个实战案例
-- Month 6：完成 M1-M15 或按需学习
-
-## 反思日志
-- [日期]：学到的关键点
-- [日期]：遇到的问题和解决方案
-```
+| 资源类型 | 入口 | 用途 |
+|----------|------|------|
+| 正式学习模块 | [modules/](./modules/) | M1-M15 的主学习内容 |
+| 支持文档 | [docs/](./docs/) | 完成报告、Review 记录、Prompt 库、阶段归档 |
+| 可运行示例 | [examples/](./examples/) | Jest、Pytest、文档生成等实践项目 |
+| Phase 1 支持资料 | [docs/phase1/](./docs/phase1/) | Phase 1 完成报告和评审资料 |
+| Phase 2 支持资料 | [docs/phase2/](./docs/phase2/) | M4-M6 报告、Prompt、技术栈和归档资料 |
+| Phase 2 归档资料 | [docs/phase2/archive/](./docs/phase2/archive/) | 分支状态和 M4-M5 转换记录 |
+| 模块模板 | [template.md](./template.md) | 新建或重写模块时复制使用 |
 
 ---
 
-**开始学习前，先选择你的学习目标和路径，然后开始第一个模块！**
+## 7. 建议学习节奏
+
+| 时间 | 建议任务 | 目标 |
+|------|----------|------|
+| 第 1 周 | M1-M2 | 掌握基础命令和提示词写法 |
+| 第 2 周 | M3 + 一个 Phase 1 示例 | 熟悉 Git/Shell/文件操作场景 |
+| 第 3-4 周 | M4-M6 | 完成测试、文档、代码审查三类 QA 工作流 |
+| 第 5-6 周 | M7-M9 | 练习复杂上下文、工作流集成和调试 |
+| 第 7-8 周 | M10-M12 | 选择一个真实项目做集成案例 |
+| 第 9 周后 | M13-M15 | 总结个人方法论和团队规范 |
+
+如果时间有限，优先走：**M1 → M2 → M4 → M5 → M6**。
 
 ---
 
-*最后更新：2026-04-10*
+## 8. 每个模块怎么学
+
+1. 先读模块的 **概览** 和 **核心概念**。
+2. 跳到 **实战应用**，选择一个场景照着执行。
+3. 到 `examples/` 找对应案例运行。
+4. 把可复用 Prompt 或命令记录到阶段支持文档。
+5. 完成后回到本文件，更新自己的学习进度。
+
+---
+
+*最后更新：2026-05-20*
