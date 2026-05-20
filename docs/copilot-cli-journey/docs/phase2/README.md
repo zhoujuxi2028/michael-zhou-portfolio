@@ -141,6 +141,16 @@ phase2/                           ← 你在这里
 
 ---
 
+## 🗄️ 归档资料
+
+阶段性状态和迁移记录已集中到归档目录，避免根目录混杂过程资料：
+
+- [Phase 2 归档资料](./archive/)
+- [分支状态记录](./archive/BRANCH-STATUS.md)
+- [M4-M5 转换进度](./archive/TRANSITION-PROGRESS.md)
+
+---
+
 ## 📚 相关文档链接
 
 ### 核心学习
