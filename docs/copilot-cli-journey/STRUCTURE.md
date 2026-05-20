@@ -22,9 +22,7 @@ docs/copilot-cli-journey/
 │           ├── prompts/
 │           └── examples/
 ├── docs/
-├── examples/
-├── LEARNING-BRANCH-GUIDE.md
-└── ...
+└── examples/
 ```
 
 ---
@@ -66,13 +64,15 @@ docs/copilot-cli-journey/
 - 评审反馈
 - 自检清单
 - 阶段 README
+- 归档资料
 
 **当前情况**
 
 | 目录 | 状态 | 说明 |
 |------|------|------|
 | `docs/phase1/` | ✅ 较完整 | 已有总结、清单、反馈、评审资料 |
-| `docs/phase2/` ~ `docs/phase5/` | 🟡 占位 | 目录已建立，后续待补充 |
+| `docs/phase2/` | ✅ 已整理 | M4-M6 报告、Prompt、归档资料 |
+| `docs/phase3/` ~ `docs/phase5/` | 🟡 占位 | 目录已建立，后续待补充 |
 
 ---
 

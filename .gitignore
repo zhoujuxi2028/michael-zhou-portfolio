@@ -5,9 +5,47 @@
 # Claude Code local settings
 .claude/settings.local.json
 
+# Git worktrees
+.worktrees/
+
 # OS
 .DS_Store
 
 # Swap files
 *.swp
 *.swo
+
+# Virtual Environments
+**/venv/
+**/env/
+**/ENV/
+**/.venv/
+
+# Node.js
+**/node_modules/
+**/npm-debug.log
+**/package-lock.json
+
+# Python
+**/__pycache__/
+**/*.py[cod]
+**/*$py.class
+**/.pytest_cache/
+**/.coverage
+**/htmlcov/
+**/.mypy_cache/
+**/dist/
+**/build/
+**/*.egg-info/
+
+# IDE & Editor
+**/.idea/
+**/*.swp
+**/*.swo
+**/*~
+
+# OS
+Thumbs.db
+
+# Test Coverage
+**/coverage/

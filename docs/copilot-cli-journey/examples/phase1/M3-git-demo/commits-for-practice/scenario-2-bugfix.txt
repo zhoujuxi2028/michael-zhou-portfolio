@@ -1,0 +1,33 @@
+场景 2: 问题修复 - 登录并发竞态条件
+
+Modified files:
+- src/auth/session-manager.js (MODIFIED)
+
+问题描述:
+- Issue #245: 在高并发场景下，多个登录请求会创建重复的 session
+- Root Cause: session 存储过程中未加锁，导致写入冲突
+- 影响: 用户数据不一致，安全风险
+
+修改详情:
+
+文件: src/auth/session-manager.js
+- 问题代码: 简单的同步 session 写入，无并发控制
+  const session = { userId, timestamp, token }
+  fs.writeFileSync(sessionFile, JSON.stringify(session))
+
+- 改进方案: 使用 Redis 分布式锁实现原子操作
+  1. 获取 Redis 分布式锁（超时 5 秒）
+  2. 检查 session 是否已存在
+  3. 如果不存在，创建新 session
+  4. 释放锁
+
+- 新增依赖: redis (为分布式锁)
+
+变更影响:
+✓ 修复了并发登录时的重复 session 创建问题
+✓ 确保了 session 创建的原子性
+✓ 提高了系统的鲁棒性和安全性
+
+测试覆盖:
+- 现有所有 15 个测试用例仍然通过
+- 新增 3 个并发测试用例（使用 Promise.all）
