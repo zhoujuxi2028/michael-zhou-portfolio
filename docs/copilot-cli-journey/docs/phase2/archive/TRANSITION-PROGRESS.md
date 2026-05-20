@@ -84,8 +84,8 @@
 ## 🔗 Related Documents
 
 - [BRANCH-STATUS.md](./BRANCH-STATUS.md) - Phase 1 documentation
-- [M4-RESOURCE-INDEX.md](./M4-RESOURCE-INDEX.md) - Phase 2 navigation
-- [STRUCTURE.md](./STRUCTURE.md) - Project structure status
+- [M4-RESOURCE-INDEX.md](../M4-RESOURCE-INDEX.md) - Phase 2 navigation
+- [STRUCTURE.md](../../../STRUCTURE.md) - Project structure status
 
 ---
 
