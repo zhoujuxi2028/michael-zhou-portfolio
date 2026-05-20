@@ -283,10 +283,10 @@
 ## 附件
 
 - 📄 [README.md](./README.md) - 项目主指南
-- 📄 [INDEX.md](./INDEX.md) - 学习路线图
-- 📄 [M1-copilot-cli-basics.md](./M1-copilot-cli-basics.md)
-- 📄 [M2-prompting-fundamentals.md](./M2-prompting-fundamentals.md)
-- 📄 [M3-cli-ecosystem.md](./M3-cli-ecosystem.md)
+- 📄 [INDEX.md](../../INDEX.md) - 学习路线图
+- 📄 [M1-copilot-cli-basics.md](../../modules/phase1/M1-copilot-cli-basics.md)
+- 📄 [M2-prompting-fundamentals.md](../../modules/phase1/M2-prompting-fundamentals.md)
+- 📄 [M3-cli-ecosystem.md](../../modules/phase1/M3-cli-ecosystem.md)
 
 ---
 

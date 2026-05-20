@@ -1,0 +1,41 @@
+场景 1: 新增功能 - JWT 用户认证系统
+
+Modified files:
+- src/auth/login.js (NEW)
+- src/auth/utils.js (NEW)
+- src/middleware/authenticate.js (NEW)
+- tests/auth.test.js (NEW)
+- package.json (MODIFIED)
+
+变更详情:
+
+新增文件: src/auth/login.js
++ 实现了用户登录端点 (/api/auth/login)
++ 使用 bcrypt 进行密码哈希验证
++ 返回 JWT token 用于后续请求认证
+
+新增文件: src/auth/utils.js
++ JWT token 生成功能
++ Token 验证和解码功能
++ 刷新 token 的刷新机制
+
+新增文件: src/middleware/authenticate.js
++ 中间件用于验证受保护路由的 JWT token
++ 从 Authorization header 提取 token
++ 验证失败时返回 401 Unauthorized
+
+新增文件: tests/auth.test.js
++ 15 个测试用例覆盖认证流程
++ 包括有效/无效密码、过期 token、缺失 token 等场景
++ 测试覆盖率达到 95%
+
+修改文件: package.json
++ 添加依赖: bcryptjs (密码哈希)
++ 添加依赖: jsonwebtoken (JWT 处理)
++ 添加脚本: npm run test:auth (运行认证测试)
+
+总结:
+- 新增 3 个源文件，1 个测试文件
+- 添加 2 个新依赖
+- 15 个新的测试用例
+- 完整的用户认证系统实现

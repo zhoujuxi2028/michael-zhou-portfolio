@@ -1,0 +1,16 @@
+{
+  "name": "m4-jest-learning-project",
+  "version": "1.0.0",
+  "description": "M4 Learning Project: Calculator Library with Jest Tests",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "keywords": ["copilot-cli", "jest", "testing", "learning"],
+  "author": "Michael Zhou",
+  "license": "MIT",
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}
