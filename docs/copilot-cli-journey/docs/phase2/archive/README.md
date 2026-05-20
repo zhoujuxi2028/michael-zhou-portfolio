@@ -9,5 +9,5 @@
 
 日常学习入口请优先查看：
 
-- [`../../README.md`](../README.md) — Phase 2 支持文档导航
+- [`../README.md`](../README.md) — Phase 2 支持文档导航
 - [`../../../README.md`](../../../README.md) — Copilot CLI 学习中心入口
