@@ -299,12 +299,12 @@ cat .commit-msg-suggestion
 
 ## 参考资源
 
-- [M3 理论文档](../../modules/phase1/M3-cli-ecosystem.md)
-- [M3 Prompt 模板库](../../docs/phase1/prompts/M3-prompts.md)
+- [M3 理论文档](../../../modules/phase1/M3-cli-ecosystem.md)
+- [M3 Prompt 模板库](../../../docs/phase1/prompts/M3-prompts.md)
 - [Conventional Commits 规范](https://www.conventionalcommits.org/)
 
 ---
 
-**下一步**: 完成本项目后，进入 [M4: 测试代码生成最佳实践](../../modules/phase2/M4-test-generation.md)
+**下一步**: 完成本项目后，进入 [M4: 测试代码生成最佳实践](../../../modules/phase2/M4-test-generation.md)
 
 *最后更新: 2026-04-15*

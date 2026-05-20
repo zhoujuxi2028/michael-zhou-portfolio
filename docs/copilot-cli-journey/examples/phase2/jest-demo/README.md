@@ -114,16 +114,16 @@ Lines        : 85.5% (72/84)
 
 使用本项目时的 Copilot Prompts：
 
-- [M4 Jest Prompts](../../docs/phase2/prompts/M4-jest-prompts.md) — 5 个可复用 Prompt 模板
+- [M4 Jest Prompts](../../../docs/phase2/prompts/M4-jest-prompts.md) — 5 个可复用 Prompt 模板
 
 ---
 
 ## 📖 进一步阅读
 
-- [M4 理论文档](../../modules/phase2/M4-test-generation.md)
-- [M4 完成总结](../../docs/phase2/M4-COMPLETION-SUMMARY.md)
+- [M4 理论文档](../../../modules/phase2/M4-test-generation.md)
+- [M4 完成总结](../../../docs/phase2/M4-COMPLETION-SUMMARY.md)
 - [Jest 官方文档](https://jestjs.io/)
-- [Copilot 测试生成提示策略](../../docs/phase2/prompts/M4-prompting-strategy.md)
+- [Copilot 测试生成提示策略](../../../docs/phase2/prompts/M4-prompting-strategy.md)
 
 ---
 

@@ -15,13 +15,13 @@
 | **gRPC** | 微服务、高性能通信 | Protocol Buffers → 代码自动生成 | 🟡 中 | ⭐⭐⭐⭐ |
 | **GraphQL** | 灵活 API、前后端协作 | Schema → 自动内省文档 | 🟡 中 | ⭐⭐⭐⭐ |
 
-详见 [完整对比分析](./COMPARISON.md)
+详见 [完整对比分析](./M5-TECH-STACK-COMPARISON.md)
 
 ---
 
 ## 🎯 三大框架深度学习
 
-### 1️⃣ [FastAPI — 代码即文档](./TECH1-FastAPI.md)
+### 1️⃣ [FastAPI — 代码即文档](./M5-TECH1-FastAPI.md)
 
 **核心概念**:
 - Pydantic 模型的自文档化
@@ -43,7 +43,7 @@
 
 ---
 
-### 2️⃣ [gRPC — 高性能多语言通信](./TECH2-gRPC.md)
+### 2️⃣ [gRPC — 高性能多语言通信](./M5-TECH2-gRPC.md)
 
 **核心概念**:
 - Protocol Buffers 二进制序列化
@@ -66,7 +66,7 @@
 
 ---
 
-### 3️⃣ [GraphQL — 灵活的数据查询语言](./TECH3-GraphQL.md)
+### 3️⃣ [GraphQL — 灵活的数据查询语言](./M5-TECH3-GraphQL.md)
 
 **核心概念**:
 - GraphQL Schema 定义（Query、Mutation、Subscription）
@@ -93,8 +93,8 @@
 ## 🔗 快速导航
 
 - [回到 Phase 2](../README.md)
-- [完整对比分析](./COMPARISON.md)
-- [所有文档](../../README.md)
+- [完整对比分析](./M5-TECH-STACK-COMPARISON.md)
+- [所有文档](../../../README.md)
 
 ---
 
@@ -110,7 +110,7 @@
    - 建议在本地环境尝试运行
 
 3. **对比理解**
-   - 完成所有三个框架后，看 [对比分析](./COMPARISON.md)
+   - 完成所有三个框架后，看 [对比分析](./M5-TECH-STACK-COMPARISON.md)
    - 理解何时选择哪个框架
 
 ---

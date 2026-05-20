@@ -250,13 +250,13 @@ class UserValidator:
 ## 📞 资源导航
 
 ### 核心文档
-- [M4 理论文档](../modules/phase2/M4-test-generation.md)
+- [M4 理论文档](../../modules/phase2/M4-test-generation.md)
 - [Jest Prompt 库](./prompts/M4-jest-prompts.md)
 - [Pytest Prompt 库](./prompts/M4-pytest-prompts.md)
 
 ### 实战项目
-- [Jest Demo 项目](../examples/phase2/jest-demo/)
-- [Pytest Demo 项目](../examples/phase2/pytest-demo/)
+- [Jest Demo 项目](../../examples/phase2/jest-demo/)
+- [Pytest Demo 项目](../../examples/phase2/pytest-demo/)
 
 ### Phase 2 导航
 - [Phase 2 完整资源](./README.md)
@@ -266,4 +266,4 @@ class UserValidator:
 **完成时间**: 2026-04-15  
 **总学习时间**: 4-5 小时  
 **推荐复习时间**: 1-2 周  
-**后续模块**: [M6: 代码审查加速](../modules/phase2/M6-code-review-workflow.md)
+**后续模块**: [M6: 代码审查加速](../../modules/phase2/M6-code-review-workflow.md)

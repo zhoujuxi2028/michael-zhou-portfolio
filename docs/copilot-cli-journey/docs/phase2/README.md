@@ -10,9 +10,9 @@
 
 | 模块 | 标题 | 状态 | 完成度 | 文档位置 |
 |------|------|------|--------|---------|
-| **M4** | 测试代码生成最佳实践 | ✅ 完成 | 100% | `../modules/phase2/M4-*` |
+| **M4** | 测试代码生成最佳实践 | ✅ 完成 | 100% | `../../modules/phase2/M4-*` |
 | **M5** | 文档和注释生成工作流 | ✅ 完成 | 100% | `./M5-*.md` |
-| **M6** | 代码审查加速 | ⏳ 筹划中 | ~5% | `../modules/phase2/M6-*` |
+| **M6** | 代码审查加速 | ⏳ 筹划中 | ~5% | `../../modules/phase2/M6-*` |
 
 ---
 
@@ -53,7 +53,7 @@
 
 | 项目 | 类型 | 代码行数 | Docstring 行数 | 描述 |
 |------|------|--------|--------|------|
-| [M5-python-doc-demo](../../examples/phase2/M5-python-doc-demo/) | Python | 575 | 165 | 电商折扣系统 + Docstring 演示 |
+| [M5 Python Docstring 示例](../../examples/phase2/M5-python-docstring-example.py) | Python | 575 | 165 | 电商折扣系统 + Docstring 演示 |
 
 ---
 
@@ -62,7 +62,7 @@
 ### ✅ 完成项目
 
 ✅ **M4.1**: 理论文档填充
-- [M4 理论文档](../modules/phase2/M4-test-generation.md)
+- [M4 理论文档](../../modules/phase2/M4-test-generation.md)
   - TDD 工作流和最佳实践
   - Jest 单元测试框架
   - Pytest 测试框架和 fixture
@@ -107,7 +107,7 @@
 
 ### 📁 预期交付物结构
 ```
-../modules/phase2/M6-code-review-workflow.md    理论文档
+../../modules/phase2/M6-code-review-workflow.md 理论文档
 ../../examples/phase2/code-review/               审查示例
 ./M6-prompts.md                                  Prompt 库
 ./M6-COMPLETION-SUMMARY.md                       完成总结
@@ -154,13 +154,13 @@ phase2/                           ← 你在这里
 ## 📚 相关文档链接
 
 ### 核心学习
-- [M4 理论文档](../modules/phase2/M4-test-generation.md)
-- [M5 理论文档](../modules/phase2/M5-doc-generation.md)
-- [M6 理论文档](../modules/phase2/M6-code-review-workflow.md)
+- [M4 理论文档](../../modules/phase2/M4-test-generation.md)
+- [M5 理论文档](../../modules/phase2/M5-doc-generation.md)
+- [M6 理论文档](../../modules/phase2/M6-code-review-workflow.md)
 
 ### 学习导航
-- [回到学习中心](../README.md)
-- [完整索引](../INDEX.md)
+- [回到学习中心](../../README.md)
+- [完整索引](../../INDEX.md)
 - [回到项目首页](../../README.md)
 
 ---
