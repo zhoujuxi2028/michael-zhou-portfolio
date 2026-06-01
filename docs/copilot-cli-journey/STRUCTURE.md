@@ -22,7 +22,12 @@ docs/copilot-cli-journey/
 │           ├── prompts/
 │           └── examples/
 ├── docs/
+│   └── phase3/
+│       └── prompts/
+│           └── M7-context-management-prompts.md
 └── examples/
+    └── phase3/
+        └── m7-context-demo/
 ```
 
 ---
@@ -47,10 +52,10 @@ docs/copilot-cli-journey/
 | 目录 | 内容定位 | 当前状态 |
 |------|----------|----------|
 | `modules/phase1/` | 基础认知、提示工程、CLI 生态 | ✅ 内容较完整 |
-| `modules/phase2/` | 测试生成、文档生成、代码审查 | 🟡 模块骨架已建 |
-| `modules/phase3/` | 上下文管理、工作流集成、调试 | 🟡 以占位为主 |
-| `modules/phase4/` | API / E2E / 性能测试项目集成 | 🟡 以占位为主 |
-| `modules/phase5/` | Workspace、团队规范、知识总结 | 🟡 以占位为主 |
+| `modules/phase2/` | 测试生成、文档生成、代码审查 | ✅ M4-M6 已完成 |
+| `modules/phase3/` | 上下文管理、工作流集成、调试 | 📘 M7-M9 初稿完成，待实战验证 |
+| `modules/phase4/` | API / E2E / 性能测试项目集成 | 📘 M10-M12 初稿完成，待项目案例验证 |
+| `modules/phase5/` | Workspace、团队规范、知识总结 | 📘 M13-M15 初稿完成，待实践沉淀 |
 
 ---
 
@@ -72,7 +77,8 @@ docs/copilot-cli-journey/
 |------|------|------|
 | `docs/phase1/` | ✅ 较完整 | 已有总结、清单、反馈、评审资料 |
 | `docs/phase2/` | ✅ 已整理 | M4-M6 报告、Prompt、归档资料 |
-| `docs/phase3/` ~ `docs/phase5/` | 🟡 占位 | 目录已建立，后续待补充 |
+| `docs/phase3/` | 🔄 M7 支持文档已启动 | 已有 M7 Prompt 模板库 |
+| `docs/phase4/` ~ `docs/phase5/` | 🟡 待补充 | 主模块已有初稿，阶段支持资料仍需创建 |
 
 ---
 
@@ -85,6 +91,10 @@ docs/copilot-cli-journey/
 - 学习实验产物
 
 当前已按阶段分目录，方便后续扩展。
+
+| 目录 | 当前内容 |
+|------|----------|
+| `examples/phase3/m7-context-demo/` | M7 上下文地图、范围收敛、多文件计划和 diff 审查练习 |
 
 #### `modules/phase2/m5/`
 这里集中存放 M5 文档生成主题的补充材料，避免根目录堆放大量专题文件。
@@ -127,6 +137,9 @@ docs/copilot-cli-journey/
 ### 想直接进入学习
 → [modules/phase1/](./modules/phase1/)
 
+### 想练习 M7 上下文管理
+→ [modules/phase3/M7-context-management.md](./modules/phase3/M7-context-management.md)
+
 ### 想先看已成熟专题
 → [modules/phase2/m5/README.md](./modules/phase2/m5/README.md)
 
@@ -134,11 +147,11 @@ docs/copilot-cli-journey/
 
 ## 5. 后续整理建议
 
-1. 将 Phase 2-Phase 5 的占位模块逐步补全
+1. 将 M7-M15 的初稿模块逐步补充实战验证和完成总结
 2. 把专题成果继续回链到对应模块页，减少资料跳转成本
 3. 统一旧文档中的历史路径描述，避免与当前目录名不一致
 4. 为 `examples/` 增加“示例用途说明”和“对应模块链接”
 
 ---
 
-*最后更新：2026-05-06*
+*最后更新：2026-05-27*
