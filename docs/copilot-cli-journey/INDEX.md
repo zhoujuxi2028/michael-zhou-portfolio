@@ -104,17 +104,26 @@
 | Phase 2 QA 工作流 | M4 | ✅ 已完成 | [测试代码生成最佳实践](./modules/phase2/M4-test-generation.md) |
 | Phase 2 QA 工作流 | M5 | ✅ 已完成 | [文档和注释生成工作流](./modules/phase2/M5-doc-generation.md) |
 | Phase 2 QA 工作流 | M6 | ✅ 已完成 | [代码审查加速工作流](./modules/phase2/M6-code-review-workflow.md) |
-| Phase 3 高阶提示工程 | M7 | 🔨 待深化 | [上下文管理与多文件交互](./modules/phase3/M7-context-management.md) |
-| Phase 3 高阶提示工程 | M8 | 🔨 待深化 | [自定义工作流与脚本集成](./modules/phase3/M8-workflow-integration.md) |
-| Phase 3 高阶提示工程 | M9 | 🔨 待深化 | [调试与故障排查](./modules/phase3/M9-debugging.md) |
-| Phase 4 项目集成案例 | M10 | 📋 占位 | [API 测试项目集成](./modules/phase4/M10-api-testing-integration.md) |
-| Phase 4 项目集成案例 | M11 | 📋 占位 | [E2E 测试项目集成](./modules/phase4/M11-e2e-testing-integration.md) |
-| Phase 4 项目集成案例 | M12 | 📋 占位 | [性能/稳定性测试集成](./modules/phase4/M12-perf-testing-integration.md) |
-| Phase 5 进阶与扩展 | M13 | 📋 占位 | [Copilot Workspace 探索](./modules/phase5/M13-copilot-workspace.md) |
-| Phase 5 进阶与扩展 | M14 | 📋 占位 | [团队工作流标准化](./modules/phase5/M14-team-standards.md) |
-| Phase 5 进阶与扩展 | M15 | 📋 占位 | [个人知识库总结与迭代](./modules/phase5/M15-knowledge-summary.md) |
+| Phase 3 高阶提示工程 | M7 | 📘 初稿完成 | [上下文管理与多文件交互](./modules/phase3/M7-context-management.md) |
+| Phase 3 高阶提示工程 | M8 | 📘 初稿完成 | [自定义工作流与脚本集成](./modules/phase3/M8-workflow-integration.md) |
+| Phase 3 高阶提示工程 | M9 | 📘 初稿完成 | [调试与故障排查](./modules/phase3/M9-debugging.md) |
+| Phase 4 项目集成案例 | M10 | 📘 初稿完成 | [API 测试项目集成](./modules/phase4/M10-api-testing-integration.md) |
+| Phase 4 项目集成案例 | M11 | 📘 初稿完成 | [E2E 测试项目集成](./modules/phase4/M11-e2e-testing-integration.md) |
+| Phase 4 项目集成案例 | M12 | 📘 初稿完成 | [性能/稳定性测试集成](./modules/phase4/M12-perf-testing-integration.md) |
+| Phase 5 进阶与扩展 | M13 | 📘 初稿完成 | [Copilot Workspace 探索](./modules/phase5/M13-copilot-workspace.md) |
+| Phase 5 进阶与扩展 | M14 | 📘 初稿完成 | [团队工作流标准化](./modules/phase5/M14-team-standards.md) |
+| Phase 5 进阶与扩展 | M15 | 📘 初稿完成 | [个人知识库总结与迭代](./modules/phase5/M15-knowledge-summary.md) |
 
-标记说明：✅ 已完成并可复习；🔨 有骨架或初稿，适合继续深化；📋 占位或规划中。
+标记说明：✅ 已完成并可复习；📘 初稿完成但仍需实战验证、示例或阶段总结；📋 占位或规划中。
+
+### 学习进度调查
+
+| 项目 | 结果 |
+|------|------|
+| 调查日期 | 2026-05-27 |
+| 已完成模块 | M1-M6，共 6/15 |
+| 初稿完成模块 | M7-M15，共 9/15 |
+| 下一步建议 | 优先验证 M7-M9，再补 Phase 4-5 项目案例 |
 
 ---
 
@@ -157,4 +166,4 @@
 
 ---
 
-*最后更新：2026-05-20*
+*最后更新：2026-05-27*
