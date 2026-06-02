@@ -6,7 +6,7 @@ Phase 3 聚焦高阶提示工程，帮助学习者在 GitHub Copilot CLI 中处�
 
 | 模块 | 状态 | 支持资料 |
 | --- | --- | --- |
-| M7 上下文管理与多文件交互 | 进行中 | [Prompt 模板库](./prompts/M7-context-management-prompts.md) |
+| M7 上下文管理与多文件交互 | ✅ 已完成 | [Prompt 模板库](./prompts/M7-context-management-prompts.md) / [完成总结](./M7-COMPLETION-SUMMARY.md) |
 | M8 高阶提示模式 | 待开始 | 待补充 |
 | M9 工作流集成与复盘 | 待开始 | 待补充 |
 
@@ -15,6 +15,7 @@ Phase 3 聚焦高阶提示工程，帮助学习者在 GitHub Copilot CLI 中处�
 - [M7 上下文管理与多文件交互](../../modules/phase3/M7-context-management.md)
 - [M7 上下文管理 Prompt 模板库](./prompts/M7-context-management-prompts.md)
 - [M7 上下文演示示例](../../examples/phase3/m7-context-demo/)
+- [M7 完成总结](./M7-COMPLETION-SUMMARY.md)
 
 ## 使用建议
 
@@ -22,4 +23,4 @@ Phase 3 聚焦高阶提示工程，帮助学习者在 GitHub Copilot CLI 中处�
 2. 再使用 Prompt 模板库完成上下文地图、修改范围收敛、任务计划和 diff 审查。
 3. 最后结合示例目录进行实战练习，并把可复用经验沉淀到自己的工作流中。
 
-*最后更新：2026-05-19*
+*最后更新：2026-06-02*
