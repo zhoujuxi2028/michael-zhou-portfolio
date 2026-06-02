@@ -104,7 +104,7 @@
 | Phase 2 QA 工作流 | M4 | ✅ 已完成 | [测试代码生成最佳实践](./modules/phase2/M4-test-generation.md) |
 | Phase 2 QA 工作流 | M5 | ✅ 已完成 | [文档和注释生成工作流](./modules/phase2/M5-doc-generation.md) |
 | Phase 2 QA 工作流 | M6 | ✅ 已完成 | [代码审查加速工作流](./modules/phase2/M6-code-review-workflow.md) |
-| Phase 3 高阶提示工程 | M7 | 📘 初稿完成 | [上下文管理与多文件交互](./modules/phase3/M7-context-management.md) |
+| Phase 3 高阶提示工程 | M7 | ✅ 已完成 | [上下文管理与多文件交互](./modules/phase3/M7-context-management.md) |
 | Phase 3 高阶提示工程 | M8 | 📘 初稿完成 | [自定义工作流与脚本集成](./modules/phase3/M8-workflow-integration.md) |
 | Phase 3 高阶提示工程 | M9 | 📘 初稿完成 | [调试与故障排查](./modules/phase3/M9-debugging.md) |
 | Phase 4 项目集成案例 | M10 | 📘 初稿完成 | [API 测试项目集成](./modules/phase4/M10-api-testing-integration.md) |
@@ -120,10 +120,10 @@
 
 | 项目 | 结果 |
 |------|------|
-| 调查日期 | 2026-05-27 |
-| 已完成模块 | M1-M6，共 6/15 |
-| 初稿完成模块 | M7-M15，共 9/15 |
-| 下一步建议 | 优先验证 M7-M9，再补 Phase 4-5 项目案例 |
+| 调查日期 | 2026-06-02 |
+| 已完成模块 | M1-M7，共 7/15 |
+| 初稿完成模块 | M8-M15，共 8/15 |
+| 下一步建议 | 优先验证 M8-M9，再补 Phase 4-5 项目案例 |
 
 ---
 
@@ -136,6 +136,7 @@
 | 可运行示例 | [examples/](./examples/) | Jest、Pytest、文档生成等实践项目 |
 | Phase 1 支持资料 | [docs/phase1/](./docs/phase1/) | Phase 1 完成报告和评审资料 |
 | Phase 2 支持资料 | [docs/phase2/](./docs/phase2/) | M4-M6 报告、Prompt、技术栈和归档资料 |
+| Phase 3 支持资料 | [docs/phase3/](./docs/phase3/) | M7 完成总结、Prompt 模板和高阶提示工程资料 |
 | Phase 2 归档资料 | [docs/phase2/archive/](./docs/phase2/archive/) | 分支状态和 M4-M5 转换记录 |
 | 模块模板 | [template.md](./template.md) | 新建或重写模块时复制使用 |
 
@@ -166,4 +167,4 @@
 
 ---
 
-*最后更新：2026-05-27*
+*最后更新：2026-06-02*

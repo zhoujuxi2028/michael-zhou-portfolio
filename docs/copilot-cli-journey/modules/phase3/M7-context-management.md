@@ -268,4 +268,9 @@ M7 是 Phase 3 的起点。进入高级阶段后，学习重点不再是让 Copi
 
 [M8: 自定义工作流与脚本集成](./M8-workflow-integration.md)
 
-*最后更新：2026-05-19*
+## 完成记录
+
+- [M7 完成总结](../../docs/phase3/M7-COMPLETION-SUMMARY.md)
+- [M7 上下文管理实战示例](../../examples/phase3/m7-context-demo/)
+
+*最后更新：2026-06-02*
