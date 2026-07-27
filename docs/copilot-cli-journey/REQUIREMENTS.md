@@ -11,8 +11,8 @@
 | 编号 | 描述 | 状态 | GitHub Issue | Phase | 优先级 |
 |------|------|------|-------------|-------|--------|
 | REQ-M5-01  | M5-doc-generation.md 末尾添加「学习成果」section，汇总 m5/summaries/ 关键结论，使模块页成为完整独立入口 | 🔴 | [#7](https://github.com/zhoujuxi2028/michael-zhou-portfolio/issues/7) | Phase 2 | 中 |
-| REQ-M8-01  | M8 工作流集成 — 实战验证记录 | 🔴 | [#9](https://github.com/zhoujuxi2028/michael-zhou-portfolio/issues/9) | Phase 3 | 高 |
-| REQ-M9-01  | M9 调试与脚本 — 实战验证记录 | 🔴 | [#8](https://github.com/zhoujuxi2028/michael-zhou-portfolio/issues/8) | Phase 3 | 高 |
+| REQ-M8-01  | M8 工作流集成 — 实战验证记录 | ✅ | [#9](https://github.com/zhoujuxi2028/michael-zhou-portfolio/issues/9) | Phase 3 | 高 |
+| REQ-M9-01  | M9 调试与脚本 — 实战验证记录 | ✅ | [#8](https://github.com/zhoujuxi2028/michael-zhou-portfolio/issues/8) | Phase 3 | 高 |
 | REQ-M0-02  | Phase 3 支持文档 — M8/M9 验证后补充 Prompt 库和完成总结到 docs/phase3/ | 🔴 | [#11](https://github.com/zhoujuxi2028/michael-zhou-portfolio/issues/11) | Phase 3 | 低 |
 | REQ-M10-01 | M10 API测试集成 — 实战验证 + 真实项目案例 | 🔴 | [#10](https://github.com/zhoujuxi2028/michael-zhou-portfolio/issues/10) | Phase 4 | 中 |
 | REQ-M11-01 | M11 E2E测试集成 — 实战验证 + 真实项目案例 | 🔴 | [#12](https://github.com/zhoujuxi2028/michael-zhou-portfolio/issues/12) | Phase 4 | 中 |
