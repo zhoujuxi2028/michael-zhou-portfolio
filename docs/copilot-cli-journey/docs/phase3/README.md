@@ -7,8 +7,8 @@ Phase 3 聚焦高阶提示工程，帮助学习者在 GitHub Copilot CLI 中处�
 | 模块 | 状态 | 支持资料 |
 | --- | --- | --- |
 | M7 上下文管理与多文件交互 | ✅ 已完成 | [Prompt 模板库](./prompts/M7-context-management-prompts.md) / [完成总结](./M7-COMPLETION-SUMMARY.md) |
-| M8 高阶提示模式 | 待开始 | 待补充 |
-| M9 工作流集成与复盘 | 待开始 | 待补充 |
+| M8 自定义工作流与脚本集成 | ✅ 已完成 | [完成总结](./M8-COMPLETION-SUMMARY.md) |
+| M9 调试与故障排查 | ✅ 已完成 | [完成总结](./M9-COMPLETION-SUMMARY.md) |
 
 ## M7 学习资料
 
