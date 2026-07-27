@@ -236,6 +236,54 @@ cat src/auth/index.py | gh copilot suggest "为这个 Python 模块生成 README
 
 ---
 
+## 学习成果
+
+> 本节汇总 [完成总结](./m5/summaries/completion-summary.md) 和 [深化学习总结](./m5/summaries/deep-dive.md) 的关键结论，使模块页成为完整的独立学习入口。
+
+### 核心实战成果
+
+| 维度 | 成果 |
+|------|------|
+| 完成的 Docstring | 7 个 JavaScript endpoints + 6 个 Python 方法 |
+| 可复用 Prompt 数量 | 9 个（3 JS + 6 Python） |
+| 覆盖技术栈 | Express/Swagger、FastAPI、gRPC、GraphQL |
+| 文档生成方式 | 9 种，从手动 JSDoc 到完全自动内省 |
+
+### 编写高质量 Docstring 的 5 步法
+
+1. **一句话总结** — 命令式，清楚表达方法作用
+2. **详细描述** — 背景信息、协议名称、适用场景
+3. **Args** — 参数名、类型、说明，复杂类型展示结构
+4. **Returns** — 返回值类型和结构（成功/失败场景）
+5. **Raises + Examples** — 异常情况和真实使用示例
+
+### 三大技术栈关键结论（深化学习）
+
+| 技术栈 | 文档自动化 | 最佳场景 |
+|--------|-----------|---------|
+| **FastAPI** | ⭐⭐⭐⭐⭐ 类型注解 → 零配置生成 | Web API、快速开发 |
+| **gRPC** | ⭐⭐⭐⭐ .proto 文件定义 | 微服务、多语言、高性能 |
+| **GraphQL** | ⭐⭐⭐⭐⭐ 内省机制完全自动 | 灵活查询、实时推送 |
+
+**文档自动化演进规律**：
+```
+手动 JSDoc (swagger-jsdoc)
+  ↓
+半自动（FastAPI 类型注解）
+  ↓
+完全自动（GraphQL 内省）
+```
+
+### Copilot Prompt 编写要点
+
+- ✅ **完整代码上下文** — 让 Copilot 理解代码含义
+- ✅ **明确的格式要求** — 指定"Google 风格"、"包含 Args 部分"
+- ✅ **具体的字段说明** — 列出期望 Docstring 包含哪些部分
+- ✅ **语言要求** — 明确指定中文还是英文
+- ✅ **示例参考** — 最好提供一个预期输出的示例
+
+---
+
 **下一步**：[M6: 代码审查加速](./M6-code-review-workflow.md)
 
 *最后更新：2026-05-06*
