@@ -37,9 +37,9 @@
 5. ✅ 5 个测试场景验证 + curl/Postman 示例
 
 **支持文档**:
-- `docs/learning/M5-copilot-prompts.md` - 3 个可复用的 JavaScript Prompts
-- `docs/learning/M5-swagger-ui-guide.md` - 完整的 Swagger UI 使用指南
-- `docs/learning/M5-swagger-optimization.md` - 优化策略总结
+- `docs/learning/M5-copilot-prompts.md` - 3 个可复用的 JavaScript Prompts *(原 michael-zhou-qa-portfolio 仓库路径，已迁移)*
+- `docs/learning/M5-swagger-ui-guide.md` - 完整的 Swagger UI 使用指南 *(原 michael-zhou-qa-portfolio 仓库路径，已迁移)*
+- `docs/learning/M5-swagger-optimization.md` - 优化策略总结 *(原 michael-zhou-qa-portfolio 仓库路径，已迁移)*
 - `performance-testing-platform/docs/DESIGN-DECISIONS.md` - 设计决策说明
 
 ---

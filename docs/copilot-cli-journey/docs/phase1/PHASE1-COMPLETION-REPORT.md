@@ -1,5 +1,7 @@
 # Phase 1 完成总结报告
 
+> **路径说明**：本文档中的 `docs/learning/` 路径为原 `michael-zhou-qa-portfolio` 仓库的历史结构，已迁移至当前仓库的 `docs/copilot-cli-journey/` 目录。以下内容为历史记录，保留原始路径表述。
+
 ## 时间轴
 - 开始时间：2026-04-10 00:21:24 UTC
 - 完成时间：2026-04-10 09:16 UTC

@@ -1,5 +1,7 @@
 # Phase 1 - 最终总结与审阅准备
 
+> **路径说明**：本文档中的 `docs/learning/` 路径为原 `michael-zhou-qa-portfolio` 仓库的历史结构，已迁移至当前仓库的 `docs/copilot-cli-journey/` 目录。以下内容为历史记录，保留原始路径表述。
+
 ## 📊 项目完成状态
 
 | 项目 | 状态 | 说明 |
