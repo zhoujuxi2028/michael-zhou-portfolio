@@ -18,9 +18,9 @@
 | REQ-M11-01 | M11 E2E测试集成 — 实战验证 + 真实项目案例 | ✅ | [#12](https://github.com/zhoujuxi2028/michael-zhou-portfolio/issues/12) | Phase 4 | 中 |
 | REQ-M12-01 | M12 性能测试集成 — 实战验证 + 真实项目案例 | ✅ | [#13](https://github.com/zhoujuxi2028/michael-zhou-portfolio/issues/13) | Phase 4 | 中 |
 | REQ-M0-03  | Phase 4 支持文档（docs/phase4/）+ 示例补充，参照 Phase 1-3 模式建立完成总结/Prompt 库/示例 | 🔴 | [#14](https://github.com/zhoujuxi2028/michael-zhou-portfolio/issues/14) | Phase 4 | 低 |
-| REQ-M13-01 | M13 Copilot Workspace — 实践沉淀 | 🔴 | [#15](https://github.com/zhoujuxi2028/michael-zhou-portfolio/issues/15) | Phase 5 | 中 |
-| REQ-M14-01 | M14 团队标准 — 实践沉淀 | 🔴 | [#16](https://github.com/zhoujuxi2028/michael-zhou-portfolio/issues/16) | Phase 5 | 中 |
-| REQ-M15-01 | M15 知识库总结 — 实践沉淀 | 🔴 | [#17](https://github.com/zhoujuxi2028/michael-zhou-portfolio/issues/17) | Phase 5 | 中 |
+| REQ-M13-01 | M13 Copilot Workspace — 实践沉淀 | ✅ | [#15](https://github.com/zhoujuxi2028/michael-zhou-portfolio/issues/15) | Phase 5 | 中 |
+| REQ-M14-01 | M14 团队标准 — 实践沉淀 | ✅ | [#16](https://github.com/zhoujuxi2028/michael-zhou-portfolio/issues/16) | Phase 5 | 中 |
+| REQ-M15-01 | M15 知识库总结 — 实践沉淀 | ✅ | [#17](https://github.com/zhoujuxi2028/michael-zhou-portfolio/issues/17) | Phase 5 | 中 |
 | REQ-M0-04  | Phase 5 支持文档（docs/phase5/）+ 示例补充，参照 Phase 1-3 模式建立完成总结/Prompt 库/示例 | 🔴 | [#18](https://github.com/zhoujuxi2028/michael-zhou-portfolio/issues/18) | Phase 5 | 低 |
 | REQ-M0-01  | 统一旧路径引用（docs/learning/ → 当前路径） | 🔴 | [#19](https://github.com/zhoujuxi2028/michael-zhou-portfolio/issues/19) | 横切 | 低 |
 
