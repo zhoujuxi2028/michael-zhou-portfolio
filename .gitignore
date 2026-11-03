@@ -49,3 +49,6 @@ Thumbs.db
 
 # Test Coverage
 **/coverage/
+
+# SQLite generated databases
+**/*.db

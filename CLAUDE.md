@@ -9,6 +9,7 @@ This is a multi-project portfolio repository. Each subdirectory is an independen
 ## Projects
 
 - **cloud-monitoring-platform/** - IoT cloud monitoring system (Spring Boot + Vue.js + uni-app)
+- **edi-reporting-demo/** - EDI message parsing + Jasper report template (Python + EDIFACT + Jasper Reports + SQLite)
 - **android-app/** - Android application *(planned)*
 - **linux-driver/** - Linux kernel driver *(planned)*
 
