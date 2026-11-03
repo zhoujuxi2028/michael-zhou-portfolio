@@ -25,6 +25,12 @@
 - [实现清单](./BEST-PRACTICES/implementation-checklist.md) — 项目开发的检查清单
 - [计划模板](./BEST-PRACTICES/templates/plan-template.md) — 项目规划模板
 
+#### [需求编号规范](./REQUIREMENTS-NUMBERING.md)
+仓库级统一需求编号规范（`REQ-{PROJECT}-{SEQ}`）。
+
+#### [全局需求索引](./REQUIREMENTS-INDEX.md)
+所有需求编号的单一登记入口，按项目分组。
+
 ---
 
 ## 📂 文档结构
@@ -33,6 +39,8 @@
 docs/
 ├── README.md (你在这里)
 ├── PROJECT-STRUCTURE.md          项目整体架构
+├── REQUIREMENTS-NUMBERING.md     需求编号规范
+├── REQUIREMENTS-INDEX.md         全局需求索引
 ├── BEST-PRACTICES/               最佳实践指南
 │   ├── implementation-checklist.md
 │   └── templates/
