@@ -18,6 +18,7 @@ This is a multi-project portfolio repository. Each subdirectory is an independen
 - Each project has its own `CLAUDE.md` with project-specific build commands and architecture details
 - Vendor references use anonymized names (Vendor A, Vendor B, Vendor C) for information security
 - Navigate to the specific project directory before running any build/dev commands
+- Requirements use the repository-level numbering convention `REQ-{PROJECT}-{SEQ}` — see [docs/REQUIREMENTS-NUMBERING.md](docs/REQUIREMENTS-NUMBERING.md) and register every new requirement in [docs/REQUIREMENTS-INDEX.md](docs/REQUIREMENTS-INDEX.md)
 
 ## Python Usage
 
