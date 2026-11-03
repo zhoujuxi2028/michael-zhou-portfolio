@@ -27,7 +27,7 @@ claude-api-journey/
 
 | 周次 | 主题 | 状态 |
 |------|------|------|
-| Week 1 | API 基础 + Prompt 工程 | 🔴 未开始 |
+| Week 1 | API 基础 + Prompt 工程 | 🟡 进行中 |
 | Week 2 | Prompt 评估 + Tool Use | 🔴 未开始 |
 | Week 3 | Claude 特性 + RAG | 🔴 未开始 |
 | Week 4 | MCP + Agents + 收尾 | 🔴 未开始 |
