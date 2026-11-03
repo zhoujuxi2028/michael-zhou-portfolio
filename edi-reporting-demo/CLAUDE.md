@@ -54,4 +54,4 @@ python3 build_orders_db.py
 - Python 使用标准库（`sqlite3`、`sys`、`dataclasses`），无第三方依赖
 - 测试用 pytest（开发依赖，运行 `python3 -m pytest`）
 - `orders.db` 是生成产物，不入库（见 `.gitignore`）
-- 文档中文优先
+- 文档双语维护：`README.md` 是语言跳转入口，`README.en.md`（英文）与 `README.zh.md`（中文）需同步更新
