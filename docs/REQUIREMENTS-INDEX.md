@@ -2,7 +2,9 @@
 
 > 本仓库所有需求的**单一登记入口**，按项目分组。编号规范见 [REQUIREMENTS-NUMBERING.md](./REQUIREMENTS-NUMBERING.md)。
 >
-> 状态：🟡 进行中 | 最后更新：2026-11-03
+> 完整台账（优先级 / 类型 / 状态）见 [requirements/req-register.md](./requirements/req-register.md)。
+>
+> 状态：🟡 进行中 | 最后更新：2026-11-05
 
 ---
 
@@ -14,8 +16,9 @@
 | `EDI` | edi-reporting-demo | 1 |
 | `CC` | copilot-cli-journey | 13 |
 | `CA` | claude-api-journey | 0 |
-| `AND` / `DRV` | （规划中） | 0 |
-| **合计** | | **15** |
+| `AND` | android-app | 1 |
+| `DRV` | （规划中） | 0 |
+| **合计** | | **16** |
 
 ---
 
@@ -62,6 +65,14 @@
 ## CA — claude-api-journey
 
 暂无正式编号需求。
+
+---
+
+## AND — android-app
+
+| 编号 | 描述 | 状态 |
+|------|------|------|
+| `REQ-AND-001` | android-app 项目初始化：CLAUDE.md + 需求登记 + CI 接入 | ✅ Verified |
 
 ---
 
