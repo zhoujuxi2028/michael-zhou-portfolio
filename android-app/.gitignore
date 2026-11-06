@@ -1,0 +1,16 @@
+# Local machine config — never commit
+local.properties
+
+# Build outputs
+build/
+app/build/
+
+# Gradle cache
+.gradle/
+
+# IDE
+.idea/
+*.iml
+
+# Accidental downloads
+*.zip
