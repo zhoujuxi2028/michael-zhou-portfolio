@@ -4,8 +4,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.michaelzhou.viewdemo.R
@@ -21,15 +23,31 @@ class LoginActivity : AppCompatActivity() {
         val etEmail = findViewById<EditText>(R.id.etEmail)
         val etPassword = findViewById<EditText>(R.id.etPassword)
         val btnLogin = findViewById<Button>(R.id.btnLogin)
+        val tvLoginError = findViewById<TextView>(R.id.tvLoginError)
 
         viewModel.isLoginEnabled.observe(this) { btnLogin.isEnabled = it }
+
+        viewModel.loginError.observe(this) { error ->
+            if (error != null) {
+                tvLoginError.text = error
+                tvLoginError.visibility = View.VISIBLE
+            } else {
+                tvLoginError.visibility = View.GONE
+            }
+        }
+
+        viewModel.loginSuccess.observe(this) { email ->
+            if (email != null) {
+                val intent = Intent(this, TodoActivity::class.java)
+                intent.putExtra("user_email", email)
+                startActivity(intent)
+            }
+        }
 
         etEmail.addTextChangedListener(onChanged { viewModel.onEmailChanged(it) })
         etPassword.addTextChangedListener(onChanged { viewModel.onPasswordChanged(it) })
 
-        btnLogin.setOnClickListener {
-            startActivity(Intent(this, TodoActivity::class.java))
-        }
+        btnLogin.setOnClickListener { viewModel.onLoginClicked() }
     }
 
     private fun onChanged(action: (String) -> Unit) = object : TextWatcher {

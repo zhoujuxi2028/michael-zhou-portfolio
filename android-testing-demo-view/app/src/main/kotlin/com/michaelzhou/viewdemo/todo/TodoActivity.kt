@@ -10,7 +10,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.michaelzhou.viewdemo.R
 
 class TodoActivity : AppCompatActivity() {
-    private val viewModel: TodoViewModel by viewModels()
+
+    private val viewModel: TodoViewModel by viewModels {
+        val email = intent.getStringExtra("user_email") ?: ""
+        TodoViewModelFactory(application, email)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
