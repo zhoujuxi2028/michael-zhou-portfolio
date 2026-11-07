@@ -23,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
@@ -30,7 +31,15 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
-fun TodoScreen(viewModel: TodoViewModel = viewModel()) {
+fun TodoScreen(
+    userEmail: String = "",
+    viewModel: TodoViewModel = viewModel(
+        factory = TodoViewModelFactory(
+            LocalContext.current.applicationContext as android.app.Application,
+            userEmail
+        )
+    )
+) {
     val todos by viewModel.todos.collectAsStateWithLifecycle()
     var input by remember { mutableStateOf("") }
 
