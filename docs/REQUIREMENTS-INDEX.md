@@ -17,8 +17,9 @@
 | `CC` | copilot-cli-journey | 13 |
 | `CA` | claude-api-journey | 0 |
 | `AND` | android-app | 1 |
+| `ANDT` | android-testing-demo | 2 |
 | `DRV` | （规划中） | 0 |
-| **合计** | | **16** |
+| **合计** | | **18** |
 
 ---
 
@@ -65,6 +66,15 @@
 ## CA — claude-api-journey
 
 暂无正式编号需求。
+
+---
+
+## ANDT — android-testing-demo
+
+| 编号 | 描述 | 状态 |
+|------|------|------|
+| `REQ-ANDT-001` | android-testing-demo-view：Login + Todo App，XML Layout + Espresso 自动化测试（TC-001~006） | ✅ |
+| `REQ-ANDT-002` | android-testing-demo-compose：Login + Todo App，Jetpack Compose + Compose UI Test（TC-001~006） + Room DB 持久化 + SHA-256 密码哈希（TC-007, TC-009） | ✅ |
 
 ---
 
