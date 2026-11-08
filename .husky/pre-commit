@@ -2,6 +2,12 @@
 
 STAGED=$(git diff --cached --name-only)
 
+# Use Java 17 for Android Gradle tasks on macOS
+if command -v /usr/libexec/java_home >/dev/null 2>&1; then
+  JAVA_HOME=$(/usr/libexec/java_home -v 17 2>/dev/null)
+  export JAVA_HOME
+fi
+
 # Python: flake8 on edi-reporting-demo
 if echo "$STAGED" | grep -q "^edi-reporting-demo/"; then
   echo "→ flake8: edi-reporting-demo"
