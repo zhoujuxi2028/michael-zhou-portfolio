@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  android-compose:
+    name: Unit Tests (android-testing-demo-compose)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+      - name: Run unit tests
+        working-directory: android-testing-demo-compose
+        run: ./gradlew test
+
+  android-view:
+    name: Unit Tests (android-testing-demo-view)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+      - name: Run unit tests
+        working-directory: android-testing-demo-view
+        run: ./gradlew test
+
+  edi:
+    name: Tests (edi-reporting-demo)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pytest
+        run: pip install pytest
+      - name: Run tests
+        working-directory: edi-reporting-demo/edi
+        run: pytest tests/ -v
