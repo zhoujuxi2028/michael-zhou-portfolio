@@ -68,4 +68,14 @@ class LoginActivityTest {
         onView(withId(R.id.tvLoginError)).check(matches(isDisplayed()))
         onView(withId(R.id.tvLoginError)).check(matches(withText("Invalid email or password")))
     }
+
+    // TC-008
+    @Test
+    fun unregisteredEmail_showsErrorMessage() {
+        onView(withId(R.id.etEmail)).perform(typeText("nobody@test.com"), closeSoftKeyboard())
+        onView(withId(R.id.etPassword)).perform(typeText("anypassword"), closeSoftKeyboard())
+        onView(withId(R.id.btnLogin)).perform(click())
+        onView(withId(R.id.tvLoginError)).check(matches(isDisplayed()))
+        onView(withId(R.id.tvLoginError)).check(matches(withText("Invalid email or password")))
+    }
 }
