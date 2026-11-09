@@ -67,4 +67,13 @@ class LoginScreenTest {
         composeRule.onNodeWithTag("loginBtn").performClick()
         composeRule.onNodeWithTag("loginError").assertIsDisplayed()
     }
+
+    // TC-008
+    @Test
+    fun unregisteredEmail_showsErrorMessage() {
+        composeRule.onNodeWithTag("emailField").performTextInput("nobody@test.com")
+        composeRule.onNodeWithTag("passwordField").performTextInput("anypassword")
+        composeRule.onNodeWithTag("loginBtn").performClick()
+        composeRule.onNodeWithTag("loginError").assertIsDisplayed()
+    }
 }
