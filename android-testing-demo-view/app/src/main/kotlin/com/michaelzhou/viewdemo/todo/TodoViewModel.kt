@@ -6,14 +6,24 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.michaelzhou.viewdemo.db.AppDatabase
+import com.michaelzhou.viewdemo.db.TodoDao
 import com.michaelzhou.viewdemo.db.TodoEntity
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class TodoViewModel(application: Application, private val userEmail: String) :
-    AndroidViewModel(application) {
+class TodoViewModel(
+    application: Application,
+    private val userEmail: String,
+    private val todoDao: TodoDao,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
+) : AndroidViewModel(application) {
 
-    private val todoDao = AppDatabase.getInstance(application).todoDao()
+    constructor(application: Application, userEmail: String) : this(
+        application,
+        userEmail,
+        AppDatabase.getInstance(application).todoDao()
+    )
 
     private val _todos = MutableLiveData<List<TodoItem>>(emptyList())
     val todos: LiveData<List<TodoItem>> = _todos
@@ -23,7 +33,7 @@ class TodoViewModel(application: Application, private val userEmail: String) :
     }
 
     private fun loadTodos() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             val entities = todoDao.getTodosForUser(userEmail)
             _todos.postValue(entities.map { TodoItem(id = it.id, text = it.text, isDone = it.isDone) })
         }
@@ -31,7 +41,7 @@ class TodoViewModel(application: Application, private val userEmail: String) :
 
     fun addTodo(text: String) {
         if (text.isBlank()) return
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             val id = todoDao.insert(TodoEntity(userEmail = userEmail, text = text))
             _todos.postValue(_todos.value.orEmpty() + TodoItem(id = id, text = text))
         }
@@ -42,7 +52,7 @@ class TodoViewModel(application: Application, private val userEmail: String) :
             if (it.id == id) it.copy(isDone = !it.isDone) else it
         }
         _todos.value = updated
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             val entity = todoDao.getTodosForUser(userEmail).find { it.id == id } ?: return@launch
             todoDao.update(entity.copy(isDone = !entity.isDone))
         }
@@ -50,6 +60,6 @@ class TodoViewModel(application: Application, private val userEmail: String) :
 
     fun deleteTodo(id: Long) {
         _todos.value = _todos.value.orEmpty().filter { it.id != id }
-        viewModelScope.launch(Dispatchers.IO) { todoDao.deleteById(id) }
+        viewModelScope.launch(ioDispatcher) { todoDao.deleteById(id) }
     }
 }
