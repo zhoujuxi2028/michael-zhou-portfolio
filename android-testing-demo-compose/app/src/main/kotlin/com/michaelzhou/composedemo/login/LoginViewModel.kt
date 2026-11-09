@@ -4,7 +4,9 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.michaelzhou.composedemo.db.AppDatabase
+import com.michaelzhou.composedemo.db.UserDao
 import com.michaelzhou.composedemo.utils.sha256
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -14,8 +16,16 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class LoginViewModel(application: Application) : AndroidViewModel(application) {
-    private val userDao = AppDatabase.getInstance(application).userDao()
+class LoginViewModel(
+    application: Application,
+    private val userDao: UserDao,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
+) : AndroidViewModel(application) {
+
+    constructor(application: Application) : this(
+        application,
+        AppDatabase.getInstance(application).userDao()
+    )
 
     private val _email = MutableStateFlow("")
     private val _password = MutableStateFlow("")
@@ -34,7 +44,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
     fun onPasswordChanged(value: String) { _password.value = value }
 
     fun onLoginClicked() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(ioDispatcher) {
             val user = userDao.findByEmail(_email.value)
             if (user != null && user.passwordHash == sha256(_password.value)) {
                 _loginError.value = null
