@@ -1,0 +1,30 @@
+#!/bin/sh
+
+STAGED=$(git diff --cached --name-only)
+
+# Use Java 17 for Android Gradle tasks on macOS
+if command -v /usr/libexec/java_home >/dev/null 2>&1; then
+  JAVA_HOME=$(/usr/libexec/java_home -v 17 2>/dev/null)
+  export JAVA_HOME
+fi
+
+# Python: flake8 on edi-reporting-demo
+if echo "$STAGED" | grep -q "^edi-reporting-demo/"; then
+  echo "→ flake8: edi-reporting-demo"
+  (cd edi-reporting-demo && python3 -m flake8 edi/ \
+    --max-line-length=100 \
+    --exclude=edi/__pycache__,edi/tests/__pycache__ \
+    --extend-ignore=E501)
+fi
+
+# Android compose: lint
+if echo "$STAGED" | grep -q "^android-testing-demo-compose/"; then
+  echo "→ lint: android-testing-demo-compose"
+  (cd android-testing-demo-compose && ./gradlew lint --quiet)
+fi
+
+# Android view: lint
+if echo "$STAGED" | grep -q "^android-testing-demo-view/"; then
+  echo "→ lint: android-testing-demo-view"
+  (cd android-testing-demo-view && ./gradlew lint --quiet)
+fi
