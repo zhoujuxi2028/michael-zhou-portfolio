@@ -11,4 +11,5 @@
 | [android-app](./android-app/) | 自适应时钟 App，支持折叠屏自适应布局，真机验证（Vivo Folder） | Kotlin, Jetpack Compose, Material3, Gradle 8.9 | ✅ |
 | [android-testing-demo-view](./android-testing-demo-view/) | Login + Todo 双页 App，XML Layout + Espresso 自动化测试（8 tests，含 Room DB 持久化验证，真机通过） | Kotlin, AppCompat, LiveData, Room, Espresso | ✅ |
 | [android-testing-demo-compose](./android-testing-demo-compose/) | Login + Todo 双页 App，Jetpack Compose + Compose UI Test 自动化测试（8 tests，含 Room DB 持久化验证，真机通过） | Kotlin, Jetpack Compose, StateFlow, Room, Compose UI Test | ✅ |
+| [devops-platform-demo](./devops-platform-demo/) | DevOps 平台演示（CI/CD + 容器编排 + IaC + DevSecOps） | GitHub Actions, Docker, Kubernetes, Helm, ArgoCD, Terraform, Trivy, Cypress, Newman, Prometheus/Grafana | ✅ |
 | linux-driver/ | Linux 内核驱动 | C, Linux Kernel | 🔲 规划中 |

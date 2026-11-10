@@ -1,0 +1,55 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: qa-portfolio-staging
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  labels:
+    environment: staging
+    team: qa
+    project: qa-portfolio
+spec:
+  project: qa-portfolio
+
+  source:
+    repoURL: https://github.com/zhoujuxi2028/michael-zhou-qa-portfolio.git
+    targetRevision: main
+    # Helm chart source (upgraded from raw K8s manifests)
+    path: cicd-demo/helm/qa-portfolio
+    helm:
+      valueFiles:
+        - values.yaml
+        - values-staging.yaml
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: qa-portfolio
+
+  syncPolicy:
+    automated:
+      # Staging: manual approval required
+      selfHeal: false
+      prune: true
+      allowEmpty: false
+    syncOptions:
+      - CreateNamespace=true
+      - Validate=true
+      - ServerSideApply=false
+      - PruneLast=false
+    retry:
+      limit: 3
+      backoff:
+        duration: 10s
+        maxDuration: 5m
+        factor: 2
+
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/template/metadata/annotations

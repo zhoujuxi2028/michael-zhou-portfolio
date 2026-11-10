@@ -28,3 +28,9 @@ if echo "$STAGED" | grep -q "^android-testing-demo-view/"; then
   echo "→ lint: android-testing-demo-view"
   (cd android-testing-demo-view && ./gradlew lint --quiet)
 fi
+
+# devops-platform-demo: ESLint
+if echo "$STAGED" | grep -q "^devops-platform-demo/"; then
+  echo "→ lint: devops-platform-demo"
+  (cd devops-platform-demo && npm run lint --if-present)
+fi
