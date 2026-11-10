@@ -1,0 +1,65 @@
+# Production environment overrides
+
+testConfig:
+  newmanEnvironment: "production"
+  logLevel: "warn"
+  enableDebug: "false"
+  bailOnFailure: "true"
+
+newmanEnv:
+  name: "JSONPlaceholder Production"
+  environment: "production"
+
+# More resources for production stability
+resources:
+  requests:
+    memory: "128Mi"
+    cpu: "200m"
+  limits:
+    memory: "256Mi"
+    cpu: "500m"
+
+cypress:
+  activeDeadlineSeconds: 900
+  resources:
+    requests:
+      memory: "2Gi"
+      cpu: "1000m"
+    limits:
+      memory: "4Gi"
+      cpu: "2000m"
+
+newman:
+  activeDeadlineSeconds: 600
+
+storage:
+  testResults:
+    size: 10Gi
+  cypressCache:
+    size: 2Gi
+
+ingress:
+  hosts:
+    - host: test-results.qa-portfolio.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+
+# 生产环境启用 HPA（需要 Metrics Server）
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+# 生产环境启用 NetworkPolicy（网络隔离）
+networkPolicy:
+  enabled: true
+  allowFromNamespaces:
+    - ingress-nginx
+
+# 生产环境启用 PodDisruptionBudget（高可用保障）
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1

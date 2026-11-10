@@ -42,6 +42,7 @@ REQ-{PROJECT}-{SEQ}
 | `CA` | `docs/claude-api-journey/` | Claude API 学习路径 |
 | `AND` | `android-app/`（规划中） | Android 应用 |
 | `DRV` | `linux-driver/`（规划中） | Linux 内核驱动 |
+| `DVP` | `devops-platform-demo/` | DevOps 平台演示（CI/CD + K8s + IaC + DevSecOps） |
 
 > 新增项目时：在本表登记前缀，并在 [REQUIREMENTS-INDEX.md](./REQUIREMENTS-INDEX.md) 增加对应小节。
 

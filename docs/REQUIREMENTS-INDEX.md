@@ -18,8 +18,9 @@
 | `CA` | claude-api-journey | 0 |
 | `AND` | android-app | 1 |
 | `ANDT` | android-testing-demo | 2 |
+| `DVP` | devops-platform-demo | 1 |
 | `DRV` | （规划中） | 0 |
-| **合计** | | **18** |
+| **合计** | | **19** |
 
 ---
 
@@ -83,6 +84,14 @@
 | 编号 | 描述 | 状态 |
 |------|------|------|
 | `REQ-AND-001` | android-app 项目初始化：CLAUDE.md + 需求登记 + CI 接入 | ✅ Verified |
+
+---
+
+## DVP — devops-platform-demo
+
+| 编号 | 描述 | 状态 |
+|------|------|------|
+| `REQ-DVP-001` | devops-platform-demo：GitHub Actions CI/CD + Docker + Kubernetes + Helm + ArgoCD + Terraform + Trivy + Cypress + Newman 全栈 DevOps 演示 | ✅ |
 
 ---
 
