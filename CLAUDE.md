@@ -11,6 +11,7 @@ This is a multi-project portfolio repository. Each subdirectory is an independen
 - **cloud-monitoring-platform/** - IoT cloud monitoring system (Spring Boot + Vue.js + uni-app)
 - **edi-reporting-demo/** - EDI message parsing + Jasper report template (Python + EDIFACT + Jasper Reports + SQLite)
 - **android-app/** - Android application *(planned)*
+- **devops-platform-demo/** - DevOps platform demo (GitHub Actions CI/CD + Docker + Kubernetes + Helm + ArgoCD + Terraform + Trivy + Cypress + Newman)
 - **linux-driver/** - Linux kernel driver *(planned)*
 
 ## General Conventions
@@ -29,6 +30,7 @@ This is a multi-project portfolio repository. Each subdirectory is an independen
 - **Be concise**: Keep responses and file content brief and to the point
 - **No fluff**: Avoid unnecessary explanations, verbose comments, or filler text
 - **Tables over prose**: Use tables/lists instead of paragraphs when possible
+- **Language**: 与用户交互时使用**中文或英文**，不得使用其他语言（如韩文）；代码、命令、文件名保持英文
 
 ## ⚠️ Branch Discipline
 
