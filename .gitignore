@@ -52,3 +52,4 @@ Thumbs.db
 
 # SQLite generated databases
 **/*.db
+!devops-platform-demo/package-lock.json
