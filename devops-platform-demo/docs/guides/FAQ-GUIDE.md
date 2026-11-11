@@ -1089,3 +1089,37 @@ If one fails, others catch threats
 
 *Last Updated*: March 1, 2026
 *Status*: Production-ready for interviews
+
+---
+
+## CI/CD Pipeline (Phase 2 Additions)
+
+**Q: How is the multi-stage pipeline designed?**
+A: `dvp-pr.yml` has 5 parallel jobs (lint, unit-tests, build, security-scan, quality-gate) all feeding into a single `pr-gate` aggregator. Only `pr-gate` is a required branch protection check — adding/renaming jobs never requires updating branch protection rules.
+
+**Q: How does environment promotion work?**
+A: Push to main → staging auto-deploys → smoke tests run → production gate requires manual reviewer approval in GitHub Environments. This mirrors a real on-call approval workflow.
+
+**Q: What happens when a deployment fails?**
+A: (1) `deploy-summary` captures all stage results in GITHUB_STEP_SUMMARY; (2) `notify-failure` fires a Slack message with a direct link to the failed run; (3) Prometheus alert `TestJobFailed` fires within 2 minutes if K8s Jobs fail; (4) Grafana → Loki → `test-failure-investigation` dashboard for log-level triage.
+
+**Q: How do you roll back a bad deployment?**
+A: `helm rollback qa-portfolio -n qa-portfolio` reverts to previous revision. Each CI run uploads a versioned Helm chart artifact. For GitOps rollback: revert the merge commit → ArgoCD auto-syncs to previous state.
+
+**Q: What metrics do you track for CI/CD reliability?**
+A: `cicd_pipeline_duration_seconds{stage}`, `cicd_pipeline_status{result}`, `cicd_test_total{suite,result}` — all pushed to Prometheus Pushgateway via `scripts/push-metrics.sh` at the end of each pipeline run. Visualized in `monitoring/dashboards/cicd-pipeline.json`.
+
+**Q: How does Loki help debug production issues?**
+A: Promtail DaemonSet collects all pod logs and ships them to Loki. The `pipeline-logs` dashboard shows all qa-portfolio namespace logs. The `test-failure-investigation` dashboard filters for `AssertionError|Error:|FAILED` patterns across Cypress and Newman pods — finding root cause in seconds instead of hunting `kubectl logs`.
+
+**Q: How do you handle flaky tests in CI?**
+A: `job-cypress.yaml` and `job-newman.yaml` have `backoffLimit: 2` — the Job retries twice before marking failure. `TestJobRunningTooLong` fires if a Job exceeds 1 hour (zombie detection). Long-term flakiness is tracked via `cicd_test_total{result="failed"}` rate in the CI/CD dashboard.
+
+**Q: What is the difference between CI and CD in this project?**
+A: CI = `dvp-pr.yml` (lint + test + build + security on every PR, < 5 min). CD = `dvp-deploy.yml` (Helm package → staging → production, triggered on merge). ArgoCD provides GitOps CD for K8s manifest changes independently of GitHub Actions.
+
+**Q: How do you implement deployment gates?**
+A: GitHub Environments (`staging` = auto, `production` = required reviewer). `smoke-test-staging` must pass before `deploy-production` is queued. This prevents bad releases from reaching production.
+
+**Q: How are secrets handled in CI/CD?**
+A: GitHub Actions secrets (`SLACK_WEBHOOK_URL`). K8s secrets would use `kubectl create secret` or external-secrets-operator in a real cluster. Terraform state uses S3 backend with DynamoDB locking (Localstack for local dev).

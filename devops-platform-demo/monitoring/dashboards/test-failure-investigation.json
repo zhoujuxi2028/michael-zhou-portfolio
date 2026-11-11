@@ -1,0 +1,74 @@
+{
+  "id": null,
+  "uid": "dvp-test-failures",
+  "title": "DVP — Test Failure Investigation",
+  "description": "Drill-down dashboard for investigating failed Cypress and Newman test runs",
+  "tags": ["devops", "testing", "loki", "debugging"],
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "1m",
+  "time": { "from": "now-24h", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "type": "logs",
+      "title": "Failed Test Output — Cypress",
+      "description": "Filter: lines containing AssertionError, expected, Error",
+      "gridPos": { "x": 0, "y": 0, "w": 24, "h": 10 },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "targets": [
+        {
+          "expr": "{namespace=\"qa-portfolio\", job_name=~\"cypress.*\"} |~ \"(AssertionError|Error:|expected|failing)\"",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "enableLogDetails": true,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      }
+    },
+    {
+      "id": 2,
+      "type": "logs",
+      "title": "Failed Assertions — Newman",
+      "description": "Filter: lines containing AssertionError, FAILED, Error",
+      "gridPos": { "x": 0, "y": 10, "w": 24, "h": 10 },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "targets": [
+        {
+          "expr": "{namespace=\"qa-portfolio\", job_name=~\"newman.*\"} |~ \"(AssertionError|FAILED|Error:)\"",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "enableLogDetails": true,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      }
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Job Failure Rate (24h)",
+      "gridPos": { "x": 0, "y": 20, "w": 24, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "rate(kube_job_status_failed{namespace=\"qa-portfolio\"}[1h])",
+          "legendFormat": "{{job_name}} failures/hr",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "unit": "reqps"
+        }
+      }
+    }
+  ]
+}
