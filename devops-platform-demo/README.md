@@ -1,38 +1,39 @@
-# CI/CD Demo — DevOps Infrastructure Platform
+# DevOps Platform Demo | DevOps / SRE
 
-**Category: DevOps 基础设施演示**
-
-A complete DevOps infrastructure platform: Terraform IaC, Kubernetes orchestration, ArgoCD GitOps, Trivy security scanning, and Prometheus + Grafana observability. Includes CI/CD pipelines and basic test automation as validation layer.
+一个面向 DevOps / SRE 工程实践的可复现演示项目，覆盖 PR 质量门禁、制品打包、部署前校验、本地 Kubernetes、IaC、GitOps、DevSecOps 与可观测性配置。项目使用外部示例 API 和 LocalStack，不是生产业务系统。
 
 ## What This Project Demonstrates
 
 ```
-Code Push → GitHub Actions (CI) → Docker Build & Test → Helm Package
-    → ArgoCD (CD) → Kubernetes Deploy → Prometheus Monitoring → Grafana Dashboards
+PR → lint / manifest & chart validation / Docker image build / security checks
+  → PR Gate
+Merge to main → Helm package + SBOM → render manifests + dry-run → smoke test
+Local demo → k3d / Kubernetes + ArgoCD configuration + Prometheus / Grafana
 ```
 
-### Phase 1: Foundation (Complete)
+**Deployment boundary:** GitHub Actions packages the Helm chart, renders manifests, and runs a deployment dry-run; it does not deploy to a live cluster. ArgoCD and Kubernetes resources are available for a separately configured local demo.
+
+### Implemented Capabilities
 
 | Component | Technology | What It Does |
 |-----------|-----------|--------------|
-| **Infrastructure as Code** | Terraform + Localstack | S3, DynamoDB, 3 environment configs (dev/staging/prod) |
-| **Container Orchestration** | Kubernetes (k3d) | 3-node cluster, Jobs, Deployments, Services, Ingress |
-| **GitOps** | ArgoCD | 2 apps (dev auto-sync, staging manual), self-healing |
-| **Security Scanning** | Trivy + npm audit | 4-layer scanning (filesystem, Docker, IaC, dependencies) |
-| **Monitoring** | Prometheus + Grafana | Metrics collection, 2 dashboards (14 panels) |
-| **CI Pipeline** | GitHub Actions | 2 active workflows: Docker regression + security scan (位于仓库根 `.github/workflows/`) |
-| **Validation Layer** | Cypress + Newman | 16 E2E tests + 18 API assertions (pipeline validation) |
-| **Containerization** | Docker Compose | Cypress + Newman in containers, reproducible test env |
+| **PR quality gate** | GitHub Actions | ESLint, manifest/chart validation, Docker image build, npm audit, Trivy, and test-count gates |
+| **Release validation** | GitHub Actions + Helm | Helm package and SBOM artifacts, rendered manifests, dry-run stages; production approval can be enforced through GitHub Environment reviewer settings |
+| **Automated tests** | Cypress + Newman | Browser E2E and API contract checks against public example APIs |
+| **Infrastructure as Code** | Terraform + LocalStack | AWS resource configuration for local emulation; environment-specific variable files |
+| **Container orchestration** | Kubernetes (k3d) | Deployments, Jobs, Services, Ingress, PVCs, and ConfigMaps |
+| **GitOps configuration** | ArgoCD | Application manifests for auto-sync and manual-sync examples |
+| **Security checks** | Trivy + npm audit | PR dependency and filesystem checks; separate Terraform validation workflow |
+| **Observability configuration** | Prometheus + Grafana | Metrics scripts, alert rules, and dashboard JSON files |
 
-### Phase 2: CI/CD Pipeline Integration (Planned)
+### Follow-up Work
 
 | Component | Technology | What It Adds |
 |-----------|-----------|-------------|
-| **Release Management** | Helm Charts | Versioned releases, parameterized deploys, rollback |
-| **Pipeline Orchestration** | GitHub Actions | Multi-stage: lint → test → build → deploy dev → deploy staging |
-| **Pipeline Alerting** | AlertManager + Slack | Alert on deployment failure, test failure, infra issues |
-| **Pipeline Metrics** | Pushgateway | Track build times, test pass rates, deployment frequency |
-| **Log Aggregation** | Loki + Promtail | Centralized logging, debug failed deployments in Grafana |
+| **Real cluster delivery** | ArgoCD or a secured runner | Replace workflow dry-runs with deployment to a reachable, credentialed cluster |
+| **Pipeline telemetry integration** | Pushgateway + Prometheus | Configure a reachable Pushgateway and validate metrics ingestion end to end |
+| **Centralized log aggregation** | Loki + Promtail | Collect cluster and workload logs in Grafana |
+| **Alert routing** | AlertManager | Configure and verify a notification receiver for actionable alerts |
 
 See [WBS.md](docs/project-management/WBS.md) for detailed task breakdown.
 
@@ -42,8 +43,9 @@ See [WBS.md](docs/project-management/WBS.md) for detailed task breakdown.
 
 ```bash
 cd devops-platform-demo
-npm install
-npm test                         # Both Cypress + Newman
+npm ci
+npm run lint
+npm test                         # Cypress + Newman; requires network access
 npm run test:cypress:headed      # Interactive Cypress
 ```
 
@@ -54,15 +56,18 @@ npm run docker:test              # Docker containers
 npm run docker:test:logs         # With detailed logs
 ```
 
-### Deploy to Kubernetes (Phase 1)
+### Optional Local Kubernetes Demo
 
 ```bash
 # Prerequisites: docker, kubectl, k3d, terraform, helm
 # Create cluster
 k3d cluster create qa-portfolio --agents 2 --port "8080:80@loadbalancer"
 
+# Start LocalStack for the Terraform demo
+docker compose -f docker-compose.localstack.yml up -d
+
 # Deploy infrastructure
-cd terraform && terraform init && terraform apply -var-file=environments/dev.tfvars
+cd terraform && terraform init -backend=false && terraform apply -var-file=environments/dev.tfvars
 
 # Deploy to K8s
 cd ../k8s && ./deploy-to-k8s.sh
@@ -77,7 +82,7 @@ cd ../../monitoring && ./deploy-monitoring.sh
 ### Access Dashboards
 
 ```bash
-# Grafana (metrics + dashboards)
+# Grafana (after installing the optional local monitoring components)
 kubectl port-forward -n monitoring svc/prometheus-grafana 3000:80
 # Open http://localhost:3000 (admin / grafana-admin)
 
@@ -215,32 +220,15 @@ devops-platform-demo/
 └── SECURITY.md                      # 安全策略
 ```
 
-## Security Scanning Strategy
+## Security Checks
 
-### 4-Layer Defense in Depth
+| Workflow | Check | Gate |
+|----------|-------|------|
+| `dvp-pr.yml` | `npm audit --omit=dev` | Fail on moderate or higher dependency findings |
+| `dvp-pr.yml` | Trivy filesystem scan | Fail on HIGH or CRITICAL findings |
+| `dvp-terraform.yml` | Terraform format and validation, Trivy IaC scan | Fail on format/validation errors or HIGH/CRITICAL findings |
 
-| Layer | Tool | Scope | Severity Gate |
-|-------|------|-------|---------------|
-| Dependency | `npm audit` | JS packages (prod only) | `--audit-level=moderate` → **pipeline fails** |
-| Filesystem | Trivy `fs` | Source code + deps | CRITICAL → **pipeline fails** (via Quality Gate job) |
-| Container | Trivy `image` | Docker image layers + OS pkgs | Report only (SARIF → GitHub Security Tab) |
-| IaC | Trivy `config` | Terraform + K8s manifests | CRITICAL → **pipeline fails** (via Quality Gate job) |
-
-### Quality Gate Design
-
-```
-npm-audit ──┐
-trivy-fs ───┤ (report mode, exit-code: 0)
-trivy-docker┤ → all artifacts uploaded regardless
-trivy-iac ──┘
-                                ↓
-              security-quality-gate (exit-code: 1, CRITICAL only)
-              ↓ FAIL on CRITICAL vulnerabilities
-```
-
-- **Report jobs** use `exit-code: '0'` — always collect full SARIF artifacts
-- **Quality Gate job** uses `exit-code: '1'` for CRITICAL severity only
-- Scan results visible in **GitHub Security Tab** (Code scanning alerts) and **Workflow Artifacts**
+These workflows do not currently upload SARIF reports or scan the built container image with Trivy.
 
 ### Suppressing Known / Accepted Risks
 
@@ -253,25 +241,23 @@ CVE-2024-12345  # false positive - not exploitable in our context | expires: 202
 
 
 
-### Current (Phase 1): CI with Manual CD
+### Current: PR Gate and Deployment Dry-Run
 
 ```
-Nightly / Manual ──→ docker-tests.yml ──→ Docker Build + Test ──→ Artifacts
-Push / PR / Daily / Manual ──→ security-scan.yml ──→ Trivy + npm audit ──→ SARIF → GitHub Security
+Pull request ──→ DVP PR workflow ──→ lint + config validation + image build + security / quality gates
+Merge to main ──→ DVP deploy workflow ──→ Helm + SBOM artifacts ──→ manifest render + dry-run ──→ smoke test
+Pull request ──→ DVP Terraform workflow ──→ fmt + validate + IaC scan
 ```
 
-ArgoCD watches the Git repo and syncs K8s manifests, but there's no automated CI → CD handoff.
+The deploy workflow hands off build artifacts and validates the release path, but does not apply manifests to a live cluster. The PR workflow also attempts to push pipeline metrics; successful ingestion requires a reachable Pushgateway.
 
-### Target (Phase 2): Full CI/CD Pipeline
+### Follow-up: Operational Integration
 
 ```
-Push ──→ Stage 1: Lint + Unit Test ──→ Stage 2: Build + Security Scan (parallel)
-     ──→ Stage 3: E2E Tests ──→ Stage 4: Deploy Dev (auto, Helm)
-     ──→ Stage 5: Deploy Staging (manual approval gate)
-
-Pipeline failure ──→ AlertManager ──→ Slack notification
-Pipeline metrics ──→ Pushgateway ──→ Prometheus ──→ Grafana dashboard
+Rendered manifests + reviewed artifact ──→ secured cluster deployment
+Pipeline metrics ──→ reachable Pushgateway ──→ Prometheus ──→ Grafana
 Pod logs ──→ Promtail ──→ Loki ──→ Grafana log explorer
+Actionable alerts ──→ AlertManager ──→ configured receiver
 ```
 
 ## Infrastructure Overview
@@ -297,10 +283,10 @@ Total Pods: 30+
 
 | Workflow | Trigger | Purpose |
 |----------|---------|---------|
-| `devops-platform-demo-pr.yml` | PR to main (`devops-platform-demo/**`) | **PR Gate**: lint + unit/contract tests + Docker build + quick security scan (< 5 min) |
-| `devops-platform-demo-deploy.yml` | Push to main (`devops-platform-demo/**`), manual | **Deploy Pipeline**: Helm package → staging (auto) → production (manual approval) |
-| `docker-tests.yml` | Nightly (02:00 UTC), manual | Docker container regression tests (Cypress + Newman) |
-| `security-scan.yml` | Push/PR to main (`devops-platform-demo/**`), daily (03:00 UTC), manual | Trivy filesystem / Docker / IaC + npm audit → SARIF |
+| `dvp-pr.yml` | PR to main (`devops-platform-demo/**`), manual | Lint, Helm/Kubernetes validation, Docker image build, npm audit, Trivy filesystem scan, quality gate, PR gate |
+| `dvp-deploy.yml` | Push to main (`devops-platform-demo/**`), manual | Helm package + SBOM, staging manifest render/dry-run + external API smoke test, Environment-controlled production render/dry-run (reviewer approval depends on settings) |
+| `dvp-terraform.yml` | Terraform changes in PR, manual | Terraform format, validation, and IaC security checks |
+| `ci.yml` | PR to main | Android and EDI project unit tests |
 
 ### PR → Merge → Deploy 流程
 
@@ -311,7 +297,7 @@ Total Pods: 30+
                                   │
                                   ▼
 ┌───────────────────────────────────────────────────────────────────────┐
-│  devops-platform-demo-pr.yml (on: pull_request)                                  │
+│  dvp-pr.yml (on: pull_request)                                                   │
 │                                                                       │
 │   ┌────────┐  ┌────────────┐  ┌───────┐  ┌──────────────┐             │
 │   │  lint  │  │ unit-tests │  │ build │  │ security-scan│  (parallel) │
@@ -333,18 +319,22 @@ Total Pods: 30+
                           │
                           ▼
 ┌───────────────────────────────────────────────────────────────────────┐
-│  devops-platform-demo-deploy.yml (on: push to main)                              │
+│  dvp-deploy.yml (on: push to main)                                               │
 │                                                                       │
 │   ┌──────────────────┐                                                │
 │   │ build-and-package│  (helm lint × 3 envs, helm package)            │
 │   └────────┬─────────┘                                                │
 │            ▼                                                          │
 │   ┌──────────────────┐                                                │
-│   │  deploy-staging  │  Environment: staging  (auto)                  │
+│   │  deploy-staging  │  staging manifests (render + dry-run)          │
 │   └────────┬─────────┘                                                │
 │            ▼                                                          │
 │   ┌──────────────────┐                                                │
-│   │ deploy-production│  Environment: production  (👤 manual approval) │
+│   │ smoke-test-staging│  External example API checks                  │
+│   └────────┬─────────┘                                                │
+│            ▼                                                          │
+│   ┌──────────────────┐                                                │
+│   │ deploy-production│  Approval-gated manifest render + dry-run      │
 │   └────────┬─────────┘                                                │
 │            ▼                                                          │
 │   ┌──────────────────┐                                                │
@@ -363,13 +353,13 @@ flowchart TD
         Push --> OpenPR
     end
 
-    subgraph PRP["🔍 PR Pipeline · devops-platform-demo-pr.yml<br/>on: pull_request"]
+    subgraph PRP["🔍 PR Pipeline · dvp-pr.yml<br/>on: pull_request"]
         direction LR
-        Lint["CICD Demo / Lint<br/>ESLint"]
-        UT["CICD Demo / Unit Tests<br/>Postman + Helm + kubeconform"]
-        Build["CICD Demo / Build<br/>Docker Buildx"]
-        Sec["CICD Demo / Security Scan<br/>npm audit + Trivy"]
-        Gate["CICD Demo / PR Gate<br/>(aggregator · Required Check)"]
+        Lint["DVP / Lint<br/>ESLint"]
+        UT["DVP / Unit Tests<br/>Postman + Helm + kubeconform"]
+        Build["DVP / Build<br/>Docker Buildx"]
+        Sec["DVP / Security Scan<br/>npm audit + Trivy"]
+        Gate["DVP / PR Gate<br/>(aggregator · Required Check)"]
         Lint --> Gate
         UT --> Gate
         Build --> Gate
@@ -380,11 +370,11 @@ flowchart TD
         Approve["Required reviewers ≥ 1<br/>+ pr-gate ✅"]
     end
 
-    subgraph DEP["🚀 Deploy Pipeline · devops-platform-demo-deploy.yml<br/>on: push → main"]
+    subgraph DEP["🚀 Deploy Pipeline · dvp-deploy.yml<br/>on: push → main · dry-run"]
         direction TB
         Pkg["build-and-package<br/>helm lint × 3 envs + helm package"]
-        Stg["deploy-staging<br/>🟢 Env: staging (auto)"]
-        Prd["deploy-production<br/>🔒 Env: production (manual approval)"]
+        Stg["deploy-staging<br/>🟢 Env: staging (render + dry-run)"]
+        Prd["deploy-production<br/>Environment approval (if configured) + render + dry-run"]
         Sum["deploy-summary<br/>GITHUB_STEP_SUMMARY"]
         Pkg --> Stg --> Prd --> Sum
     end
@@ -414,21 +404,21 @@ flowchart TD
 | Require conversation resolution before merging | ✅ 开启 |
 | Do not allow bypassing the above settings | ✅ 开启 |
 
-**必需 Status Checks**（与 `devops-platform-demo-pr.yml` 中 jobs 一一对应）：
+**必需 Status Check**（与 `dvp-pr.yml` 中 job 一致）：
 
 | Status Check 名称 | 来源 Job | 是否必需 |
 |-------------------|----------|----------|
-| `CICD Demo / PR Gate` | `pr-gate` (aggregator) | ✅ **唯一必需** |
-| `CICD Demo / Lint` | `lint` | ⚪ 可选（已被 pr-gate 聚合） |
-| `CICD Demo / Unit Tests` | `unit-tests` | ⚪ 可选（已被 pr-gate 聚合） |
-| `CICD Demo / Build` | `build` | ⚪ 可选（已被 pr-gate 聚合） |
-| `CICD Demo / Security Scan` | `security-scan` | ⚪ 可选（已被 pr-gate 聚合） |
+| `DVP / PR Gate` | `pr-gate` (aggregator) | ✅ **唯一必需** |
+| `DVP / Lint` | `lint` | ⚪ 可选（已被 PR Gate 聚合） |
+| `DVP / Unit Tests` | `unit-tests` | ⚪ 可选（已被 PR Gate 聚合） |
+| `DVP / Build` | `build` | ⚪ 可选（已被 PR Gate 聚合） |
+| `DVP / Security Scan` | `security-scan` | ⚪ 可选（已被 PR Gate 聚合） |
 
-> 💡 **设计取舍**：`pr-gate` 通过 `needs: [lint, unit-tests, build, security-scan]` 聚合所有子 job，任何一个失败则 gate 失败。**只配置 `CICD Demo / PR Gate` 一项必需 check 即可**，避免新增/重命名子 job 时需要同步更新 branch protection（参考 CLAUDE.md "CI Job Naming Convention" 段对历史 required check 漂移的教训）。
+> 💡 **设计取舍**：`pr-gate` 汇总 lint、配置测试、镜像构建、安全扫描和质量门禁；任何一项未成功则 gate 失败。**只配置 `DVP / PR Gate` 一项必需 check 即可**，避免新增或重命名子 job 时需要同步更新 branch protection。
 >
 > 如希望在 PR UI 中并排显示各子 job 状态以便排错，可将其他 4 项也加入必需 checks 列表（功能等价，仅 UI 表达不同）。
 >
-> ⚠️ **注意 `pr-gate` 与 `defaults.run.working-directory`（PDEF-002）**：`devops-platform-demo-pr.yml` 在 workflow 顶层设置了 `defaults.run.working-directory: devops-platform-demo`，但 `pr-gate` job **不执行 checkout**，因此不存在 `devops-platform-demo/` 目录。若 `pr-gate` 直接继承该默认值，其 `run:` step 会因目录不存在而报错。为此，`pr-gate` 在 job 内显式覆盖 `defaults.run.working-directory: .`。如需复制或修改该 workflow，请确保新增的无 checkout job 也同样显式覆盖。
+> ⚠️ **注意 `pr-gate` 与 `defaults.run.working-directory`**：PR workflow 的 `pr-gate` 不执行 checkout，因此显式将工作目录覆盖为 `.`，避免继承 workflow 默认目录后启动失败。
 
 **本地验证 Checklist**（提 PR 前确认）：
 
@@ -451,15 +441,15 @@ flowchart TD
 | `staging` | 自动部署；可选 secrets：`STAGING_KUBECONFIG` |
 | `production` | Required reviewers ≥ 1（手动审批）；wait timer 可选；secrets：`PROD_KUBECONFIG` |
 
-> 在 GitHub-hosted runner 上 deploy job 默认执行 dry-run（`helm template` 渲染产物作为 artifact 上传）。如需真实集群部署，请取消脚本中注释的 `helm upgrade --install` 行，并在 self-hosted runner 上配置 `KUBECONFIG`。
+> 在 GitHub-hosted runner 上 deploy job 默认执行 dry-run（`helm template` 渲染产物作为 artifact 上传）。Production 审批需在 GitHub Environment 中配置 Required reviewers；如需真实集群部署，还需在安全评估后配置受限的部署凭据和目标集群。
 
 ## Documentation
 
 | Document | What It Covers |
 |----------|---------------|
 | [ARCHITECTURE.md](docs/architecture/ARCHITECTURE.md) | 技术架构、设计决策、扩展性 |
-| [WBS.md](docs/project-management/WBS.md) | Phase 1 (完成) + Phase 2 (计划中) 工作分解 |
-| [QUICKSTART.md](docs/guides/QUICKSTART.md) | 5 分钟从零到集群运行 |
+| [WBS.md](docs/project-management/WBS.md) | 项目工作分解与后续事项 |
+| [QUICKSTART.md](docs/guides/QUICKSTART.md) | 本地测试与可选集群演示 |
 | [FAQ-GUIDE.md](docs/guides/FAQ-GUIDE.md) | 35+ Q&A，覆盖 6 个技术领域 |
 | [CI-CD-GUIDE.md](docs/guides/CI-CD-GUIDE.md) | CI/CD 管道搭建与集成 |
 | [TROUBLESHOOTING.md](docs/guides/TROUBLESHOOTING.md) | 故障排查手册 |
@@ -470,31 +460,25 @@ flowchart TD
 
 ### 30-Second Pitch
 
-> "I built a complete DevOps platform demonstrating the full CI/CD lifecycle: GitHub Actions pipelines, Docker containerization, Kubernetes orchestration, Terraform IaC, ArgoCD GitOps, security scanning with Trivy, and Prometheus + Grafana monitoring. All deployed to a k3d cluster with 30+ pods across 3 namespaces."
+> "I built a DevOps/SRE portfolio project that validates pull requests with lint, Kubernetes and Helm checks, container builds, and security gates. The release workflow packages a Helm chart and SBOM, renders environment-specific manifests, and demonstrates dry-run stages with optional Environment-based approval. I also provide local Kubernetes, Terraform/LocalStack, ArgoCD, Prometheus, and Grafana configurations, while clearly separating those demos from production deployment."
 
 ### Key Skills Demonstrated
 
 - **Terraform IaC**: Multi-environment (dev/staging/prod) with Localstack
 - **Kubernetes**: Deployments, Jobs, Services, Ingress, PVCs, ConfigMaps, 3-node k3d
-- **GitOps**: ArgoCD with auto-sync, self-heal, manual approval gate
-- **Security Scanning**: Trivy 4-layer (filesystem, Docker, IaC, deps) + SARIF → GitHub Security
-- **Monitoring**: Prometheus metrics, Grafana dashboards (14 panels), PromQL, AlertManager
-- **CI/CD Pipeline Design**: security scan 持续检查 + nightly/manual Docker regression
+- **GitOps**: ArgoCD application configuration with auto-sync and manual-sync examples
+- **Security Scanning**: PR npm audit and Trivy filesystem checks, plus Terraform IaC checks
+- **Monitoring**: Prometheus configuration, Grafana dashboards, and alert rules
+- **CI/CD Pipeline Design**: PR quality gates, Helm/SBOM artifact generation, and deployment dry-runs
 - **Docker**: Multi-container orchestration, custom images, volume caching
 
 ### Pre-Demo Checklist
 
 ```bash
-# Verify cluster
-kubectl get nodes                              # 3 nodes
-kubectl get pods --all-namespaces | grep -c Running  # 25+ running
-
-# Verify dashboards
-kubectl port-forward -n monitoring svc/prometheus-grafana 3000:80 &
-kubectl port-forward -n argocd svc/argocd-server 9090:443 &
-
-# Verify tests
-npm test                                        # All pass
+cd devops-platform-demo
+npm ci
+npm run lint
+npm test
 ```
 
 See [FAQ-GUIDE.md](docs/guides/FAQ-GUIDE.md) for 35+ Q&A with detailed answers.

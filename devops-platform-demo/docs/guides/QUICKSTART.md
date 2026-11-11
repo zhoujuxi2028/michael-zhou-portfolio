@@ -1,93 +1,82 @@
-# 🚀 DevOps Platform - Quick Start Guide
-
-**Get the platform running in 5 minutes!**
+# DevOps Platform - Quick Start Guide
 
 ---
 
 ## ✅ Prerequisites
 
-- Docker Desktop (or Docker Engine) v29.0+
-- kubectl v1.24+
-- Helm v3.10+
-- Git
-- 8GB RAM minimum, 4 CPU cores
-- ~20GB disk space
-
-**Verify installation:**
-```bash
-docker --version   && echo "✅ Docker"
-kubectl version    && echo "✅ kubectl"
-helm version       && echo "✅ Helm"
-```
+- Node.js version from `.nvmrc`, npm, and Git (for local lint and tests)
+- Docker (for containerized tests and the local infrastructure demo)
+- For the optional Kubernetes demo: kubectl, k3d, Helm, Terraform, at least 8GB RAM, and ~20GB disk space
 
 ---
 
-## 🚀 5-Minute Quick Start
+## Local Verification
 
-### Step 1: Clone Repository (30 seconds)
-
-```bash
-git clone https://github.com/zhoujuxi2028/michael-zhou-qa-portfolio.git
-cd michael-zhou-qa-portfolio/cicd-demo
-```
-
-### Step 2: Start k3d Cluster (2 minutes)
+### Step 1: Clone and install dependencies
 
 ```bash
-# Create 3-node cluster (1 server + 2 agents)
-k3d cluster create qa-portfolio --servers 1 --agents 2 -p "9000:80@loadbalancer" -p "9001:443@loadbalancer"
-
-# Verify cluster is running
-kubectl cluster-info
-kubectl get nodes              # Should show 3 nodes
+git clone https://github.com/zhoujuxi2028/michael-zhou-portfolio.git
+cd michael-zhou-qa-portfolio/devops-platform-demo
+npm ci
 ```
 
-### Step 3: Deploy Full Stack (2 minutes)
+### Step 2: Run lint and tests
 
 ```bash
-# Infrastructure as Code (optional)
-cd terraform && terraform init && terraform apply -auto-approve && cd ..
-
-# Kubernetes infrastructure
-cd k8s && ./deploy-to-k8s.sh && cd ..
-
-# GitOps (ArgoCD)
-cd gitops/argocd && ./install-argocd.sh && cd ../..
-
-# Monitoring (Prometheus + Grafana)
-cd monitoring && ./deploy-monitoring.sh && cd ..
+npm run lint
+npm test
 ```
 
-### Step 4: Verify Everything (1 minute)
+`npm test` runs Cypress and Newman against public example APIs; results depend on network availability.
+
+## Optional Local Kubernetes Demo
+
+### Step 1: Start the local cluster
 
 ```bash
-# Check all pods running
-kubectl get pods --all-namespaces
-
-# Expected output: 30+ pods across 3 namespaces
-# qa-portfolio, argocd, monitoring
+k3d cluster create qa-portfolio --servers 1 --agents 2 -p "8080:80@loadbalancer"
+kubectl get nodes
 ```
 
----
+### Step 2: Apply Kubernetes resources
 
-## 📊 Architecture Overview
-
-```
-┌─────────────────────────────────────────────────┐
-│                 DevOps Platform                  │
-├─────────────────────────────────────────────────┤
-│                                                  │
-│  Phase 1.1: Environment (k3d 3-node cluster)    │
-│  Phase 1.2: IaC (Terraform + Localstack)        │
-│  Phase 1.3: Kubernetes (10 manifests)           │
-│  Phase 1.4: Security (Trivy scanning)           │
-│  Phase 1.5: GitOps (ArgoCD 7 pods)              │
-│  Phase 1.6: Monitoring (Prometheus + Grafana)   │
-│                                                  │
-└─────────────────────────────────────────────────┘
+```bash
+./k8s/deploy-to-k8s.sh
 ```
 
-**Result**: 30+ pods, 6 complete phases, production-grade platform
+### Step 3: Add optional components
+
+```bash
+# ArgoCD
+./gitops/argocd/install-argocd.sh
+
+# Prometheus + Grafana
+./monitoring/deploy-monitoring.sh
+```
+
+### Optional Terraform Demo with LocalStack
+
+Run these commands from `devops-platform-demo/`:
+
+```bash
+docker compose -f docker-compose.localstack.yml up -d
+cd terraform
+terraform init -backend=false
+terraform apply -var-file=environments/dev.tfvars
+```
+
+`-backend=false` uses local Terraform state and avoids requiring a pre-provisioned remote state bucket.
+
+This is a local demonstration, not a production deployment. GitHub Actions renders Kubernetes manifests and performs dry-run stages; it does not deploy to this local cluster.
+
+## Architecture Overview
+
+```
+PR → GitHub Actions quality gate → merge
+                              → Helm package + SBOM
+                              → render manifests + dry-run + smoke test
+Local demo → k3d / Kubernetes + optional ArgoCD and monitoring
+```
 
 ---
 
@@ -144,10 +133,10 @@ k3d cluster delete qa-portfolio
 ### Git & ArgoCD
 
 ```bash
-# Make change and push (triggers ArgoCD sync)
+# Replace the branch name with one watched by the ArgoCD Application
 git add .
 git commit -m "Change description"
-git push origin feature/devops-platform
+git push origin your-branch-name
 
 # Check ArgoCD sync status
 kubectl get applications -n argocd
@@ -159,81 +148,23 @@ kubectl patch application qa-portfolio-staging -n argocd \
 
 ---
 
-## ✅ Verification Checklist
+## Verify the Local Demo
 
-Run this to verify everything is working:
+After deploying the optional components, inspect only the resources you installed:
 
 ```bash
-#!/bin/bash
-echo "🔍 Verification Checklist"
-echo ""
-
-# Pods
-PODS=$(kubectl get pods --all-namespaces --no-headers | grep Running | wc -l)
-[ "$PODS" -ge 20 ] && echo "✅ Pods running: $PODS" || echo "❌ Pods: $PODS (need 20+)"
-
-# Namespaces
-kubectl get ns qa-portfolio &>/dev/null && echo "✅ qa-portfolio namespace" || echo "❌ qa-portfolio namespace"
-kubectl get ns argocd &>/dev/null && echo "✅ argocd namespace" || echo "❌ argocd namespace"
-kubectl get ns monitoring &>/dev/null && echo "✅ monitoring namespace" || echo "❌ monitoring namespace"
-
-# Services
-kubectl get svc -n monitoring prometheus-grafana &>/dev/null && echo "✅ Grafana service" || echo "❌ Grafana"
-kubectl get svc -n argocd argocd-server &>/dev/null && echo "✅ ArgoCD service" || echo "❌ ArgoCD"
-kubectl get svc -n monitoring prometheus-kube-prometheus-prometheus &>/dev/null && echo "✅ Prometheus service" || echo "❌ Prometheus"
-
-# Applications
-kubectl get applications -n argocd &>/dev/null && echo "✅ ArgoCD Applications" || echo "❌ ArgoCD Applications"
-
-# Storage
-PVC=$(kubectl get pvc --all-namespaces --no-headers | wc -l)
-[ "$PVC" -ge 1 ] && echo "✅ Persistent volumes: $PVC" || echo "❌ Persistent volumes"
-
-echo ""
-echo "🎉 Verification complete!"
+kubectl get nodes
+kubectl get pods -n qa-portfolio
+kubectl get applications -n argocd       # if ArgoCD was installed
+kubectl get pods -n monitoring           # if monitoring was installed
 ```
 
----
+## Suggested Project Walkthrough
 
-## 🎯 What to Demo First
-
-**Recommended 5-minute demo path:**
-
-1. **Show the cluster** (30 sec)
-   ```bash
-   kubectl get pods --all-namespaces | head -20
-   # Shows: 30+ pods running across 3 namespaces
-   ```
-
-2. **Show Grafana dashboards** (1.5 min)
-   ```bash
-   kubectl port-forward -n monitoring svc/prometheus-grafana 3000:80
-   # Open: http://localhost:3000
-   # Login: admin / grafana-admin
-   # Browse: Dashboards → DevOps folder
-   # Show: Cluster Overview (real-time metrics)
-   ```
-
-3. **Show ArgoCD** (1.5 min)
-   ```bash
-   kubectl port-forward -n argocd svc/argocd-server 9090:443
-   # Open: https://localhost:9090
-   # Show: 2 Applications (dev and staging)
-   # Explain: Auto-sync vs manual sync
-   ```
-
-4. **Show Git integration** (1 min)
-   ```bash
-   # Explain: Any commit to feature/devops-platform
-   # auto-syncs to dev environment
-   # Staging requires manual approval
-   ```
-
-5. **Discuss architecture** (1 min)
-   - 6 complete phases
-   - 30+ pods
-   - Production patterns
-   - Interview talking points in INTERVIEW-GUIDE.md
+1. Review `dvp-pr.yml` and explain the lint, configuration, image-build, security, and quality gates.
+2. Review a deploy workflow run and its Helm chart, SBOM, and rendered-manifest artifacts. The deploy stages are dry-runs, not live cluster deployments.
+3. If the local demo is running, show the Kubernetes resources and the optional ArgoCD or Grafana dashboards.
+4. Explain the operational follow-ups: connecting a secured target cluster, configuring a reachable Pushgateway, and enabling alert/log delivery.
 
 ---
 
@@ -342,4 +273,3 @@ kubectl port-forward -n monitoring svc/prometheus-kube-prometheus-prometheus 909
 **Interview-ready**: Yes ✅
 
 **Ready to demo? Let's go!** 🚀
-
