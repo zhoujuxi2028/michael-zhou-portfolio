@@ -1,0 +1,28 @@
+# Pushgateway Helm values
+# helm upgrade --install pushgateway prometheus-community/prometheus-pushgateway \
+#   -f monitoring/pushgateway/pushgateway-values.yaml -n monitoring
+
+replicaCount: 1
+
+service:
+  type: ClusterIP
+  port: 9091
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 32Mi
+  limits:
+    cpu: 100m
+    memory: 64Mi
+
+serviceMonitor:
+  enabled: true
+  namespace: monitoring
+  labels:
+    release: prometheus
+
+persistentMetrics: false
+nodeSelector: {}
+tolerations: []
+affinity: {}

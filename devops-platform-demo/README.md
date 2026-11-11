@@ -1,5 +1,9 @@
 # CI/CD Demo — DevOps Infrastructure Platform
 
+![PR Gate](https://github.com/zhoujuxi2028/michael-zhou-portfolio/actions/workflows/dvp-pr.yml/badge.svg)
+![Deploy Pipeline](https://github.com/zhoujuxi2028/michael-zhou-portfolio/actions/workflows/dvp-deploy.yml/badge.svg)
+![Security Scan](https://github.com/zhoujuxi2028/michael-zhou-portfolio/actions/workflows/security-scan.yml/badge.svg)
+
 **Category: DevOps 基础设施演示**
 
 A complete DevOps infrastructure platform: Terraform IaC, Kubernetes orchestration, ArgoCD GitOps, Trivy security scanning, and Prometheus + Grafana observability. Includes CI/CD pipelines and basic test automation as validation layer.

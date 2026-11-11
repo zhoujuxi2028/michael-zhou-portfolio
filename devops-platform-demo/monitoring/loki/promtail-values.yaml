@@ -1,0 +1,39 @@
+# Promtail Helm values — DaemonSet，收集所有 Pod 日志送往 Loki
+# helm upgrade --install promtail grafana/promtail \
+#   -f monitoring/loki/promtail-values.yaml -n monitoring
+
+config:
+  clients:
+    - url: http://loki:3100/loki/api/v1/push
+  snippets:
+    pipelineStages:
+      - cri: {}
+      - match:
+          selector: '{namespace=~"qa-portfolio.*"}'
+          stages:
+            - labeldrop:
+                - filename
+            - labels:
+                job_name:
+                  source: kubernetes_labels_job_name
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 100m
+    memory: 128Mi
+
+tolerations:
+  - key: node-role.kubernetes.io/master
+    operator: Exists
+    effect: NoSchedule
+  - key: node-role.kubernetes.io/control-plane
+    operator: Exists
+    effect: NoSchedule
+
+serviceMonitor:
+  enabled: true
+  labels:
+    release: prometheus
