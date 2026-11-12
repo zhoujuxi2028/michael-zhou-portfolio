@@ -33,7 +33,7 @@
 
 ## REQ 级需求总览
 
-> 可行性评估日期 2026-11-12。本机：Intel i5 4C / 16 GB；docker、k3d、kubectl、helm、terraform、az 已装；`az` 已登录 Azure Pass Sponsorship（Enabled）。
+> 可行性评估日期 2026-11-12。本机：Intel i5 4C / 16 GB；容器运行时 **OrbStack 2.2.5**（VM 上限 8 GB / 8 CPU，可调至 ~12 GB），k3d 集群 `portfolio-dev` 运行于其上；docker、k3d、kubectl、helm、terraform、az 已装；`az` 已登录 Azure Pass Sponsorship（Enabled）。
 
 | REQ ID | 标题 | 类型 | 优先级 | 可行性 | 依赖 | JD 映射 | 状态 |
 |--------|------|------|--------|--------|------|---------|------|
@@ -47,8 +47,11 @@
 | `REQ-DVP-008` | Elastic 集成 / Loki vs Elastic 对比 | DEMO | P3 | 60%（部署）/ 100%（文档） | — | SCOM/Elastic | 🔲 Planned |
 | `REQ-DVP-009` | 数据管道 / DB 备份自动化 | FR | P3 | 85% | — | 数据库及数据管道、运维自动化 | 🔲 Planned |
 | `REQ-DVP-010` | OPA/Kyverno 策略即代码 | FR | P3 | 90% | — | 合规与安全策略、DevSecOps | 🔲 Planned |
+| `REQ-DVP-011` | Dev Container 标准化开发环境 | NFR | P1 | 95% | — | 自动化安装与配置；指导团队最佳实践 | 🔲 Planned |
 
-**整体风险：** k3d 同时运行 Prometheus 栈 + Loki + ArgoCD + Kyverno + Postgres（+ Elastic）约 8–12 GB，16 GB 内存吃紧 → 按 REQ 分开演示，不用的组件缩到 0。
+**整体风险：** k3d 同时运行 Prometheus 栈 + Loki + ArgoCD + Kyverno + Postgres（+ Elastic）约 8–12 GB，超出 OrbStack 8 GB 上限 → 按 REQ 分开演示、不用的组件缩到 0；必要时调高 `memory_mib`（宿主机仅剩 ~4 GB）或改用 Azure VM。
+
+**建议实施顺序：** 011 → 004 → 005 / 007 → 003 → 006 → 010 / 009 → 008（011 先行，后续 REQ 均在统一环境中开发）。
 
 ---
 
@@ -156,7 +159,7 @@
 - [ ] 对比文档完成
 - [ ] （可选）Kibana 可检索与 Loki 相同的日志
 
-**可行性：** 文档 100%；部署 60%，因为 Elasticsearch 需要 2–4 GB 内存，与现有栈并行运行时 16 GB 不够。可替代方案：Elastic Cloud 14 天试用。
+**可行性：** 文档 100%；部署 60%，因为 Elasticsearch 需要 2–4 GB 内存，与现有栈并行运行时超出 OrbStack 8 GB 上限。可替代方案：Elastic Cloud 14 天试用。
 
 ### REQ-DVP-009 — 数据管道 / DB 备份自动化
 
@@ -193,3 +196,22 @@
 - [ ] Grafana 可见策略违规计数
 
 **可行性 90%：** Helm 一键安装，CI 校验无需集群。风险：现有 chart 可能违反策略，需要先修复。需要 `brew install kyverno`。
+
+### REQ-DVP-011 — Dev Container 标准化开发环境
+
+**User Story:** As a developer joining the project, I want a one-click containerized toolchain, so that I can build, test and deploy without installing tools on my host.
+
+| ID | 描述 |
+|----|------|
+| FR-DVP-011-01 | `.devcontainer/devcontainer.json`：Node LTS、terraform、kubectl、helm、k3d、az、trivy、kyverno（版本固定） |
+| FR-DVP-011-02 | docker-outside-of-docker：复用宿主 OrbStack，容器内可操作 k3d 集群 |
+| FR-DVP-011-03 | `postCreateCommand`：`npm ci` + 工具版本自检脚本 |
+| FR-DVP-011-04 | CI 中用 `devcontainers/ci` 构建并在容器内执行 lint/test，保证本地与 CI 一致 |
+| FR-DVP-011-05 | README / QUICKSTART 增加 Dev Container 使用说明 |
+
+**验收标准：**
+- [ ] VS Code "Reopen in Container" 成功，`npm run lint` / `npm test` 通过
+- [ ] 容器内 `kubectl get nodes` 可访问 `portfolio-dev` 集群
+- [ ] CI 中 devcontainer job 绿灯
+
+**可行性 95%：** Dev Container 是开放规范（containers.dev），作为容器运行在 OrbStack 现有 VM 内，无额外 VM 开销，并解决 Intel macOS Homebrew Tier 3 的工具链问题。风险：容器内访问 k3d API 需处理网络（`host.docker.internal` / kubeconfig 改写）。

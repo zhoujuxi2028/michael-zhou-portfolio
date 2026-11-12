@@ -18,9 +18,9 @@
 | `CA` | claude-api-journey | 0 |
 | `AND` | android-app | 1 |
 | `ANDT` | android-testing-demo | 2 |
-| `DVP` | devops-platform-demo | 10 |
+| `DVP` | devops-platform-demo | 11 |
 | `DRV` | （规划中） | 0 |
-| **合计** | | **28** |
+| **合计** | | **29** |
 
 ---
 
@@ -101,6 +101,7 @@
 | `REQ-DVP-008` | Elastic 集成 / Loki vs Elastic 对比 | 🔲 |
 | `REQ-DVP-009` | 数据管道 / DB 备份自动化 | 🔲 |
 | `REQ-DVP-010` | OPA/Kyverno 策略即代码 | 🔲 |
+| `REQ-DVP-011` | Dev Container 标准化开发环境 | 🔲 |
 
 ---
 

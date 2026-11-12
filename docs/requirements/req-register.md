@@ -41,6 +41,7 @@
 | REQ-DVP-008 | Elastic 集成 / Loki vs Elastic 对比 | devops-platform-demo | DEMO | P3 | 2026-11-12 | Open |
 | REQ-DVP-009 | 数据管道 / DB 备份自动化 | devops-platform-demo | FR | P3 | 2026-11-12 | Open |
 | REQ-DVP-010 | OPA/Kyverno 策略即代码 | devops-platform-demo | FR | P3 | 2026-11-12 | Open |
+| REQ-DVP-011 | Dev Container 标准化开发环境 | devops-platform-demo | NFR | P1 | 2026-11-12 | Open |
 
 ---
 
@@ -99,7 +100,7 @@
 | `CA` | `docs/claude-api-journey/` | 0 | — |
 | `AND` | `android-app/` | 1 | 2026-11-05 |
 | `ANDT` | `android-testing-demo-*/` | 0 | — |
-| `DVP` | `devops-platform-demo/` | 8 | 2026-11-12 |
+| `DVP` | `devops-platform-demo/` | 9 | 2026-11-12 |
 | `DRV` | `linux-driver/`（规划中） | 0 | — |
 
 ---
@@ -108,6 +109,6 @@
 
 | 日期 | 操作 | 内容 | 操作人 |
 |------|------|------|--------|
-| 2026-11-12 | 新增 | 登记 REQ-DVP-003~010（来源：DSV JD 差距分析）；补登已关闭的 REQ-DVP-001/002；§7 补 ANDT、DVP 行 | Michael Zhou |
+| 2026-11-12 | 新增 | 登记 REQ-DVP-003~011（来源：DSV JD 差距分析）；补登已关闭的 REQ-DVP-001/002；§7 补 ANDT、DVP 行 | Michael Zhou |
 | 2026-11-06 | 关闭 | REQ-AND-001 Verified：android-app 初始化完成，真机测试通过（Vivo Folder） | Michael Zhou |
 | 2026-11-05 | 初始化 | 创建 Portfolio 需求台账，迁移历史需求（REQ-CMP-001、REQ-EDI-01、REQ-CC-* × 13）；登记 REQ-AND-001 | Michael Zhou |

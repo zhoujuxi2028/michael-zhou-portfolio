@@ -37,6 +37,7 @@
 | `REQ-DVP-008` | 可选：Elastic/Filebeat 或 Loki vs Elastic 对比文档 | SCOM/Elastic | 🔲 |
 | `REQ-DVP-009` | 数据管道 / DB 备份自动化（P3） | 数据库及数据管道 | 🔲 |
 | `REQ-DVP-010` | OPA/Kyverno 策略即代码（P3） | 合规 / DevSecOps | 🔲 |
+| `REQ-DVP-011` | Dev Container 标准化开发环境（P1，先行） | 自动化安装与配置 | 🔲 |
 
 ## 风险
 
