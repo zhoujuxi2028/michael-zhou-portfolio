@@ -92,6 +92,8 @@ jobs:
           exit-code: '1'
           format: 'table'
           trivyignores: 'devops-platform-demo/.trivyignore'
+          # 以真实云环境变量评估（use_localstack=false）；LocalStack 豁免仅适用于本地 dev
+          tf-vars: 'devops-platform-demo/terraform/environments/production.tfvars'
 
   # ---------------------------------------------------------------------------
   # Job 4: Terraform Gate —— 汇总闸口（Branch Protection Required Check）

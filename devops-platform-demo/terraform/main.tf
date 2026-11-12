@@ -21,7 +21,9 @@ locals {
 }
 
 # S3 桶加密使用的 KMS Customer Managed Key
+# LocalStack Community 不支持 KMS，仅在真实 AWS 环境创建
 resource "aws_kms_key" "s3" {
+  count                   = var.use_localstack ? 0 : 1
   description             = "${local.name_prefix} S3 encryption key"
   deletion_window_in_days = 7
   enable_key_rotation     = true
@@ -34,8 +36,9 @@ resource "aws_kms_key" "s3" {
 
 # KMS 别名（便于运维识别）
 resource "aws_kms_alias" "s3" {
+  count         = var.use_localstack ? 0 : 1
   name          = "alias/${local.name_prefix}-s3"
-  target_key_id = aws_kms_key.s3.key_id
+  target_key_id = aws_kms_key.s3[0].key_id
 }
 
 # ==============================================================================
@@ -68,19 +71,21 @@ resource "aws_s3_bucket_versioning" "artifacts" {
 
 # Enable server-side encryption for artifacts bucket
 resource "aws_s3_bucket_server_side_encryption_configuration" "artifacts" {
-  count  = var.enable_encryption ? 1 : 0
+  count  = var.enable_encryption && !var.use_localstack ? 1 : 0
   bucket = aws_s3_bucket.artifacts.id
 
   rule {
     apply_server_side_encryption_by_default {
       sse_algorithm     = "aws:kms"
-      kms_master_key_id = aws_kms_key.s3.arn
+      kms_master_key_id = aws_kms_key.s3[0].arn
     }
   }
 }
 
 # Lifecycle policy for artifacts (automatic cleanup)
+# LocalStack Community 对 lifecycle 配置支持不完整，跳过
 resource "aws_s3_bucket_lifecycle_configuration" "artifacts" {
+  count  = var.use_localstack ? 0 : 1
   bucket = aws_s3_bucket.artifacts.id
 
   rule {
@@ -121,7 +126,9 @@ resource "aws_s3_bucket_public_access_block" "artifacts" {
 # ==============================================================================
 
 # S3 bucket for storing Terraform state files (for team collaboration)
+# LocalStack: 此 bucket 由 backend.tf bootstrap 预先创建，不在此管理（避免循环依赖）
 resource "aws_s3_bucket" "terraform_state" {
+  count  = var.use_localstack ? 0 : 1
   bucket = "${local.name_prefix}-tfstate"
 
   # Never allow deletion of state bucket
@@ -136,7 +143,8 @@ resource "aws_s3_bucket" "terraform_state" {
 
 # Enable versioning for state bucket (critical for state recovery)
 resource "aws_s3_bucket_versioning" "terraform_state" {
-  bucket = aws_s3_bucket.terraform_state.id
+  count  = var.use_localstack ? 0 : 1
+  bucket = aws_s3_bucket.terraform_state[0].id
 
   versioning_configuration {
     status = "Enabled"
@@ -144,20 +152,23 @@ resource "aws_s3_bucket_versioning" "terraform_state" {
 }
 
 # Enable encryption for state bucket (state may contain sensitive data)
+# LocalStack: 跳过 KMS 加密，state bucket 已由 backend bootstrap 创建
 resource "aws_s3_bucket_server_side_encryption_configuration" "terraform_state" {
-  bucket = aws_s3_bucket.terraform_state.id
+  count  = var.use_localstack ? 0 : 1
+  bucket = aws_s3_bucket.terraform_state[0].id
 
   rule {
     apply_server_side_encryption_by_default {
       sse_algorithm     = "aws:kms"
-      kms_master_key_id = aws_kms_key.s3.arn
+      kms_master_key_id = aws_kms_key.s3[0].arn
     }
   }
 }
 
 # Block public access to state bucket (security critical)
 resource "aws_s3_bucket_public_access_block" "terraform_state" {
-  bucket = aws_s3_bucket.terraform_state.id
+  count  = var.use_localstack ? 0 : 1
+  bucket = aws_s3_bucket.terraform_state[0].id
 
   block_public_acls       = true
   block_public_policy     = true
@@ -170,7 +181,9 @@ resource "aws_s3_bucket_public_access_block" "terraform_state" {
 # ==============================================================================
 
 # DynamoDB table for Terraform state locking (prevents concurrent modifications)
+# LocalStack: 此 table 由 bootstrap script 预先创建，不在此管理（避免循环依赖）
 resource "aws_dynamodb_table" "terraform_locks" {
+  count        = var.use_localstack ? 0 : 1
   name         = "${local.name_prefix}-tf-locks"
   billing_mode = "PAY_PER_REQUEST" # On-demand pricing, cost-effective for low usage
   hash_key     = "LockID"
