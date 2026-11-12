@@ -2,7 +2,7 @@
 
 **Date:** 2026-11-12
 **Author:** michael_zhou
-**Status:** Revised after spec review round 1
+**Status:** Spec review approved (round 2) — Pending user review
 **Requirement:** [`REQ-DVP-011`](../../../devops-platform-demo/docs/requirements/REQUIREMENTS.md#req-dvp-011--dev-container-标准化开发环境)
 
 ---
@@ -95,7 +95,7 @@ GitHub runner 无代理配置，P1 仅适用于本机。
 | `containerEnv` | `NO_PROXY` / `no_proxy` = `host.docker.internal,localhost,127.0.0.1`（保证 kubectl 直连 k3d）；`CYPRESS_INSTALL_BINARY=0`（与 `dvp-pr.yml` 一致，避免下载约 500 MB 二进制） |
 | `workspaceMount` | `source=${localWorkspaceFolder}/..,target=/workspaces/michael-zhou-portfolio,type=bind` |
 | `workspaceFolder` | `/workspaces/michael-zhou-portfolio/devops-platform-demo`（生命周期命令在此目录执行） |
-| `postCreateCommand` | `sudo chown vscode:vscode node_modules && npm ci && .devcontainer/verify-tools.sh`（新命名 volume 属主为 root） |
+| `postCreateCommand` | `git config --global --add safe.directory /workspaces/michael-zhou-portfolio && sudo chown vscode:vscode node_modules && npm ci && .devcontainer/verify-tools.sh`（仓库根 bind mount 避免 git dubious ownership；新命名 volume 属主为 root） |
 | `postStartCommand` | `.devcontainer/setup-kubeconfig.sh` |
 | `customizations.vscode.extensions` | `hashicorp.terraform`、`ms-kubernetes-tools.vscode-kubernetes-tools`、`dbaeumer.vscode-eslint` |
 
@@ -164,7 +164,7 @@ Terraform `~1.7` 视为与 `1.7.x` 匹配；其余工具精确匹配。
 
 1. 宿主 kubeconfig（`~/.kube-host/config`）不存在 → 打印提示，exit 0
 2. `docker port k3d-${K3D_CLUSTER}-serverlb 6443/tcp | head -1 | awk -F: '{print $NF}'` 取端口（输出可能含 `[::]:port` 第二行）；容器不存在或未运行 → 打印 `⚠️ cluster not running: k3d cluster start portfolio-dev`，exit 0
-3. `kubectl --kubeconfig ~/.kube-host/config config view --minify --flatten --context k3d-${K3D_CLUSTER}` 写入临时文件，再 `mv` 到 `~/.kube/config`（显式源文件，避免读写同一文件导致截断）
+3. `mkdir -p ~/.kube`；`kubectl --kubeconfig ~/.kube-host/config config view --minify --flatten --context k3d-${K3D_CLUSTER}` 写入临时文件，再 `mv` 到 `~/.kube/config`（显式源文件，避免读写同一文件导致截断）
 4. `kubectl config set-cluster k3d-${K3D_CLUSTER} --server=https://host.docker.internal:<port> --tls-server-name=localhost`
 5. `kubectl version --request-timeout=5s` 自检；失败 → 打印排查提示，exit 0
 
@@ -216,6 +216,8 @@ Terraform `~1.7` 视为与 `1.7.x` 匹配；其余工具精确匹配。
 
 lint job 增加一步：`bash .devcontainer/verify-tools.sh --drift`（该 workflow `defaults.run.working-directory` 为 `devops-platform-demo`）。
 
+`paths` 过滤增加 `.github/workflows/dvp-*.yml`：仅修改其他 DVP workflow 中工具版本（如 `dvp-terraform.yml` 的 `terraform_version`）的 PR 也会触发 drift 检查。
+
 ## 10. 验收与测试
 
 | 验收项 | 验证方法 | 位置 |
@@ -237,7 +239,7 @@ lint job 增加一步：`bash .devcontainer/verify-tools.sh --drift`（该 workf
 
 | 文件 | 变更 |
 |------|------|
-| `devops-platform-demo/README.md` | 新增 "Dev Container" 小节：打开方式、资源占用、限制 |
+| `devops-platform-demo/README.md` | 新增 "Dev Container" 小节：打开方式、资源占用、限制；须从主 clone 打开（git worktree 的 `.git` 指向宿主绝对路径，容器内 git / husky 失效）；`dvp-node-modules` volume 为所有 checkout 共享 |
 | `devops-platform-demo/docs/guides/QUICKSTART.md` | Dev Container 作为推荐入门方式 |
 | `devops-platform-demo/CLAUDE.md` | 增加 Dev Container 命令 |
 | `devops-platform-demo/docs/requirements/REQUIREMENTS.md` | `REQ-DVP-011` 状态更新；FR-DVP-011-02 / 04 与本设计对齐；验收项 "`npm run lint` / `npm test` 通过" 改为 "`npm run lint` / `npm run validate` / `npm run test:newman` 通过，Cypress 走 `docker:test`" |
