@@ -4,7 +4,7 @@
 >
 > 完整台账（优先级 / 类型 / 状态）见 [requirements/req-register.md](./requirements/req-register.md)。
 >
-> 状态：🟡 进行中 | 最后更新：2026-11-05
+> 状态：🟡 进行中 | 最后更新：2026-11-12
 
 ---
 
@@ -18,9 +18,9 @@
 | `CA` | claude-api-journey | 0 |
 | `AND` | android-app | 1 |
 | `ANDT` | android-testing-demo | 2 |
-| `DVP` | devops-platform-demo | 1 |
+| `DVP` | devops-platform-demo | 10 |
 | `DRV` | （规划中） | 0 |
-| **合计** | | **19** |
+| **合计** | | **28** |
 
 ---
 
@@ -92,6 +92,15 @@
 | 编号 | 描述 | 状态 |
 |------|------|------|
 | `REQ-DVP-001` | devops-platform-demo：GitHub Actions CI/CD + Docker + Kubernetes + Helm + ArgoCD + Terraform + Trivy + Cypress + Newman 全栈 DevOps 演示 | ✅ |
+| `REQ-DVP-002` | Phase 2：AlertManager Slack、Pushgateway、Loki/Promtail、Grafana 仪表盘、Runbook 文档（#45） | ✅ |
+| `REQ-DVP-003` | Phase 3：Azure 集成（ACR + azurerm + Blob backend + Trivy→Prometheus） | 🔲 |
+| `REQ-DVP-004` | devops-platform-demo/CLAUDE.md 等过期内容修正 | 🔲 |
+| `REQ-DVP-005` | Incident / RCA postmortem 模板 + 案例 | 🔲 |
+| `REQ-DVP-006` | Azure Key Vault + External Secrets + K8s RBAC | 🔲 |
+| `REQ-DVP-007` | Dependabot 依赖与补丁自动化 | 🔲 |
+| `REQ-DVP-008` | Elastic 集成 / Loki vs Elastic 对比 | 🔲 |
+| `REQ-DVP-009` | 数据管道 / DB 备份自动化 | 🔲 |
+| `REQ-DVP-010` | OPA/Kyverno 策略即代码 | 🔲 |
 
 ---
 
