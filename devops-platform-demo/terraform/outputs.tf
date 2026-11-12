@@ -50,12 +50,12 @@ output "artifacts_bucket_domain_name" {
 
 output "tfstate_bucket_name" {
   description = "Name of the S3 bucket for Terraform state storage"
-  value       = aws_s3_bucket.terraform_state.id
+  value       = var.use_localstack ? "${var.project_name}-${var.environment}-tfstate" : aws_s3_bucket.terraform_state[0].id
 }
 
 output "tfstate_bucket_arn" {
   description = "ARN of the Terraform state bucket"
-  value       = aws_s3_bucket.terraform_state.arn
+  value       = var.use_localstack ? "arn:aws:s3:::${var.project_name}-${var.environment}-tfstate" : aws_s3_bucket.terraform_state[0].arn
 }
 
 # ==============================================================================
@@ -64,12 +64,12 @@ output "tfstate_bucket_arn" {
 
 output "dynamodb_table_name" {
   description = "Name of the DynamoDB table for state locking"
-  value       = aws_dynamodb_table.terraform_locks.name
+  value       = var.use_localstack ? "${var.project_name}-${var.environment}-tf-locks" : aws_dynamodb_table.terraform_locks[0].name
 }
 
 output "dynamodb_table_arn" {
   description = "ARN of the DynamoDB table"
-  value       = aws_dynamodb_table.terraform_locks.arn
+  value       = var.use_localstack ? "arn:aws:dynamodb:${var.aws_region}:000000000000:table/${var.project_name}-${var.environment}-tf-locks" : aws_dynamodb_table.terraform_locks[0].arn
 }
 
 # ==============================================================================
@@ -109,8 +109,8 @@ output "resource_summary" {
     environment      = var.environment
     provider         = var.use_localstack ? "localstack" : "aws"
     artifacts_bucket = aws_s3_bucket.artifacts.id
-    tfstate_bucket   = aws_s3_bucket.terraform_state.id
-    dynamodb_table   = aws_dynamodb_table.terraform_locks.name
+    tfstate_bucket   = var.use_localstack ? "${var.project_name}-${var.environment}-tfstate" : aws_s3_bucket.terraform_state[0].id
+    dynamodb_table   = var.use_localstack ? "${var.project_name}-${var.environment}-tf-locks" : aws_dynamodb_table.terraform_locks[0].name
     versioning       = var.enable_versioning
     encryption       = var.enable_encryption
     retention_days   = var.retention_days
@@ -133,8 +133,8 @@ output "usage_instructions" {
 
     📦 Resources Created:
     - S3 Artifacts: ${aws_s3_bucket.artifacts.id}
-    - S3 TF State: ${aws_s3_bucket.terraform_state.id}
-    - DynamoDB Lock: ${aws_dynamodb_table.terraform_locks.name}
+    - S3 TF State: ${var.use_localstack ? "${var.project_name}-${var.environment}-tfstate" : aws_s3_bucket.terraform_state[0].id}
+    - DynamoDB Lock: ${var.use_localstack ? "${var.project_name}-${var.environment}-tf-locks" : aws_dynamodb_table.terraform_locks[0].name}
 
     🔍 Verify Resources:
     ${var.use_localstack ? "aws --endpoint-url=http://localhost:4566 s3 ls" : "aws s3 ls"}
