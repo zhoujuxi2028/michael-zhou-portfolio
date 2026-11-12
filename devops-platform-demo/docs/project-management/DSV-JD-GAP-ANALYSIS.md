@@ -20,7 +20,7 @@
 | 网络/防火墙/安全访问 | 仅 NetworkPolicy | ⚠️ 弱 |
 | 漏洞管理/补丁 | Trivy gate；无 Dependabot、无趋势 | ⚠️ 中 |
 
-## 差异化亮点（面试主动讲）
+## 差异化亮点
 
 - **edi-reporting-demo**：EDIFACT 是物流行业标准，直接契合 DSV 业务
 - **cloud-monitoring-platform**：对应 JD "连接仓储自动化设备"
