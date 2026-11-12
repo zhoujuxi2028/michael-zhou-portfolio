@@ -15,26 +15,21 @@
 
 terraform {
   backend "s3" {
-    bucket = "qa-portfolio-dev-tfstate"
+    bucket = "portfolio-dev-tfstate"
     key    = "terraform.tfstate"
     region = "us-east-1"
 
     # DynamoDB table for state locking (prevents concurrent modifications)
-    dynamodb_table = "qa-portfolio-dev-tf-locks"
+    dynamodb_table = "portfolio-dev-tf-locks"
 
     encrypt = true
 
-    # Localstack overrides
+    # Localstack overrides (compatible with Terraform v1.5.7)
     skip_credentials_validation = true
-    skip_requesting_account_id  = true
     skip_metadata_api_check     = true
-    skip_s3_checksum            = true
-    use_path_style              = true
-
-    endpoints = {
-      s3       = "http://localhost:4566"
-      dynamodb = "http://localhost:4566"
-    }
+    force_path_style            = true
+    endpoint                    = "http://localhost:4566"
+    dynamodb_endpoint           = "http://localhost:4566"
   }
 }
 
