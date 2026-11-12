@@ -12,6 +12,8 @@
 
 **Branch:** `feature/dvp-devcontainer`（已存在，含 spec 提交）
 
+**已确认版本（2026-11-12）：** `@devcontainers/cli@0.90.0`（npm）、`devcontainers/ci@v0.3`（tag 存在）、base 镜像 `3.0.12-noble`
+
 ---
 
 ## 执行约定
@@ -23,6 +25,7 @@
 | 宿主 bash | macOS `/bin/bash` 为 3.2：脚本不得使用 `mapfile`、关联数组等 bash 4 特性 |
 | 失败处理 | 禁止 `\|\| true`、`continue-on-error` 隐藏失败（项目 CLAUDE.md） |
 | 提交 | 每个 Task 结束提交一次；commit message 英文 `type(scope): description`，结尾附 `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>` |
+| 运行位置 | Task 6、7 必须在**主 clone**（`~/Documents/github/michael-zhou-portfolio`）执行，不得在 git worktree 中：worktree 的 `.git` 指向宿主路径，容器内 git / husky 失效 |
 | 下载工具 | 使用 `curl`，不使用 busybox `wget`（经代理访问 HTTPS 返回 502） |
 | shellcheck | `source` 外部文件统一用 `# shellcheck source=/dev/null`（不使用 `-x`）；大写变量不触发 SC2154 |
 
@@ -250,11 +253,6 @@ report() {
   fi
 }
 
-# First x.y.z found on stdin (awk exits 0 even without a match)
-semver() {
-  awk 'match($0, /[0-9]+\.[0-9]+\.[0-9]+/) { print substr($0, RSTART, RLENGTH); exit }'
-}
-
 check_drift() {
   local wf="$ROOT/.github/workflows" v count
 
@@ -365,9 +363,14 @@ Expected: `FAIL installed: all versions match (exit 1, want 0)`，其余 3 个 i
 
 - [ ] **Step 3: 实现 `check_installed`**
 
-将 `verify-tools.sh` 中的 `check_installed` 替换为：
+将 `verify-tools.sh` 中的 `check_installed` 替换为以下内容（含 `semver()`，Task 2 不定义以免 shellcheck SC2329 未使用告警）：
 
 ```bash
+# First x.y.z found on stdin (awk exits 0 even without a match)
+semver() {
+  awk 'match($0, /[0-9]+\.[0-9]+\.[0-9]+/) { print substr($0, RSTART, RLENGTH); exit }'
+}
+
 # version_of <command> [args...]: prints x.y.z, "missing", or "error"
 version_of() {
   local out
@@ -849,7 +852,7 @@ RUN bash /tmp/dvp-tools/install-tools.sh && rm -rf /tmp/dvp-tools
 
 ```bash
 export PATH="$HOME/.nvm/versions/node/v26.13.1/bin:$PATH"
-npx -y @devcontainers/cli@0.90.0 up --workspace-folder . 2>&1 | tail -20
+npx -y @devcontainers/cli@0.90.0 up --workspace-folder . 2>&1 | grep -E '✅|⚠️|❌|outcome'
 ```
 
 Expected: 输出 JSON 含 `"outcome":"success"`；日志含 `verify-tools.sh` 的 8 行 `✅` 与 `✅ kubeconfig written`
@@ -891,7 +894,11 @@ dc kubectl get nodes
 dc sh -c 'cp ~/.kube/config /tmp/no-sni && kubectl --kubeconfig /tmp/no-sni config unset clusters.k3d-portfolio-dev.tls-server-name >/dev/null && kubectl --kubeconfig /tmp/no-sni get nodes --request-timeout=5s'
 ```
 
-Expected: 第一条列出 3 个节点；第二条失败并含 `x509: certificate is valid for … localhost, not host.docker.internal`
+```bash
+dc sh -c 'openssl req -x509 -newkey rsa:2048 -nodes -keyout /tmp/k -out /tmp/c -days 1 -subj /CN=fake-ca 2>/dev/null && cp ~/.kube/config /tmp/bad-ca && kubectl --kubeconfig /tmp/bad-ca config set clusters.k3d-portfolio-dev.certificate-authority-data "$(base64 -w0 /tmp/c)" >/dev/null && kubectl --kubeconfig /tmp/bad-ca get nodes --request-timeout=5s'
+```
+
+Expected: 第一条列出 3 个节点；第二条失败并含 `x509: certificate is valid for … localhost, not host.docker.internal`；第三条失败并含 `x509: certificate signed by unknown authority`
 
 - [ ] **Step 2: 内存限制**
 
@@ -909,7 +916,13 @@ dc git status --short
 dc sh -c 'cd .. && git config core.hooksPath'
 ```
 
-Expected: `git status` 正常输出（无 `dubious ownership`）；`core.hooksPath` 为 `.husky/_`
+在临时分支上做一次空提交，验证 husky pre-commit 在容器内执行，随后清理：
+
+```bash
+dc sh -c 'cd .. && git switch -q -c tmp/devcontainer-hook-check && git commit --allow-empty -m "chore: hook check" && git switch -q - && git branch -D tmp/devcontainer-hook-check'
+```
+
+Expected: `git status` 正常输出（无 `dubious ownership`）；`core.hooksPath` 为 `.husky/_`；空提交成功、无 `husky - … failed`；临时分支已删除（`git branch --list 'tmp/*'` 为空）
 
 - [ ] **Step 4: 集群停止时容器可启动**
 
@@ -1113,7 +1126,10 @@ bash .devcontainer/tests/test-verify-tools.sh
 | 位置 | 原文 | 改为 |
 |------|------|------|
 | FR-DVP-011-04 | `CI 中用 \`devcontainers/ci\` 构建并在容器内执行 lint/test，保证本地与 CI 一致` | `CI 中用 \`devcontainers/ci\` 构建并在容器内执行 drift 检查、lint、validate、test:newman；PR 门禁执行 \`verify-tools.sh --drift\`` |
+| FR-DVP-011-02 | `docker-outside-of-docker：复用宿主 OrbStack，容器内可操作 k3d 集群` | `docker-outside-of-docker：复用宿主 OrbStack 与 k3d 集群；kubeconfig 经 \`host.docker.internal\` + \`tls-server-name: localhost\`，TLS 完整校验` |
 | REQ-DVP-011 验收第 1 项 | `VS Code "Reopen in Container" 成功，\`npm run lint\` / \`npm test\` 通过` | `VS Code "Reopen in Container" 成功，\`npm run lint\` / \`npm run validate\` / \`npm run test:newman\` 通过（Cypress 走 \`npm run docker:test\`）` |
+
+`REQ-DVP-011` 状态（`🔲 Planned` → `✅ Done`）及 `REQUIREMENTS-INDEX.md` / `req-register.md` 在 Stage 5 PR 合并时更新，本 Task 不改。
 
 - [ ] **Step 5: Commit**
 
