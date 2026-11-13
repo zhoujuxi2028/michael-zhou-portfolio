@@ -44,9 +44,34 @@ check_drift() {
   if [ "$count" -eq 0 ]; then echo "❌ no azure/setup-helm version pins found in $wf"; fail=1; fi
 }
 
+# First x.y.z found on stdin (awk exits 0 even without a match)
+semver() {
+  awk 'match($0, /[0-9]+\.[0-9]+\.[0-9]+/) { print substr($0, RSTART, RLENGTH); exit }'
+}
+
+# version_of <command> [args...]: prints x.y.z, "missing", or "error"
+version_of() {
+  local out
+  if ! command -v "$1" >/dev/null 2>&1; then
+    echo "missing"
+    return 0
+  fi
+  if ! out=$("$@" 2>&1); then
+    echo "error"
+    return 0
+  fi
+  printf '%s\n' "$out" | semver
+}
+
 check_installed() {
-  echo "check_installed: not implemented" >&2
-  fail=1
+  report node      "$NODE_VERSION"      "$(version_of node --version)"
+  report terraform "$TERRAFORM_VERSION" "$(version_of terraform version)"
+  report helm      "$HELM_VERSION"      "$(version_of helm version --short)"
+  report kubectl   "$KUBECTL_VERSION"   "$(version_of kubectl version --client)"
+  report k3d       "$K3D_VERSION"       "$(version_of k3d version)"
+  report trivy     "$TRIVY_VERSION"     "$(version_of trivy --version)"
+  report kyverno   "$KYVERNO_VERSION"   "$(version_of kyverno version)"
+  report az        "$AZ_CLI_VERSION"    "$(version_of az version)"
 }
 
 case "${1:-}" in
