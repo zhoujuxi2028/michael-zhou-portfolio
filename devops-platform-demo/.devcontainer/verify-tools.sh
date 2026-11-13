@@ -7,6 +7,8 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT="${DVP_ROOT:-$(cd "$SCRIPT_DIR/../.." && pwd)}"
+# Drop inherited values so a missing key in versions.env trips set -u
+unset NODE_VERSION TERRAFORM_VERSION HELM_VERSION KUBECTL_VERSION K3D_VERSION TRIVY_VERSION KYVERNO_VERSION AZ_CLI_VERSION
 # shellcheck source=/dev/null
 . "${VERSIONS_FILE:-$SCRIPT_DIR/versions.env}"
 
@@ -22,6 +24,21 @@ report() {
   fi
 }
 
+# pins_of <action-regex> <key> <files...>: one line per 'uses: <action>' step,
+# the pin value or UNPINNED (next step / next file / EOF reached without a pin)
+pins_of() {
+  local action=$1 key=$2
+  shift 2
+  awk -v action="$action" -v key="$key" '
+    FNR == 1 && f { print "UNPINNED" }
+    FNR == 1 { f = 0 }
+    /uses:/ && f { print "UNPINNED"; f = 0 }
+    $0 ~ "uses:[[:space:]]*" action { f = 1; next }
+    f && $0 ~ "^[[:space:]]*" key ":" { print $2; f = 0 }
+    END { if (f) print "UNPINNED" }
+  ' "$@" | tr -d "'\""
+}
+
 check_drift() {
   local wf="$ROOT/.github/workflows" v count
 
@@ -32,15 +49,15 @@ check_drift() {
   while read -r v; do
     report "terraform_version" "~${TERRAFORM_VERSION%.*}" "$v"
     count=$((count + 1))
-  done < <(grep -hE '^[[:space:]]*terraform_version:' "$wf"/dvp-*.yml | awk '{print $2}' | tr -d "'\"")
+  done < <(pins_of 'hashicorp\/setup-terraform' 'terraform_version' "$wf"/dvp-*.yml)
   if [ "$count" -eq 0 ]; then echo "❌ no terraform_version pins found in $wf"; fail=1; fi
 
-  # helm: first 'version:' after each 'uses: azure/setup-helm'
+  # helm: 'version:' within each 'uses: azure/setup-helm' step
   count=0
   while read -r v; do
     report "setup-helm version" "$HELM_VERSION" "${v#v}"
     count=$((count + 1))
-  done < <(awk '/uses:[[:space:]]*azure\/setup-helm/ { f = 1; next } f && /version:/ { print $2; f = 0 }' "$wf"/dvp-*.yml | tr -d "'\"")
+  done < <(pins_of 'azure\/setup-helm' 'version' "$wf"/dvp-*.yml)
   if [ "$count" -eq 0 ]; then echo "❌ no azure/setup-helm version pins found in $wf"; fail=1; fi
 }
 

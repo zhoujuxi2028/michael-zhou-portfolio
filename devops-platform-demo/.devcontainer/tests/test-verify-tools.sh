@@ -71,7 +71,35 @@ echo "jobs: {}" > "$empty/.github/workflows/dvp-a.yml"
 echo "20.20.0" > "$empty/devops-platform-demo/.nvmrc"
 assert_exit "drift: no pins found fails" 1 drift "$empty"
 
-assert_exit "drift: real repository" 0 bash "$SUT" --drift
+# make_wf <name> <workflow-body>: custom workflow, valid .nvmrc
+make_wf() {
+  local d="$TMP_ROOT/$1"
+  mkdir -p "$d/.github/workflows" "$d/devops-platform-demo"
+  printf '%s\n' "$2" > "$d/.github/workflows/dvp-a.yml"
+  echo "20.20.0" > "$d/devops-platform-demo/.nvmrc"
+  printf '%s\n' "$d"
+}
+
+H_PIN='      - uses: azure/setup-helm@v5
+        with:
+          version: v3.14.0'
+H_BAD='      - uses: azure/setup-helm@v5
+        with:
+          version: v3.15.0'
+H_NONE='      - uses: azure/setup-helm@v5'
+T_PIN="      - uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: '~1.7'"
+T_NONE='      - uses: hashicorp/setup-terraform@v4'
+
+assert_exit "drift: one of two helm steps unpinned" 1 drift \
+  "$(make_wf h-unpinned "$(printf '%s\n%s\n%s' "$H_PIN" "$H_NONE" "$T_PIN")")"
+assert_exit "drift: one of two terraform steps unpinned" 1 drift \
+  "$(make_wf t-unpinned "$(printf '%s\n%s\n%s\n%s' "$H_PIN" "$T_PIN" "$T_NONE" "$T_PIN")")"
+assert_exit "drift: second of two helm pins drifts" 1 drift \
+  "$(make_wf h-second "$(printf '%s\n%s\n%s' "$H_PIN" "$H_BAD" "$T_PIN")")"
+
+assert_exit "drift: real repository" 0 env -u DVP_ROOT -u VERSIONS_FILE bash "$SUT" --drift
 assert_exit "usage: unknown flag" 2 bash "$SUT" --bogus
 
 # --- installed mode (stub binaries) ---
