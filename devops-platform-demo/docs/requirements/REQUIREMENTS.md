@@ -204,13 +204,13 @@
 | ID | 描述 |
 |----|------|
 | FR-DVP-011-01 | `.devcontainer/devcontainer.json`：Node LTS、terraform、kubectl、helm、k3d、az、trivy、kyverno（版本固定） |
-| FR-DVP-011-02 | docker-outside-of-docker：复用宿主 OrbStack，容器内可操作 k3d 集群 |
+| FR-DVP-011-02 | docker-outside-of-docker：复用宿主 OrbStack 与 k3d 集群；通过 `host.docker.internal` 和 `tls-server-name: localhost` 完整校验 TLS |
 | FR-DVP-011-03 | `postCreateCommand`：`npm ci` + 工具版本自检脚本 |
-| FR-DVP-011-04 | CI 中用 `devcontainers/ci` 构建并在容器内执行 lint/test，保证本地与 CI 一致 |
+| FR-DVP-011-04 | CI 中用 `devcontainers/ci` 构建并执行 drift 检查、lint、validate、test:newman；PR 门禁执行 `verify-tools.sh --drift` |
 | FR-DVP-011-05 | README / QUICKSTART 增加 Dev Container 使用说明 |
 
 **验收标准：**
-- [ ] VS Code "Reopen in Container" 成功，`npm run lint` / `npm test` 通过
+- [ ] VS Code “Reopen in Container” 成功，`npm run lint` / `npm run validate` / `npm run test:newman` 通过；Cypress 使用 `npm run docker:test`
 - [ ] 容器内 `kubectl get nodes` 可访问 `portfolio-dev` 集群
 - [ ] CI 中 devcontainer job 绿灯
 

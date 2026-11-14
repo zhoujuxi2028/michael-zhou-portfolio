@@ -1,0 +1,49 @@
+{
+  "name": "devops-platform-demo",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": "."
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20.20.0"
+    },
+    "ghcr.io/devcontainers/features/terraform:1": {
+      "version": "1.7.5"
+    },
+    "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {
+      "version": "1.33.6",
+      "helm": "3.14.0",
+      "minikube": "none"
+    },
+    "ghcr.io/devcontainers/features/azure-cli:1": {
+      "version": "2.84.0"
+    },
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
+  },
+  "runArgs": ["--memory=2g", "--cpus=2"],
+  "initializeCommand": "mkdir -p \"${localEnv:HOME}/.kube\"",
+  "workspaceMount": "source=${localWorkspaceFolder}/..,target=/workspaces/michael-zhou-portfolio,type=bind",
+  "workspaceFolder": "/workspaces/michael-zhou-portfolio/devops-platform-demo",
+  "mounts": [
+    "source=${localEnv:HOME}/.kube,target=/home/vscode/.kube-host,type=bind,readonly",
+    "source=dvp-node-modules,target=${containerWorkspaceFolder}/node_modules,type=volume"
+  ],
+  "containerEnv": {
+    "NO_PROXY": "host.docker.internal,localhost,127.0.0.1",
+    "no_proxy": "host.docker.internal,localhost,127.0.0.1",
+    "CYPRESS_INSTALL_BINARY": "0"
+  },
+  "remoteUser": "vscode",
+  "postCreateCommand": "git config --global --add safe.directory /workspaces/michael-zhou-portfolio && sudo chown vscode:vscode node_modules && npm ci && .devcontainer/verify-tools.sh",
+  "postStartCommand": ".devcontainer/setup-kubeconfig.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "hashicorp.terraform",
+        "ms-kubernetes-tools.vscode-kubernetes-tools",
+        "dbaeumer.vscode-eslint"
+      ]
+    }
+  }
+}

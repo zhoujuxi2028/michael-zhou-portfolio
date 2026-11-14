@@ -13,6 +13,14 @@ npm test
 npm run docker:test
 ```
 
+## Dev Container
+```bash
+npx -y @devcontainers/cli@0.90.0 up --workspace-folder .
+npx -y @devcontainers/cli@0.90.0 exec --workspace-folder . .devcontainer/verify-tools.sh
+bash .devcontainer/verify-tools.sh --drift
+bash .devcontainer/tests/test-verify-tools.sh
+```
+
 ## 提交前检查
 ```bash
 npm run validate

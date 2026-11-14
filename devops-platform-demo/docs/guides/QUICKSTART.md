@@ -8,6 +8,12 @@
 - Docker (for containerized tests and the local infrastructure demo)
 - For the optional Kubernetes demo: kubectl, k3d, Helm, Terraform, at least 8GB RAM, and ~20GB disk space
 
+## 推荐：Dev Container
+
+在 VS Code 中打开 `devops-platform-demo/`，执行 “Dev Containers: Reopen in Container”。容器提供与 CI 对齐的固定版本工具链，并复用宿主 k3d 集群。镜像限制为 2 GB 内存和 2 个 CPU；Cypress 不在容器中运行，请使用 `npm run docker:test`。首次构建前请确认 Docker 代理可从容器访问。
+
+更多说明与版本自检命令见 README 的 “Dev Container” 小节。
+
 ---
 
 ## Local Verification
