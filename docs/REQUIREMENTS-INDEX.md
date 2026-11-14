@@ -4,7 +4,7 @@
 >
 > 完整台账（优先级 / 类型 / 状态）见 [requirements/req-register.md](./requirements/req-register.md)。
 >
-> 状态：🟡 进行中 | 最后更新：2026-11-12
+> 状态：🟡 进行中 | 最后更新：2026-11-14
 
 ---
 
@@ -101,7 +101,7 @@
 | `REQ-DVP-008` | Elastic 集成 / Loki vs Elastic 对比 | 🔲 |
 | `REQ-DVP-009` | 数据管道 / DB 备份自动化 | 🔲 |
 | `REQ-DVP-010` | OPA/Kyverno 策略即代码 | 🔲 |
-| `REQ-DVP-011` | Dev Container 标准化开发环境 | 🔲 |
+| `REQ-DVP-011` | Dev Container 标准化开发环境（#50） | ✅ |
 
 ---
 
