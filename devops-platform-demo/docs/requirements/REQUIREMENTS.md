@@ -47,7 +47,7 @@
 | `REQ-DVP-008` | Elastic 集成 / Loki vs Elastic 对比 | DEMO | P3 | 60%（部署）/ 100%（文档） | — | SCOM/Elastic | 🔲 Planned |
 | `REQ-DVP-009` | 数据管道 / DB 备份自动化 | FR | P3 | 85% | — | 数据库及数据管道、运维自动化 | 🔲 Planned |
 | `REQ-DVP-010` | OPA/Kyverno 策略即代码 | FR | P3 | 90% | — | 合规与安全策略、DevSecOps | 🔲 Planned |
-| `REQ-DVP-011` | Dev Container 标准化开发环境 | NFR | P1 | 95% | — | 自动化安装与配置；指导团队最佳实践 | 🔲 Planned |
+| `REQ-DVP-011` | Dev Container 标准化开发环境 | NFR | P1 | 95% | — | 自动化安装与配置；指导团队最佳实践 | ✅ Done |
 
 **整体风险：** k3d 同时运行 Prometheus 栈 + Loki + ArgoCD + Kyverno + Postgres（+ Elastic）约 8–12 GB，超出 OrbStack 8 GB 上限 → 按 REQ 分开演示、不用的组件缩到 0；必要时调高 `memory_mib`（宿主机仅剩 ~4 GB）或改用 Azure VM。
 
@@ -197,7 +197,9 @@
 
 **可行性 90%：** Helm 一键安装，CI 校验无需集群。风险：现有 chart 可能违反策略，需要先修复。需要 `brew install kyverno`。
 
-### REQ-DVP-011 — Dev Container 标准化开发环境
+### REQ-DVP-011 — Dev Container 标准化开发环境 ✅
+
+已完成（PR #50，2026-11-14 合并）：`.devcontainer/` 全套定义 + 脚本 + 单元测试；新增 `dvp-devcontainer.yml` 与 PR 门禁 drift 检查；容器构建 `outcome: success`、8 工具版本校验、`host.docker.internal` + `tls-server-name: localhost` TLS 校验访问 k3d、drift 拦截均通过。Cypress 走 `npm run docker:test`。
 
 **User Story:** As a developer joining the project, I want a one-click containerized toolchain, so that I can build, test and deploy without installing tools on my host.
 
