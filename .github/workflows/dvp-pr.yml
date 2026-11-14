@@ -11,7 +11,7 @@ on:
     branches: [main]
     paths:
       - 'devops-platform-demo/**'
-      - '.github/workflows/dvp-pr.yml'
+      - '.github/workflows/dvp-*.yml'
   workflow_dispatch:
 
 concurrency:
@@ -54,6 +54,9 @@ jobs:
 
       - name: Run ESLint
         run: npm run lint
+
+      - name: Tool version drift check
+        run: bash .devcontainer/verify-tools.sh --drift
 
   # ---------------------------------------------------------------------------
   # Job 2: Unit Tests —— 配置/契约校验（Postman collection, Helm chart, K8s YAML）
