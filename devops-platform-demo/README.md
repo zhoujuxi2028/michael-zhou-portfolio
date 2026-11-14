@@ -39,6 +39,26 @@ See [WBS.md](docs/project-management/WBS.md) for detailed task breakdown.
 
 ## Quick Start
 
+### Dev Container（推荐）
+
+容器内工具版本固定并与 CI 对齐，复用宿主机 k3d 集群，不额外启动 Kubernetes 集群。
+
+| 项目 | 说明 |
+|------|------|
+| 打开方式 | 在 VS Code 中打开 `devops-platform-demo/`，执行 “Dev Containers: Reopen in Container” |
+| 工具链 | Node 20.20.0、Terraform 1.7.5、Helm 3.14.0、kubectl 1.33.6、k3d 5.8.3、Trivy 0.70.0、Kyverno 1.20.0、Azure CLI 2.84.0 |
+| 资源限制 | `--memory=2g --cpus=2` |
+| 集群访问 | 通过 `host.docker.internal` 访问宿主 k3d，并使用 `tls-server-name: localhost` 校验 TLS |
+| Cypress | 不在容器内运行；使用 `npm run docker:test` |
+
+```bash
+.devcontainer/verify-tools.sh
+.devcontainer/verify-tools.sh --drift
+k3d cluster stop portfolio-dev  # 暂停演示时释放资源
+```
+
+请从主 clone 打开项目，不要从 git worktree 启动；Dev Container 会将仓库根目录挂载至容器。所有 checkout 共用 `dvp-node-modules` 命名 volume。本机使用代理时，Docker 代理地址须在容器内可达（例如 `host.docker.internal`）。
+
 ### Run Tests Locally
 
 ```bash

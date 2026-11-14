@@ -1,0 +1,55 @@
+name: DVP / Dev Container
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'devops-platform-demo/.devcontainer/**'
+      - '.github/workflows/dvp-devcontainer.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'devops-platform-demo/.devcontainer/**'
+      - '.github/workflows/dvp-devcontainer.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: dvp-devcontainer-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  scripts:
+    name: DVP / Dev Container Scripts
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: ShellCheck
+        run: shellcheck devops-platform-demo/.devcontainer/*.sh devops-platform-demo/.devcontainer/tests/*.sh
+
+      - name: Script tests
+        run: |
+          bash devops-platform-demo/.devcontainer/tests/test-verify-tools.sh
+          bash devops-platform-demo/.devcontainer/tests/test-setup-kubeconfig.sh
+          bash devops-platform-demo/.devcontainer/tests/test-install-tools.sh
+
+  build-and-verify:
+    name: DVP / Dev Container Build
+    needs: scripts
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Build and verify inside Dev Container
+        uses: devcontainers/ci@v0.3
+        with:
+          subFolder: devops-platform-demo
+          push: never
+          runCmd: .devcontainer/verify-tools.sh --drift && npm run lint && npm run validate && npm run test:newman
