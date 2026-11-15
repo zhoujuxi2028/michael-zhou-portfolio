@@ -94,7 +94,7 @@
 | `REQ-DVP-001` | devops-platform-demo：GitHub Actions CI/CD + Docker + Kubernetes + Helm + ArgoCD + Terraform + Trivy + Cypress + Newman 全栈 DevOps 演示 | ✅ |
 | `REQ-DVP-002` | Phase 2：AlertManager Slack、Pushgateway、Loki/Promtail、Grafana 仪表盘、Runbook 文档（#45） | ✅ |
 | `REQ-DVP-003` | Phase 3：Azure 集成（ACR + azurerm + Blob backend + Trivy→Prometheus） | 🔲 |
-| `REQ-DVP-004` | devops-platform-demo/CLAUDE.md 等过期内容修正 | 🔲 |
+| `REQ-DVP-004` | devops-platform-demo/CLAUDE.md 等过期内容修正（#52） | ✅ |
 | `REQ-DVP-005` | Incident / RCA postmortem 模板 + 案例 | 🔲 |
 | `REQ-DVP-006` | Azure Key Vault + External Secrets + K8s RBAC | 🔲 |
 | `REQ-DVP-007` | Dependabot 依赖与补丁自动化 | 🔲 |
