@@ -41,7 +41,7 @@
 | `REQ-DVP-002` | Phase 2：告警、日志、指标、文档 | DEMO | P1 | 100% | 001 | 监控/日志/告警 | ✅ Done（PR #45） |
 | `REQ-DVP-003` | Phase 3：Azure 集成（ACR + azurerm + Blob + Trivy→Prometheus） | FR | P1 | 80% | 002 | Azure、Terraform、云/混合、漏洞管理 | 🔲 Planned |
 | `REQ-DVP-004` | README / CLAUDE.md 过期内容修正 | NFR | P1 | 100% | — | 知识分享、生命周期管理 | ✅ Done |
-| `REQ-DVP-005` | Incident / RCA postmortem 模板 + 案例 | DEMO | P2 | 95% | — | 故障排查、RCA、运维支持 | 🔲 Planned |
+| `REQ-DVP-005` | Incident / RCA postmortem 模板 + 案例 | DEMO | P2 | 95% | — | 故障排查、RCA、运维支持 | ✅ Done |
 | `REQ-DVP-006` | Azure Key Vault + External Secrets + K8s RBAC | FR | P2 | 75% | 003 | 安全访问管理、合规 | 🔲 Planned |
 | `REQ-DVP-007` | Dependabot 依赖与补丁自动化 | NFR | P2 | 95% | — | 补丁策略、漏洞管理 | 🔲 Planned |
 | `REQ-DVP-008` | Elastic 集成 / Loki vs Elastic 对比 | DEMO | P3 | 60%（部署）/ 100%（文档） | — | SCOM/Elastic | 🔲 Planned |
@@ -99,7 +99,9 @@
 
 **可行性 100%：** 纯文档改动。
 
-### REQ-DVP-005 — Incident / RCA postmortem
+### REQ-DVP-005 — Incident / RCA postmortem ✅
+
+已完成（PR #54，2026-11-15 合并）：新增 `docs/incidents/POSTMORTEM-TEMPLATE.md` 与基于真实 bug（Cypress SIGKILL）的案例 `POSTMORTEM-2026-02-21-cypress-sigkill.md`，并将 ALERT-RUNBOOK 的 `TestJobFailed` 告警链接到案例。
 
 **User Story:** As an on-call engineer, I want a standard postmortem template with a worked example, so that incidents are analysed consistently and lessons are shared.
 
@@ -110,7 +112,7 @@
 | FR-DVP-005-03 | ALERT-RUNBOOK 中告警链接到对应排查步骤与 postmortem |
 
 **验收标准：**
-- [ ] 模板 + 1 个完整案例，行动项可追溯到 commit/PR
+- [x] 模板 + 1 个完整案例，行动项可追溯到 commit/PR
 
 **可行性 95%：** 已有真实 bug 素材。风险仅在于案例的深度。
 
