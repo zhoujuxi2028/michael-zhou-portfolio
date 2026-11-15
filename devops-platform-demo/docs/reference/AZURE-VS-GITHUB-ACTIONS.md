@@ -58,8 +58,8 @@
 on:                                  trigger:
   push:                                branches:
     branches: [main]                     include: [main]
-    paths: ['cicd-demo/**']            paths:
-                                         include: ['cicd-demo/**']
+    paths: ['devops-platform-demo/**']            paths:
+                                         include: ['devops-platform-demo/**']
 ```
 
 ### Job 定义

@@ -47,7 +47,7 @@ gitops/
 
 ```bash
 # Navigate to the gitops directory
-cd cicd-demo/gitops/argocd
+cd devops-platform-demo/gitops/argocd
 
 # Run the installation script
 ./install-argocd.sh
@@ -134,7 +134,7 @@ kubectl apply -f gitops/argocd/applications/qa-portfolio-staging.yaml
 │  Developer Workflow (Dev Environment)                            │
 └─────────────────────────────────────────────────────────────────┘
 
-1. Developer updates Kubernetes manifests in cicd-demo/k8s/
+1. Developer updates Kubernetes manifests in devops-platform-demo/k8s/
 2. Developer commits and pushes to feature/devops-platform branch
 3. ArgoCD detects changes (polling every 3 minutes by default)
 4. ArgoCD automatically syncs changes to cluster
@@ -309,7 +309,7 @@ kubectl logs -n qa-portfolio <pod-name>
 **Solution**:
 ```bash
 # Validate manifests locally
-kubectl apply --dry-run=client -f cicd-demo/k8s/
+kubectl apply --dry-run=client -f devops-platform-demo/k8s/
 
 # Fix errors in Git
 # Push changes

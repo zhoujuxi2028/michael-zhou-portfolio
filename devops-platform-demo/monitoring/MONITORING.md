@@ -80,7 +80,7 @@ kubectl top nodes                  # Should work without errors
 
 ```bash
 # 1. Navigate to monitoring directory
-cd cicd-demo/monitoring
+cd devops-platform-demo/monitoring
 
 # 2. Run deployment script
 ./deploy-monitoring.sh
