@@ -630,7 +630,7 @@ aws --endpoint-url=http://localhost:4566 dynamodb list-tables
 
 ```bash
 # 创建docker-compose文件
-cd cicd-demo
+cd devops-platform-demo
 cat > docker-compose.localstack.yml << 'EOF'
 # ... (上面的docker-compose配置) ...
 EOF

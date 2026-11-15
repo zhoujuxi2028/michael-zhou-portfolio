@@ -2,7 +2,7 @@
 # 部署到 monitoring namespace，由 kube-prometheus-stack 的 Prometheus Operator 自动加载。
 #
 # 使用方法：
-#   kubectl apply -f cicd-demo/monitoring/alertrules/test-alerts.yaml
+#   kubectl apply -f devops-platform-demo/monitoring/alertrules/test-alerts.yaml
 #
 # 前置条件：
 #   - kube-prometheus-stack 已安装（monitoring namespace）

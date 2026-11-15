@@ -120,7 +120,7 @@ kubectl get nodes
 #### 1. Verify Terraform Directory Structure
 
 ```bash
-cd cicd-demo/terraform
+cd devops-platform-demo/terraform
 
 # List directory structure
 ls -R
@@ -215,7 +215,7 @@ terraform state list
 #### 1. Verify K8s Directory Structure
 
 ```bash
-cd cicd-demo/k8s
+cd devops-platform-demo/k8s
 
 # List all files
 ls -l
@@ -333,7 +333,7 @@ kubectl get pvc -n qa-portfolio
 #### 1. Verify Security Directory Structure
 
 ```bash
-cd cicd-demo/security
+cd devops-platform-demo/security
 
 # List files
 ls -l
@@ -372,7 +372,7 @@ bash -n security-report.sh && echo "✅ Syntax OK" || echo "❌ Syntax error"
 #### 4. Test npm audit Script
 
 ```bash
-cd cicd-demo
+cd devops-platform-demo
 
 # Run npm audit
 npm run security:audit
@@ -450,7 +450,7 @@ grep "security:" package.json
 #### 1. Verify GitOps Directory Structure
 
 ```bash
-cd cicd-demo/gitops
+cd devops-platform-demo/gitops
 
 # List directory structure
 tree argocd/ || find argocd/

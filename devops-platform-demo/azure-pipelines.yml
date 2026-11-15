@@ -20,7 +20,7 @@ trigger:
       - main
   paths:
     include:
-      - 'cicd-demo/**'
+      - 'devops-platform-demo/**'
 
 # No PR trigger (handled by separate pipeline)
 pr: none
@@ -46,7 +46,7 @@ parameters:
 # GitHub Actions equivalent: GitHub Secrets + env
 # Variable Groups can connect to Azure Key Vault for secret rotation
 variables:
-  - group: cicd-demo-vars          # Linked Variable Group (portal)
+  - group: devops-platform-demo-vars          # Linked Variable Group (portal)
   - name: nodeVersion
     value: '20'
   - name: dockerImage
@@ -83,22 +83,22 @@ stages:
           - task: Cache@2
             displayName: 'Cache npm'
             inputs:
-              key: 'npm | "$(Agent.OS)" | cicd-demo/package-lock.json'
+              key: 'npm | "$(Agent.OS)" | devops-platform-demo/package-lock.json'
               path: $(Pipeline.Workspace)/.npm
               restoreKeys: |
                 npm | "$(Agent.OS)"
 
           - script: npm ci
             displayName: 'Install dependencies'
-            workingDirectory: cicd-demo
+            workingDirectory: devops-platform-demo
 
           - script: npm run lint --if-present
             displayName: 'Lint'
-            workingDirectory: cicd-demo
+            workingDirectory: devops-platform-demo
 
           - script: npm test --if-present
             displayName: 'Run unit tests'
-            workingDirectory: cicd-demo
+            workingDirectory: devops-platform-demo
 
   # ============================================
   # Stage 2: Build Docker images
@@ -122,13 +122,13 @@ stages:
                 $(dockerImage):latest
               echo "Newman image built successfully"
             displayName: 'Build Newman image'
-            workingDirectory: cicd-demo
+            workingDirectory: devops-platform-demo
 
           - script: |
               docker compose build --no-cache 2>&1 | tail -5
               echo "Docker Compose build complete"
             displayName: 'Build with Docker Compose'
-            workingDirectory: cicd-demo
+            workingDirectory: devops-platform-demo
 
   # ============================================
   # Stage 3: E2E Tests (Cypress + Newman)
@@ -152,14 +152,14 @@ stages:
               docker compose up --build --wait --wait-timeout 120
               echo "E2E tests completed"
             displayName: 'Run E2E tests in Docker'
-            workingDirectory: cicd-demo
+            workingDirectory: devops-platform-demo
 
           - script: |
               mkdir -p test-artifacts
               docker compose cp cypress:/e2e/cypress/videos test-artifacts/videos 2>/dev/null || true
               docker compose cp cypress:/e2e/cypress/screenshots test-artifacts/screenshots 2>/dev/null || true
             displayName: 'Collect test results'
-            workingDirectory: cicd-demo
+            workingDirectory: devops-platform-demo
             condition: always()          # GitHub Actions: if: always()
 
           # GitHub Actions: actions/upload-artifact@v4
@@ -168,7 +168,7 @@ stages:
             displayName: 'Upload test artifacts'
             condition: always()
             inputs:
-              targetPath: cicd-demo/test-artifacts
+              targetPath: devops-platform-demo/test-artifacts
               artifactName: 'e2e-test-results'
 
           # Publish JUnit results to Azure Test tab (no GitHub Actions equivalent)
@@ -178,12 +178,12 @@ stages:
             condition: always()
             inputs:
               testResultsFormat: 'JUnit'
-              testResultsFiles: 'cicd-demo/test-artifacts/**/*.xml'
+              testResultsFiles: 'devops-platform-demo/test-artifacts/**/*.xml'
               mergeTestResults: true
 
           - script: docker compose down -v --remove-orphans 2>/dev/null || true
             displayName: 'Cleanup Docker'
-            workingDirectory: cicd-demo
+            workingDirectory: devops-platform-demo
             condition: always()
 
   # ============================================

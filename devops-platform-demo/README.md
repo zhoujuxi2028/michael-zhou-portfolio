@@ -26,14 +26,25 @@ Local demo → k3d / Kubernetes + ArgoCD configuration + Prometheus / Grafana
 | **Security checks** | Trivy + npm audit | PR dependency and filesystem checks; separate Terraform validation workflow |
 | **Observability configuration** | Prometheus + Grafana | Metrics scripts, alert rules, and dashboard JSON files |
 
+### Project Status
+
+| Phase | Scope | Status |
+|-------|-------|--------|
+| Phase 1 | 全栈 DevOps 演示（CI/CD + IaC + K8s + ArgoCD + 监控） | ✅ Done |
+| Phase 2 | 告警、日志、指标（AlertManager + Loki/Promtail + Pushgateway） | ✅ Done |
+| Dev Container | 版本固定的容器化工具链（REQ-DVP-011） | ✅ Done |
+| Phase 3 | Azure 集成（ACR + azurerm + Blob backend + Trivy→Prometheus） | 🔲 Planned |
+
+完整需求与路线图见 [REQUIREMENTS.md](docs/requirements/REQUIREMENTS.md)。
+
 ### Follow-up Work
 
 | Component | Technology | What It Adds |
 |-----------|-----------|-------------|
+| **Azure integration** | Terraform azurerm + ACR | Provision ACR, push images, switch chart image source to ACR (Phase 3) |
 | **Real cluster delivery** | ArgoCD or a secured runner | Replace workflow dry-runs with deployment to a reachable, credentialed cluster |
-| **Pipeline telemetry integration** | Pushgateway + Prometheus | Configure a reachable Pushgateway and validate metrics ingestion end to end |
-| **Centralized log aggregation** | Loki + Promtail | Collect cluster and workload logs in Grafana |
-| **Alert routing** | AlertManager | Configure and verify a notification receiver for actionable alerts |
+| **Secret management** | Azure Key Vault + External Secrets | Source secrets from Key Vault, no credentials in Git |
+| **Policy as code** | Kyverno | Enforce admission policies (no `latest` tag, resource limits, privileged) |
 
 See [WBS.md](docs/project-management/WBS.md) for detailed task breakdown.
 

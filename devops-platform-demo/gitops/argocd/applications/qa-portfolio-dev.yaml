@@ -16,7 +16,7 @@ spec:
     repoURL: https://github.com/zhoujuxi2028/michael-zhou-qa-portfolio.git
     targetRevision: feature/devops-platform
     # Helm chart source (upgraded from raw K8s manifests)
-    path: cicd-demo/helm/qa-portfolio
+    path: devops-platform-demo/helm/qa-portfolio
     helm:
       valueFiles:
         - values.yaml
