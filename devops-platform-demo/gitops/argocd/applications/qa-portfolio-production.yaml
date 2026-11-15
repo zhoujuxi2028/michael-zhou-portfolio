@@ -18,7 +18,7 @@ spec:
   source:
     repoURL: https://github.com/zhoujuxi2028/michael-zhou-qa-portfolio.git
     targetRevision: main
-    path: cicd-demo/helm/qa-portfolio
+    path: devops-platform-demo/helm/qa-portfolio
     helm:
       valueFiles:
         - values.yaml
