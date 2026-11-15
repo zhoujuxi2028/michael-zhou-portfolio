@@ -34,6 +34,8 @@ kubectl describe job <job-name> -n qa-portfolio
 
 **Resolution:** Fix the test failure or rerun the CI/CD pipeline.
 
+**Related postmortem:** [Cypress 测试被 SIGKILL 中断（INC-2026-02-21-001）](../incidents/POSTMORTEM-2026-02-21-cypress-sigkill.md) — 容器退出策略导致测试被强制终止的复盘。
+
 ---
 
 ## NoTestJobsCompleted
