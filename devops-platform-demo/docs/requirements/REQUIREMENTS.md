@@ -40,7 +40,7 @@
 | `REQ-DVP-001` | 全栈 DevOps 演示（Phase 1） | DEMO | P1 | — | — | CI/CD、IaC、K8s、监控 | ✅ Done |
 | `REQ-DVP-002` | Phase 2：告警、日志、指标、文档 | DEMO | P1 | 100% | 001 | 监控/日志/告警 | ✅ Done（PR #45） |
 | `REQ-DVP-003` | Phase 3：Azure 集成（ACR + azurerm + Blob + Trivy→Prometheus） | FR | P1 | 80% | 002 | Azure、Terraform、云/混合、漏洞管理 | 🔲 Planned |
-| `REQ-DVP-004` | README / CLAUDE.md 过期内容修正 | NFR | P1 | 100% | — | 知识分享、生命周期管理 | 🔲 Planned |
+| `REQ-DVP-004` | README / CLAUDE.md 过期内容修正 | NFR | P1 | 100% | — | 知识分享、生命周期管理 | ✅ Done |
 | `REQ-DVP-005` | Incident / RCA postmortem 模板 + 案例 | DEMO | P2 | 95% | — | 故障排查、RCA、运维支持 | 🔲 Planned |
 | `REQ-DVP-006` | Azure Key Vault + External Secrets + K8s RBAC | FR | P2 | 75% | 003 | 安全访问管理、合规 | 🔲 Planned |
 | `REQ-DVP-007` | Dependabot 依赖与补丁自动化 | NFR | P2 | 95% | — | 补丁策略、漏洞管理 | 🔲 Planned |
@@ -81,7 +81,9 @@
 
 **可行性 80%：** `az` 已登录且订阅 Enabled，成本约 $5–6/月。风险：Sponsorship 额度/到期；Service Principal 创建可能受租户权限限制；spec 中明文订阅 ID 与邮箱需先脱敏。
 
-### REQ-DVP-004 — README / CLAUDE.md 过期内容修正
+### REQ-DVP-004 — README / CLAUDE.md 过期内容修正 ✅
+
+已完成（PR #52，2026-11-15 合并）：CLAUDE.md workflow 名改为 `dvp-*.yml`；README 新增 Project Status（Phase 1/2/Dev Container ✅、Phase 3 🔲 Planned）并刷新 Follow-up Work；`cicd-demo` 路径全部替换为 `devops-platform-demo`（历史文档除外）；重写 3 个 workflow 指南。
 
 **User Story:** As a reviewer, I want the docs to match the actual state of the project, so that I can trust what the portfolio claims.
 
@@ -92,8 +94,8 @@
 | FR-DVP-004-03 | 文档中失效链接/路径（如 `cicd-demo/**`）检查与修正 |
 
 **验收标准：**
-- [ ] README、CLAUDE.md 中所有 workflow 名与 `.github/workflows/` 一致
-- [ ] 无 `cicd-demo` 残留路径（历史文档除外）
+- [x] README、CLAUDE.md 中所有 workflow 名与 `.github/workflows/` 一致
+- [x] 无 `cicd-demo` 残留路径（历史文档除外）
 
 **可行性 100%：** 纯文档改动。
 
