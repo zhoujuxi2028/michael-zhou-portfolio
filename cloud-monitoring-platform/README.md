@@ -17,9 +17,10 @@ IoT cloud monitoring system for signal coverage device monitoring, management, a
 │   ├── poc/            # Proof of concept projects
 │   ├── aep-integration/# AEP platform integration phases
 │   └── docs/           # Prototype documentation
-├── reference/          # Reference docs, SDK, and data
 └── docs/               # Project documentation
 ```
+
+> Note: `reference/`（AEP SDK、真实生产数据）不在公开仓库中，见 `.gitignore`。
 
 ## Core Features
 

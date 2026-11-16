@@ -171,7 +171,6 @@ AEP_PRODUCT_ID=您的产品ID
 - [开发总结报告](phase1-query/docs/PROJECT_SUMMARY.md)
 
 ### 通用文档
-- [AEP API官方文档](../reference/YOUR_APP_ID_sdk/doc/)
 - [项目架构设计](../docs/architecture/)
 - [需求分析文档](../docs/requirements/)
 

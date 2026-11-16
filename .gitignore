@@ -53,3 +53,6 @@ Thumbs.db
 # SQLite generated databases
 **/*.db
 !devops-platform-demo/package-lock.json
+
+# Reference data (real production data — never commit)
+cloud-monitoring-platform/reference/

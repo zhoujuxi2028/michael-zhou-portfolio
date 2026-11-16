@@ -18,8 +18,7 @@ We take security vulnerabilities seriously. If you discover a security issue, pl
 Since this is a demonstration project for a QA portfolio:
 
 1. **GitHub Issues**: Open a public issue for non-critical findings
-2. **Email**: For sensitive issues, email [security@example.com](mailto:security@example.com)
-3. **GitHub Security Advisories**: Use private vulnerability reporting if available
+2. **GitHub Security Advisories**: Use private vulnerability reporting for sensitive issues
 
 ### What to Include
 
@@ -116,7 +115,6 @@ This project demonstrates security practices aligned with:
 ## Security Contacts
 
 - **Project Owner**: Michael Zhou
-- **Email**: [security@example.com](mailto:security@example.com)
 - **GitHub**: [@zhoujuxi2028](https://github.com/zhoujuxi2028)
 
 ## Acknowledgments

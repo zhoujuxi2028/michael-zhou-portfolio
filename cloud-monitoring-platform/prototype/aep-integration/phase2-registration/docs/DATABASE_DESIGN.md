@@ -806,7 +806,6 @@ echo "OK: Database is healthy"
 ## 📚 参考资料
 
 ### 1. 相关文档
-- [AEP平台API文档](../../reference/YOUR_APP_ID_sdk/doc/)
 - [现有系统数据库设计](../../../../vendor-b/zc_backend/db_control_sys.sql)
 - [项目架构设计](./architecture-design.md)
 

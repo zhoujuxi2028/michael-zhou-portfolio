@@ -44,13 +44,10 @@ cloud-monitoring-platform/
 │   │   ├── phase1.1-export/
 │   │   └── phase2-registration/
 │   └── docs/                          # 原型文档
-├── reference/                         # 参考文档和AEP SDK
-│   ├── YOUR_APP_ID_sdk/                    # AEP SDK
-│   ├── analysis/                      # 分析报告
-│   ├── data/                          # 数据文件
-│   └── reports/                       # 报告
 └── docs/                              # 项目文档
 ```
+
+> `reference/`（AEP SDK、真实生产数据）已从公开仓库移除并加入 `.gitignore`。
 
 ## 开发命令
 
@@ -65,9 +62,8 @@ cd cloud-monitoring-platform/prototype/poc/telecom-api-validation/
 
 ### AEP集成开发
 ```bash
-cd cloud-monitoring-platform/reference/YOUR_APP_ID_sdk/demo/
-source export_env.sh
-./run_query.sh
+cd cloud-monitoring-platform/prototype/poc/simple-product-status-query/
+mvn spring-boot:run
 ```
 
 ## 核心技术配置
@@ -91,7 +87,6 @@ source export_env.sh
 
 **AEP (Application Enablement Platform)** - 中国电信应用使能平台
 - **域名**: `*.api.ctwing.cn`
-- **SDK位置**: `reference/YOUR_APP_ID_sdk/`
 
 ### 核心服务
 - 产品管理、设备管理、数据查询、远程控制
@@ -100,15 +95,12 @@ source export_env.sh
 ### 认证配置
 ```bash
 export AEP_APP_ID="YOUR_APP_ID"
-export AEP_APP_KEY="Your_App_Key"
-export AEP_APP_SECRET="Your_App_Secret"
-export AEP_API_HOST="99990003.api.ctwing.cn"
+export AEP_APP_KEY="YOUR_APP_KEY"
+export AEP_APP_SECRET="YOUR_APP_SECRET"
+export AEP_API_HOST="YOUR_API_HOST.api.ctwing.cn"
 ```
 
-### 文档位置
-- API文档: `reference/YOUR_APP_ID_sdk/doc/`
-- SDK示例: `reference/YOUR_APP_ID_sdk/demo/`
-- 学习笔记: `reference/AEP_学习笔记.md`
+> 官方 SDK 与 API 文档原位于 `reference/YOUR_APP_ID_sdk/`，已从公开仓库移除。
 
 ## Vendor C验收4个子系统
 1. **物联网云监控平台**: 通用监控框架
