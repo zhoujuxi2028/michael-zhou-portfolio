@@ -361,7 +361,9 @@ git commit -m "docs(dvp): register REQ-DVP-012 and REQ-DVP-013"
 - [ ] `verify-tools.sh --drift` 与 `test-verify-tools.sh` 通过
 - [ ] `validate-environment.sh` 退出码 0
 - [ ] CI：`dvp-pr.yml` 全绿，`e2e` job 实际执行 Cypress（本 PR 改了 `cypress/` 与 `.nvmrc`，应触发）
-- [ ] CI：`dvp-devcontainer.yml` 全绿（Node 26 feature 构建）
+- [ ] CI：`dvp-devcontainer.yml` 全绿（Node 26 feature 构建），日志中 `verify-tools.sh` 报 `node 26.13.1` 无 drift（只看 `scripts` job 不算）
+- [ ] Dev Container 构建日志：`postCreateCommand` 的 `npm ci` 是否出现 npm 11 `allowScripts` 警告 / cypress postinstall 被跳过，结果写入 PR
+- [ ] 本地 `npm run lint` 在 Cypress 运行后仍可用（未加引号的 glob 问题，见 Stage 3 发现）
 
 ## 风险
 
