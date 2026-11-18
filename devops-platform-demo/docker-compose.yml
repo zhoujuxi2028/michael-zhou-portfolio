@@ -121,7 +121,7 @@ networks:
 volumes:
   cypress-cache:
     name: qa-cypress-demo-cache
-    # After changing the cypress/included version, remove first: docker volume rm qa-cypress-demo-cache
+    # After bumping cypress/included: docker compose down && docker volume rm qa-cypress-demo-cache
 
 # =============================================================================
 # Usage Instructions

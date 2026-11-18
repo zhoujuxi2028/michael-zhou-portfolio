@@ -25,7 +25,7 @@ cypress:
   enabled: true
   image:
     repository: cypress/included
-    tag: "13.6.0"
+    tag: "16.3.0"
     pullPolicy: IfNotPresent
   backoffLimit: 2
   ttlSecondsAfterFinished: 3600
