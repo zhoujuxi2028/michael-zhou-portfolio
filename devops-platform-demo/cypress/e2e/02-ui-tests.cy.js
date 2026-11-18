@@ -15,9 +15,9 @@ describe('UI Tests - Example.com', () => {
       // Interview Point: "We test basic page load and verify key elements"
       cy.visit('https://example.com')
 
-      // example.com dropped its <h1>; the page now has only <p> content + title
-      cy.get('p').first().should('be.visible')
-      cy.get('p').first().should('contain', 'This domain is for use in documentation examples')
+      // example.com removed its <h1>; content is now <p> (multilingual, injected by s.js) + "Learn more" link
+      cy.get('p[lang=en]').should('be.visible')
+        .and('contain', 'This domain is for use in documentation examples')
 
       // Verify page title
       cy.title().should('eq', 'Example Domain')
