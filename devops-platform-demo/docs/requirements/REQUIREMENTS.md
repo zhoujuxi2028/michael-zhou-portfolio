@@ -43,7 +43,7 @@
 | `REQ-DVP-004` | README / CLAUDE.md 过期内容修正 | NFR | P1 | 100% | — | 知识分享、生命周期管理 | ✅ Done |
 | `REQ-DVP-005` | Incident / RCA postmortem 模板 + 案例 | DEMO | P2 | 95% | — | 故障排查、RCA、运维支持 | ✅ Done |
 | `REQ-DVP-006` | Azure Key Vault + External Secrets + K8s RBAC | FR | P2 | 75% | 003 | 安全访问管理、合规 | 🔲 Planned |
-| `REQ-DVP-007` | Dependabot 依赖与补丁自动化 | NFR | P2 | 95% | — | 补丁策略、漏洞管理 | 🔲 Planned |
+| `REQ-DVP-007` | Dependabot 依赖与补丁自动化 | NFR | P2 | 95% | — | 补丁策略、漏洞管理 | ✅ Done（PR #56） |
 | `REQ-DVP-008` | Elastic 集成 / Loki vs Elastic 对比 | DEMO | P3 | 60%（部署）/ 100%（文档） | — | SCOM/Elastic | 🔲 Planned |
 | `REQ-DVP-009` | 数据管道 / DB 备份自动化 | FR | P3 | 85% | — | 数据库及数据管道、运维自动化 | 🔲 Planned |
 | `REQ-DVP-010` | OPA/Kyverno 策略即代码 | FR | P3 | 90% | — | 合规与安全策略、DevSecOps | 🔲 Planned |
@@ -145,8 +145,8 @@
 | FR-DVP-007-03 | 文档：补丁策略（严重度 SLA：CRITICAL 7 天 / HIGH 30 天） |
 
 **验收标准：**
-- [ ] Dependabot 生成 PR 并通过 `dvp-pr.yml` 门禁
-- [ ] 补丁策略文档与 Trivy 门禁阈值一致
+- [x] Dependabot 生成 PR 并通过 `dvp-pr.yml` 门禁
+- [x] 补丁策略文档与 Trivy 门禁阈值一致
 
 **可行性 95%：** GitHub 原生功能。风险：PR 噪音，可通过分组控制。
 

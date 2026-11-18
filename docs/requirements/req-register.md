@@ -35,7 +35,6 @@
 |--------|----------|-------------|------|--------|----------|------|
 | REQ-DVP-003 | Phase 3：Azure 集成（ACR + azurerm + Blob + Trivy→Prometheus） | devops-platform-demo | FR | P1 | 2026-11-12 | Open |
 | REQ-DVP-006 | Azure Key Vault + External Secrets + K8s RBAC | devops-platform-demo | FR | P2 | 2026-11-12 | Open |
-| REQ-DVP-007 | Dependabot 依赖与补丁自动化 | devops-platform-demo | NFR | P2 | 2026-11-12 | Open |
 | REQ-DVP-008 | Elastic 集成 / Loki vs Elastic 对比 | devops-platform-demo | DEMO | P3 | 2026-11-12 | Open |
 | REQ-DVP-009 | 数据管道 / DB 备份自动化 | devops-platform-demo | FR | P3 | 2026-11-12 | Open |
 | REQ-DVP-010 | OPA/Kyverno 策略即代码 | devops-platform-demo | FR | P3 | 2026-11-12 | Open |
@@ -77,6 +76,7 @@
 | REQ-DVP-011 | Dev Container 标准化开发环境 | devops-platform-demo | NFR | P1 | 2026-11-14 | #50 |
 | REQ-DVP-004 | README / CLAUDE.md 过期内容修正 | devops-platform-demo | NFR | P1 | 2026-11-15 | #52 |
 | REQ-DVP-005 | Incident / RCA postmortem 模板 + 案例 | devops-platform-demo | DEMO | P2 | 2026-11-15 | #54 |
+| REQ-DVP-007 | Dependabot 依赖与补丁自动化 | devops-platform-demo | NFR | P2 | 2026-11-16 | #56 |
 
 ---
 
@@ -100,7 +100,7 @@
 | `CA` | `docs/claude-api-journey/` | 0 | — |
 | `AND` | `android-app/` | 1 | 2026-11-05 |
 | `ANDT` | `android-testing-demo-*/` | 0 | — |
-| `DVP` | `devops-platform-demo/` | 6 | 2026-11-15 |
+| `DVP` | `devops-platform-demo/` | 5 | 2026-11-17 |
 | `DRV` | `linux-driver/`（规划中） | 0 | — |
 
 ---
@@ -109,6 +109,7 @@
 
 | 日期 | 操作 | 内容 | 操作人 |
 |------|------|------|--------|
+| 2026-11-16 | 关闭 | REQ-DVP-007 Done：Dependabot 依赖与补丁自动化（#56） | Michael Zhou |
 | 2026-11-15 | 关闭 | REQ-DVP-005 Done：Incident / RCA postmortem 模板 + 案例（#54） | Michael Zhou |
 | 2026-11-15 | 关闭 | REQ-DVP-004 Done：README / CLAUDE.md 过期内容修正（#52） | Michael Zhou |
 | 2026-11-14 | 关闭 | REQ-DVP-011 Done：Dev Container 标准化开发环境（#50） | Michael Zhou |
