@@ -252,13 +252,82 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
   # ---------------------------------------------------------------------------
-  # Job 6: PR Gate —— 汇总闸口（Branch Protection 的 Required Check）
+  # Job 6: E2E —— Cypress 端到端测试（仅相关路径变更时执行，否则直接通过）
+  # job 始终运行：pr-gate 要求 success，job 级 if 跳过会得到 skipped
+  # ---------------------------------------------------------------------------
+  e2e:
+    name: DVP / E2E (Cypress)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Detect E2E-relevant changes
+        id: changes
+        shell: bash
+        working-directory: .
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          CHANGED=$(git diff --name-only "origin/${{ github.base_ref }}...HEAD")
+          echo "$CHANGED"
+          if grep -qE '^devops-platform-demo/(cypress/|cypress\.config\.js$|package(-lock)?\.json$|\.nvmrc$)|^\.github/workflows/dvp-pr\.yml$' <<< "$CHANGED"; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "No E2E-relevant changes — skipping Cypress run."
+          fi
+
+      - name: Setup Node.js
+        if: steps.changes.outputs.run == 'true'
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: devops-platform-demo/.nvmrc
+          cache: npm
+          cache-dependency-path: devops-platform-demo/package-lock.json
+
+      - name: Cache Cypress binary
+        if: steps.changes.outputs.run == 'true'
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/Cypress
+          key: cypress-${{ runner.os }}-${{ hashFiles('devops-platform-demo/package-lock.json') }}
+
+      - name: Install dependencies (with Cypress binary)
+        if: steps.changes.outputs.run == 'true'
+        env:
+          CYPRESS_INSTALL_BINARY: ''
+        run: |
+          npm ci
+          npx cypress verify
+
+      - name: Run Cypress
+        if: steps.changes.outputs.run == 'true'
+        run: npx cypress run
+
+      - name: Upload Cypress artifacts on failure
+        if: failure() && steps.changes.outputs.run == 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: cypress-artifacts
+          path: |
+            devops-platform-demo/cypress/screenshots
+            devops-platform-demo/cypress/videos
+          if-no-files-found: ignore
+
+  # ---------------------------------------------------------------------------
+  # Job 7: PR Gate —— 汇总闸口（Branch Protection 的 Required Check）
   # 配置 branch protection 时，将本 job 设为 required，即可一处守住所有 PR 校验
   # ---------------------------------------------------------------------------
   pr-gate:
     name: DVP / PR Gate
     runs-on: ubuntu-latest
-    needs: [lint, unit-tests, build, security-scan, quality-gate]
+    needs: [lint, unit-tests, build, security-scan, quality-gate, e2e]
     if: always()
     timeout-minutes: 2
     # 覆盖 workflow 级 defaults.run.working-directory（=devops-platform-demo），
@@ -277,13 +346,15 @@ jobs:
           echo "Build:         ${{ needs.build.result }}"
           echo "Security scan: ${{ needs.security-scan.result }}"
           echo "Quality gate:  ${{ needs.quality-gate.result }}"
+          echo "E2E:           ${{ needs.e2e.result }}"
 
           for result in \
             "${{ needs.lint.result }}" \
             "${{ needs.unit-tests.result }}" \
             "${{ needs.build.result }}" \
             "${{ needs.security-scan.result }}" \
-            "${{ needs.quality-gate.result }}"; do
+            "${{ needs.quality-gate.result }}" \
+            "${{ needs.e2e.result }}"; do
             if [ "$result" != "success" ]; then
               echo "::error::PR gate failed — one or more checks did not succeed."
               exit 1
@@ -292,13 +363,13 @@ jobs:
           echo "✅ All PR checks passed — safe to merge."
 
   # ---------------------------------------------------------------------------
-  # Job 7: Push Pipeline Metrics —— 推送 PR 流水线指标到 Prometheus Pushgateway
+  # Job 8: Push Pipeline Metrics —— 推送 PR 流水线指标到 Prometheus Pushgateway
   # 面试要点：每次 CI 运行后度量数据入库，Grafana 追踪质量趋势
   # ---------------------------------------------------------------------------
   push-metrics:
     name: DVP / Push Metrics
     runs-on: ubuntu-latest
-    needs: [lint, unit-tests, build, security-scan, quality-gate, pr-gate]
+    needs: [lint, unit-tests, build, security-scan, quality-gate, e2e, pr-gate]
     if: always()
     timeout-minutes: 3
     defaults:
