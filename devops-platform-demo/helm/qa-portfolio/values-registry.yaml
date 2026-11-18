@@ -1,0 +1,24 @@
+# Registry override — 从本地 Docker Registry 拉取 newman 镜像（Phase 3 本地闭环）
+#
+# 用法（叠加在基础 values.yaml 之上）：
+#   helm template qa-portfolio helm/qa-portfolio \
+#     -f helm/qa-portfolio/values.yaml \
+#     -f helm/qa-portfolio/values-registry.yaml
+#   # ArgoCD：在 application 的 helm.valueFiles 中追加 values-registry.yaml
+#
+# 镜像仓库地址取决于本地 registry 与 k3d 的连通方式：
+#   A) k3d 托管 registry（推荐，`k3d registry create qa-registry --port 5000`）：
+#        仓库地址填 k3d-qa-registry:5000        ← 集群内可达
+#   B) 宿主机 registry:2（docker-compose.registry.yml）：
+#        仓库地址填 host.k3d.internal:5000       ← 需 k3s 允许 HTTP insecure registry
+#   宿主机本地推拉仍可用 localhost:5000（用于 docker push / trivy scan）
+#
+# 本地 registry 为 HTTP 明文、无认证时 imagePullSecrets 留空；
+# 若启用 auth，则先创建 k8s docker-registry secret 并在此引用。
+
+newman:
+  image:
+    repository: k3d-qa-registry:5000/qa-newman
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  imagePullSecrets: []

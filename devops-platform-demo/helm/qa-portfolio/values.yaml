@@ -45,6 +45,7 @@ newman:
     repository: qa-newman-demo
     tag: "latest"
     pullPolicy: Never  # Locally built image for demo
+  imagePullSecrets: []  # 从私有 registry 拉取时配置，如 [{name: qa-registry-pull-secret}]
   backoffLimit: 2
   ttlSecondsAfterFinished: 3600
   activeDeadlineSeconds: 300

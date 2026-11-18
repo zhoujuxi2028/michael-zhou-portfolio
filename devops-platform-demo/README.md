@@ -33,7 +33,9 @@ Local demo → k3d / Kubernetes + ArgoCD configuration + Prometheus / Grafana
 | Phase 1 | 全栈 DevOps 演示（CI/CD + IaC + K8s + ArgoCD + 监控） | ✅ Done |
 | Phase 2 | 告警、日志、指标（AlertManager + Loki/Promtail + Pushgateway） | ✅ Done |
 | Dev Container | 版本固定的容器化工具链（REQ-DVP-011） | ✅ Done |
-| Phase 3 | Azure 集成（ACR + azurerm + Blob backend + Trivy→Prometheus） | 🔲 Planned |
+| Phase 3 | 本地 DevSecOps 闭环（本地 registry + Trivy→Prometheus + ArgoCD/Helm） | 🟡 In progress |
+
+> Phase 3 原计划为 Azure 集成（ACR + azurerm + Blob backend）。因 Azure Pass Sponsorship 订阅到期，改为不依赖云的本地等价方案，详见 [docs/guides/LOCAL-DEVSECOPS.md](docs/guides/LOCAL-DEVSECOPS.md)。
 
 完整需求与路线图见 [REQUIREMENTS.md](docs/requirements/REQUIREMENTS.md)。
 
@@ -41,7 +43,7 @@ Local demo → k3d / Kubernetes + ArgoCD configuration + Prometheus / Grafana
 
 | Component | Technology | What It Adds |
 |-----------|-----------|-------------|
-| **Azure integration** | Terraform azurerm + ACR | Provision ACR, push images, switch chart image source to ACR (Phase 3) |
+| **Cloud registry (optional)** | ACR / ECR | 本地 registry 已覆盖演示；真实云集成因订阅到期暂缓，见 [LOCAL-DEVSECOPS.md](docs/guides/LOCAL-DEVSECOPS.md) |
 | **Real cluster delivery** | ArgoCD or a secured runner | Replace workflow dry-runs with deployment to a reachable, credentialed cluster |
 | **Secret management** | Azure Key Vault + External Secrets | Source secrets from Key Vault, no credentials in Git |
 | **Policy as code** | Kyverno | Enforce admission policies (no `latest` tag, resource limits, privileged) |

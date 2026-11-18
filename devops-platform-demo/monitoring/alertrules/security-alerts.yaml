@@ -1,0 +1,76 @@
+# PrometheusRule — 镜像漏洞安全告警
+# 部署到 monitoring namespace，由 kube-prometheus-stack 的 Prometheus Operator 自动加载。
+#
+# 数据来源：scripts/push-trivy-metrics.sh 推送的指标（经 Pushgateway 抓取）
+#   - trivy_vulnerabilities_total{severity, image, registry}
+#   - trivy_last_scan_timestamp{image, registry}
+#
+# 使用方法：
+#   kubectl apply -f devops-platform-demo/monitoring/alertrules/security-alerts.yaml
+#
+# 前置条件：
+#   - kube-prometheus-stack 已安装（monitoring namespace）
+#   - prometheus-values.yaml 中 serviceMonitorSelectorNilUsesHelmValues: false
+#   - Pushgateway 已启用并抓取（prometheus-pushgateway.enabled: true）
+
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: qa-portfolio-security-alerts
+  namespace: monitoring
+  labels:
+    app: kube-prometheus-stack
+    release: prometheus
+    app.kubernetes.io/part-of: qa-portfolio
+spec:
+  groups:
+    # ==========================================================================
+    # 镜像漏洞告警 — 基于 Trivy 扫描指标
+    # ==========================================================================
+    - name: image-vulnerabilities
+      interval: 1m
+      rules:
+        # 出现 CRITICAL 漏洞即告警
+        - alert: CriticalVulnerabilityDetected
+          expr: >
+            sum by (image, registry) (trivy_vulnerabilities_total{severity="CRITICAL"}) > 0
+          for: 1m
+          labels:
+            severity: critical
+            team: security
+            project: qa-portfolio
+          annotations:
+            summary: "镜像 {{ $labels.image }} 存在 CRITICAL 漏洞"
+            description: >
+              镜像 {{ $labels.image }}（来源 {{ $labels.registry }}）检测到 {{ $value }} 个
+              CRITICAL 漏洞。按补丁策略需在 7 天内修复，请检查 Trivy 报告并升级依赖或基础镜像。
+
+        # HIGH 漏洞数量超过阈值
+        - alert: HighVulnerabilityCountHigh
+          expr: >
+            sum by (image, registry) (trivy_vulnerabilities_total{severity="HIGH"}) > 10
+          for: 5m
+          labels:
+            severity: warning
+            team: security
+            project: qa-portfolio
+          annotations:
+            summary: "镜像 {{ $labels.image }} HIGH 漏洞数偏高（{{ $value }}）"
+            description: >
+              镜像 {{ $labels.image }}（来源 {{ $labels.registry }}）HIGH 漏洞数为 {{ $value }}，
+              超过阈值 10。建议在本迭代内按 SLA（30 天）修复。
+
+        # 超过 24 小时未扫描，说明安全扫描链路中断
+        - alert: TrivyScanStale
+          expr: >
+            (time() - max by (image, registry) (trivy_last_scan_timestamp)) > 86400
+          for: 10m
+          labels:
+            severity: warning
+            team: security
+            project: qa-portfolio
+          annotations:
+            summary: "镜像 {{ $labels.image }} 超过 24 小时未扫描"
+            description: >
+              镜像 {{ $labels.image }}（来源 {{ $labels.registry }}）最近一次 Trivy 扫描已超过 24 小时。
+              请检查 push-trivy-metrics.sh 是否正常执行、Pushgateway 是否可达。
