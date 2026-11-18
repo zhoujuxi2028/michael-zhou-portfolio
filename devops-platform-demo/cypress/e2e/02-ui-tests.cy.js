@@ -15,9 +15,8 @@ describe('UI Tests - Example.com', () => {
       // Interview Point: "We test basic page load and verify key elements"
       cy.visit('https://example.com')
 
-      cy.get('h1').should('be.visible')
-        .and('contain', 'Example Domain')
-
+      // example.com dropped its <h1>; the page now has only <p> content + title
+      cy.get('p').first().should('be.visible')
       cy.get('p').first().should('contain', 'This domain is for use in documentation examples')
 
       // Verify page title
@@ -59,8 +58,7 @@ describe('UI Tests - Example.com', () => {
         cy.viewport(viewport.width, viewport.height)
         cy.visit('https://example.com')
 
-        cy.get('h1').should('be.visible')
-        cy.get('p').should('be.visible')
+        cy.get('p').first().should('be.visible')
 
         // Take screenshot for visual verification
         cy.screenshot(`${viewport.device}-view`)
@@ -95,7 +93,7 @@ describe('UI Tests - Example.com', () => {
       })
 
       cy.visit('https://example.com')
-      cy.get('h1').should('be.visible')
+      cy.get('p').first().should('be.visible')
     })
   })
 })
@@ -111,6 +109,6 @@ describe('Custom Command Examples', () => {
     // Interview Point: "We create custom commands for frequently used actions"
     // Example: cy.login(), cy.searchFor(), cy.validateApiResponse()
 
-    cy.get('h1').should('be.visible')
+    cy.get('p').first().should('be.visible')
   })
 })
