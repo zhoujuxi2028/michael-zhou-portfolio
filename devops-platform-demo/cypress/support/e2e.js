@@ -17,7 +17,7 @@ import './commands'
 before(() => {
   // Use console.log instead of cy.log in global hooks
   console.log('Starting test suite execution')
-  console.log(`Environment: ${Cypress.env('environment') || 'default'}`)
+  console.log(`Environment: ${Cypress.expose('environment') || 'default'}`)
 })
 
 // Global after hook - runs once after all tests
