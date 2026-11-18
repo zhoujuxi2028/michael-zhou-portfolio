@@ -2,7 +2,7 @@ name: DVP / PR Pipeline
 
 # PR-触发的快速校验流水线，展示 PR → Merge 工作流。
 # 与 docker-tests.yml（nightly 全量回归）和 security-scan.yml（深度安全扫描）形成分层策略：
-#   PR 阶段：< 5 分钟快速反馈（lint + 构建 + 单元/契约校验 + 轻量安全扫描）
+#   PR 阶段：< 5 分钟快速反馈（lint + 构建 + 单元/契约校验 + 轻量安全扫描 + 按路径触发的 Cypress E2E）
 #   合并后：devops-platform-demo-deploy.yml 触发部署
 #   夜间：完整的 Docker 回归 + 完整 SARIF 扫描
 
@@ -27,7 +27,7 @@ defaults:
     working-directory: devops-platform-demo
 
 env:
-  # PR 流水线不运行 Cypress，跳过 Cypress 二进制下载以加速 npm ci
+  # 默认跳过 Cypress 二进制下载以加速 npm ci；仅 e2e job 在步骤级覆盖为 '' 以安装
   CYPRESS_INSTALL_BINARY: '0'
 
 jobs:
@@ -269,12 +269,15 @@ jobs:
         id: changes
         shell: bash
         working-directory: .
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_REF: ${{ github.base_ref }}
         run: |
           set -euo pipefail
-          if [ "${{ github.event_name }}" != "pull_request" ]; then
+          if [ "$EVENT_NAME" != "pull_request" ]; then
             echo "run=true" >> "$GITHUB_OUTPUT"; exit 0
           fi
-          CHANGED=$(git diff --name-only "origin/${{ github.base_ref }}...HEAD")
+          CHANGED=$(git diff --name-only "origin/${BASE_REF}...HEAD")
           echo "$CHANGED"
           if grep -qE '^devops-platform-demo/(cypress/|cypress\.config\.js$|package(-lock)?\.json$|\.nvmrc$)|^\.github/workflows/dvp-pr\.yml$' <<< "$CHANGED"; then
             echo "run=true" >> "$GITHUB_OUTPUT"
@@ -319,6 +322,7 @@ jobs:
             devops-platform-demo/cypress/screenshots
             devops-platform-demo/cypress/videos
           if-no-files-found: ignore
+          retention-days: 7
 
   # ---------------------------------------------------------------------------
   # Job 7: PR Gate —— 汇总闸口（Branch Protection 的 Required Check）
