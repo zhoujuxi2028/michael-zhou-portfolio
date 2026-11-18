@@ -26,7 +26,7 @@
 
 ### Prevention
 - ✅ package-lock.json now tracked in git
-- ✅ Using stable Node.js LTS version (v20.20.0)
+- ✅ Using stable Node.js LTS version (v20.20.0) (superseded by 26.13.1 in REQ-DVP-012)
 - ✅ Simplified Cypress reporter configuration
 - ✅ Documented for future reference
 

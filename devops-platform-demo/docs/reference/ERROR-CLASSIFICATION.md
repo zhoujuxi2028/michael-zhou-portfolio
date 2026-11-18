@@ -290,7 +290,7 @@ jobs:
 
 Create `.nvmrc`:
 ```
-20.20.0
+26.13.1
 ```
 
 Create `scripts/validate-environment.sh`:
