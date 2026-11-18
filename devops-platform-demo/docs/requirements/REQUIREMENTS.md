@@ -39,7 +39,7 @@
 |--------|------|------|--------|--------|------|---------|------|
 | `REQ-DVP-001` | 全栈 DevOps 演示（Phase 1） | DEMO | P1 | — | — | CI/CD、IaC、K8s、监控 | ✅ Done |
 | `REQ-DVP-002` | Phase 2：告警、日志、指标、文档 | DEMO | P1 | 100% | 001 | 监控/日志/告警 | ✅ Done（PR #45） |
-| `REQ-DVP-003` | Phase 3：Azure 集成（ACR + azurerm + Blob + Trivy→Prometheus） | FR | P1 | 80% | 002 | Azure、Terraform、云/混合、漏洞管理 | 🔲 Planned |
+| `REQ-DVP-003` | Phase 3：本地 DevSecOps 闭环（本地 registry + Trivy→Prometheus，替代 Azure） | FR | P1 | — | 002 | DevSecOps、漏洞管理、registry | 🟡 In Progress |
 | `REQ-DVP-004` | README / CLAUDE.md 过期内容修正 | NFR | P1 | 100% | — | 知识分享、生命周期管理 | ✅ Done |
 | `REQ-DVP-005` | Incident / RCA postmortem 模板 + 案例 | DEMO | P2 | 95% | — | 故障排查、RCA、运维支持 | ✅ Done |
 | `REQ-DVP-006` | Azure Key Vault + External Secrets + K8s RBAC | FR | P2 | 75% | 003 | 安全访问管理、合规 | 🔲 Planned |

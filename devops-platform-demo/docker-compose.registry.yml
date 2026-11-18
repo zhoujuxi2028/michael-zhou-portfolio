@@ -1,0 +1,41 @@
+# Local Docker Registry — 本地替代 ACR（Phase 3 本地 DevSecOps 闭环）
+#
+# 用途：
+#   在本地跑一个 Docker Registry 2.0，模拟云镜像仓库（ACR/ECR）。
+#   用于演示 build → push → Trivy scan → Prometheus 闭环，以及 ArgoCD/Helm 从仓库拉取镜像。
+#
+# 使用：
+#   docker compose -f docker-compose.registry.yml up -d
+#   docker push localhost:5000/qa-newman:demo
+#
+# k3d 集群拉取本地 registry 的镜像（二选一）：
+#   A) 创建集群时挂接 registry（推荐，HTTP 免配置）：
+#        k3d registry create qa-registry --port 5000
+#        k3d cluster create qa-portfolio --registry-use k3d-qa-registry:5000 ...
+#      镜像引用：k3d-qa-registry:5000/qa-newman:demo（集群内）/ localhost:5000/...（宿主机）
+#   B) 已在运行的集群：用 `k3d image import` 兜底，values 中 pullPolicy 设为 Never
+#
+# 生产级差距：真实环境用 ACR/ECR + TLS + 私有网络；本地方案为 HTTP 明文、无认证。
+
+services:
+  registry:
+    image: registry:2
+    container_name: qa-portfolio-registry
+    ports:
+      - "5000:5000"
+    environment:
+      - REGISTRY_STORAGE_DELETE_ENABLED=true
+    volumes:
+      - registry-data:/var/lib/registry
+    restart: unless-stopped
+    networks:
+      - devops-network
+
+networks:
+  devops-network:
+    name: qa-portfolio-network
+    driver: bridge
+
+volumes:
+  registry-data:
+    name: qa-portfolio-registry-data
