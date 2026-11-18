@@ -33,7 +33,7 @@ Local demo → k3d / Kubernetes + ArgoCD configuration + Prometheus / Grafana
 | Phase 1 | 全栈 DevOps 演示（CI/CD + IaC + K8s + ArgoCD + 监控） | ✅ Done |
 | Phase 2 | 告警、日志、指标（AlertManager + Loki/Promtail + Pushgateway） | ✅ Done |
 | Dev Container | 版本固定的容器化工具链（REQ-DVP-011） | ✅ Done |
-| Phase 3 | 本地 DevSecOps 闭环（本地 registry + Trivy→Prometheus + ArgoCD/Helm） | 🟡 In progress |
+| Phase 3 | 本地 DevSecOps 闭环（本地 registry + Trivy→Prometheus + ArgoCD/Helm） | ✅ Done |
 
 > Phase 3 原计划为 Azure 集成（ACR + azurerm + Blob backend）。因 Azure Pass Sponsorship 订阅到期，改为不依赖云的本地等价方案，详见 [docs/guides/LOCAL-DEVSECOPS.md](docs/guides/LOCAL-DEVSECOPS.md)。
 

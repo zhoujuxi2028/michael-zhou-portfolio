@@ -93,7 +93,7 @@
 |------|------|------|
 | `REQ-DVP-001` | devops-platform-demo：GitHub Actions CI/CD + Docker + Kubernetes + Helm + ArgoCD + Terraform + Trivy + Cypress + Newman 全栈 DevOps 演示 | ✅ |
 | `REQ-DVP-002` | Phase 2：AlertManager Slack、Pushgateway、Loki/Promtail、Grafana 仪表盘、Runbook 文档（#45） | ✅ |
-| `REQ-DVP-003` | Phase 3：本地 DevSecOps 闭环（本地 registry + Trivy→Prometheus + ArgoCD/Helm，替代 Azure） | 🟡 |
+| `REQ-DVP-003` | Phase 3：本地 DevSecOps 闭环（本地 registry + Trivy→Prometheus + ArgoCD/Helm，替代 Azure）（#65） | ✅ |
 | `REQ-DVP-004` | devops-platform-demo/CLAUDE.md 等过期内容修正（#52） | ✅ |
 | `REQ-DVP-005` | Incident / RCA postmortem 模板 + 案例（#54） | ✅ |
 | `REQ-DVP-006` | Azure Key Vault + External Secrets + K8s RBAC | 🔲 |
