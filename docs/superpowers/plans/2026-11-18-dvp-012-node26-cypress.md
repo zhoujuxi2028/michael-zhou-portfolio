@@ -45,6 +45,7 @@
 | `devops-platform-demo/cypress/support/commands.js:15,49,76` | 同上 | 2 |
 | `devops-platform-demo/cypress/e2e/01-api-tests.cy.js:12` | 同上 | 2 |
 | `devops-platform-demo/docker-compose.yml:19` | `cypress/included:13.6.0` → `16.3.0` | 2 |
+| `devops-platform-demo/k8s/job-cypress.yaml:54`、`helm/qa-portfolio/values.yaml:28` | 同上（code review 补漏：13.x 无 `Cypress.expose`） | 2 |
 | `devops-platform-demo/cypress/e2e/*.cy.js` | 视 Task 3 排查结果 | 3 |
 | `devops-platform-demo/.nvmrc` | `20.20.0` → `26.13.1` | 4 |
 | `devops-platform-demo/.devcontainer/versions.env:3` | `NODE_VERSION=26.13.1` | 4 |
@@ -158,7 +159,7 @@ git commit -m "fix(dvp): migrate Cypress.env to Cypress.expose for Cypress 16"
 - [ ] **Step 1: 全量运行**
 
 Run: `npx cypress run`
-Expected: 15 tests（`01` 8 + `02` 7），0 failing。若通过，跳至 Step 4
+Expected: 17 tests（`01` 8 + `02` 9，含循环生成的 responsive 用例；`grep "it("` 只数到 15），0 failing。若通过，跳至 Step 4
 
 - [ ] **Step 2: 若失败，按 @superpowers:systematic-debugging 定位根因**
 
@@ -173,7 +174,7 @@ docker volume rm qa-cypress-demo-cache   # 清除只含 13.6.0 的旧缓存
 docker compose run --rm cypress
 ```
 
-Expected: 退出码 0，15 tests passing
+Expected: 退出码 0，17 tests passing
 
 若仍失败：检查 `cypress/included` 的 entrypoint 已是 `cypress run`，compose 中 `command: npx cypress run ...` 会被追加为参数；必要时将 `command` 改为仅传参数（如 `--browser electron`），或设置 `entrypoint: [""]`
 
@@ -354,7 +355,7 @@ git commit -m "docs(dvp): register REQ-DVP-012 and REQ-DVP-013"
 ## Stage 4 验证清单
 
 - [ ] `npm run lint` 0 errors
-- [ ] `npx cypress run` 15 tests 全部通过（本机 Node 26）
+- [ ] `npx cypress run` 17 tests 全部通过（本机 Node 26）
 - [ ] `docker compose run --rm cypress` 退出码 0
 - [ ] `npm run test:newman` 0 failed
 - [ ] `verify-tools.sh --drift` 与 `test-verify-tools.sh` 通过
