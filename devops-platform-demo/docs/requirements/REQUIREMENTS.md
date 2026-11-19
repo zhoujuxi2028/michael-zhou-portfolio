@@ -39,7 +39,7 @@
 |--------|------|------|--------|--------|------|---------|------|
 | `REQ-DVP-001` | 全栈 DevOps 演示（Phase 1） | DEMO | P1 | — | — | CI/CD、IaC、K8s、监控 | ✅ Done |
 | `REQ-DVP-002` | Phase 2：告警、日志、指标、文档 | DEMO | P1 | 100% | 001 | 监控/日志/告警 | ✅ Done（PR #45） |
-| `REQ-DVP-003` | Phase 3：本地 DevSecOps 闭环（本地 registry + Trivy→Prometheus，替代 Azure） | FR | P1 | — | 002 | DevSecOps、漏洞管理、registry | 🟡 In Progress |
+| `REQ-DVP-003` | Phase 3：本地 DevSecOps 闭环（本地 registry + Trivy→Prometheus，替代 Azure） | FR | P1 | — | 002 | DevSecOps、漏洞管理、registry | ✅ Done（PR #65） |
 | `REQ-DVP-004` | README / CLAUDE.md 过期内容修正 | NFR | P1 | 100% | — | 知识分享、生命周期管理 | ✅ Done |
 | `REQ-DVP-005` | Incident / RCA postmortem 模板 + 案例 | DEMO | P2 | 95% | — | 故障排查、RCA、运维支持 | ✅ Done |
 | `REQ-DVP-006` | Azure Key Vault + External Secrets + K8s RBAC | FR | P2 | 75% | 003 | 安全访问管理、合规 | 🔲 Planned |
@@ -59,27 +59,25 @@
 
 已完成（PR #45，2026-11-11 合并）：AlertManager Slack receiver、deploy 失败通知、Pushgateway/Loki/Promtail、2 个新 Grafana 仪表盘、Helm chart README、ALERT-RUNBOOK / PIPELINE-GUIDE / HELM-CHART-GUIDE。详见 [PHASE-2-COMPLETION.md](../project-management/PHASE-2-COMPLETION.md)（位于 origin/main）。
 
-### REQ-DVP-003 — Phase 3：Azure 集成
+### REQ-DVP-003 — Phase 3：本地 DevSecOps 闭环 ✅
 
-**User Story:** As a DevOps engineer, I want images built in CI pushed to Azure Container Registry provisioned by Terraform, so that the platform runs on real cloud infrastructure with tracked vulnerability metrics.
+已完成（PR #65，2026-11-18 合并）。原 Azure 方案（ACR + azurerm + Blob）因 Azure Pass Sponsorship 订阅到期改为本地等价方案，原设计保留于 [2026-11-11-devops-phase3-azure-design.md](../../../docs/superpowers/specs/2026-11-11-devops-phase3-azure-design.md)。指南：[LOCAL-DEVSECOPS.md](../guides/LOCAL-DEVSECOPS.md)。
 
-设计：[2026-11-11-devops-phase3-azure-design.md](../../../docs/superpowers/specs/2026-11-11-devops-phase3-azure-design.md)
+**User Story:** As a DevOps engineer, I want images pushed to a registry, scanned by Trivy, and their vulnerability counts tracked in Prometheus/Grafana, so that supply-chain risk is visible and alertable.
 
 | ID | 描述 |
 |----|------|
-| FR-DVP-003-01 | Terraform azurerm：Resource Group + ACR Basic + Service Principal + Blob 远程状态 |
-| FR-DVP-003-02 | `dvp-deploy.yml`：build → push ACR → 传入动态 image tag |
-| FR-DVP-003-03 | k3d ACR pull secret + Helm chart image 源切换为 ACR |
-| FR-DVP-003-04 | Trivy 扫描 ACR 镜像 → Pushgateway → `security-overview` 仪表盘 + 告警规则 |
-| FR-DVP-003-05 | `demo/azure-demo.sh` 7 步端到端脚本 |
+| FR-DVP-003-01 | 本地 `registry:2`（`docker-compose.registry.yml`，替代 ACR） |
+| FR-DVP-003-02 | `scripts/push-trivy-metrics.sh`：Trivy JSON → Pushgateway（`trivy_vulnerabilities_total` / `trivy_last_scan_timestamp`） |
+| FR-DVP-003-03 | Helm `values-registry.yaml` + `imagePullSecrets`，从 registry 拉取镜像 |
+| FR-DVP-003-04 | `security-overview` 仪表盘 + `security-alerts` 告警规则（CRITICAL / HIGH / 过期扫描） |
+| FR-DVP-003-05 | `demo/local-devsecops-demo.sh` 端到端脚本 |
 
 **验收标准：**
-- [ ] `terraform apply` 在真实 Azure 创建资源，state 存于 Blob
-- [ ] ArgoCD 从 ACR 拉取镜像部署成功
-- [ ] Grafana 可见按严重度的漏洞趋势
-- [ ] 演示后 `terraform destroy` 可清理
-
-**可行性 80%：** `az` 已登录且订阅 Enabled，成本约 $5–6/月。风险：Sponsorship 额度/到期；Service Principal 创建可能受租户权限限制；spec 中明文订阅 ID 与邮箱需先脱敏。
+- [x] build → push 本地 registry → Trivy 扫描 → 指标进入 Pushgateway（2026-11-18 本地运行验证）
+- [x] 仪表盘与告警规则引用的指标名与脚本输出一致
+- [x] `helm lint` / `helm template` 通过（含 `values-registry.yaml`）
+- [ ] Prometheus/Grafana 端到端可视化与 Helm 从 registry 部署（需 monitoring 栈，未做运行时验证）
 
 ### REQ-DVP-004 — README / CLAUDE.md 过期内容修正 ✅
 

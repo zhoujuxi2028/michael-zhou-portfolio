@@ -1,6 +1,6 @@
 # REQ-DVP-003 实施计划：本地 DevSecOps 闭环
 
-> 日期：2026-11-18 | 分支：`feature/dvp-003-local-devsecops` | 状态：实现中
+> 日期：2026-11-18 | 分支：`feature/dvp-003-local-devsecops` | 状态：✅ 已完成（#65）
 
 ## 背景
 
@@ -30,11 +30,16 @@
 
 ## 验证
 
-- [ ] `bash -n` 通过（两个脚本）
-- [ ] `jq empty` 通过（dashboard JSON）
-- [ ] `helm lint` / `helm template` 通过（含 `values-registry.yaml`）
-- [ ] YAML 语法校验（alertrule / compose）
-- [ ] 运行时验证（需 Docker + k3d，待环境就绪）
+- [x] `bash -n` 通过（两个脚本）
+- [x] `jq empty` 通过（dashboard JSON）
+- [x] `helm lint` / `helm template` 通过（含 `values-registry.yaml`）
+- [x] YAML 语法校验（alertrule / compose）
+- [x] 轻量运行时验证（2026-11-18）：registry push → Trivy（CRITICAL 10 / HIGH 92 / MEDIUM 76 / LOW 35）→ 独立 Pushgateway 收到全部指标
+- [ ] 完整运行时验证（kube-prometheus-stack + Grafana + `--deploy`）：未执行
+
+## 后续发现
+
+- `qa-newman` 镜像基于已 EOL 的 alpine 3.18.3，含 10 个 CRITICAL，建议升级基础镜像（可另开需求）
 
 ## 生产差距
 

@@ -33,7 +33,6 @@
 
 | REQ ID | 标题摘要 | 项目 / 范围 | 类型 | 优先级 | 提出日期 | 状态 |
 |--------|----------|-------------|------|--------|----------|------|
-| REQ-DVP-003 | Phase 3：本地 DevSecOps 闭环（本地 registry + Trivy→Prometheus，替代 Azure） | devops-platform-demo | FR | P1 | 2026-11-12 | In Progress |
 | REQ-DVP-006 | Azure Key Vault + External Secrets + K8s RBAC | devops-platform-demo | FR | P2 | 2026-11-12 | Open |
 | REQ-DVP-008 | Elastic 集成 / Loki vs Elastic 对比 | devops-platform-demo | DEMO | P3 | 2026-11-12 | Open |
 | REQ-DVP-009 | 数据管道 / DB 备份自动化 | devops-platform-demo | FR | P3 | 2026-11-12 | Open |
@@ -77,6 +76,7 @@
 | REQ-DVP-004 | README / CLAUDE.md 过期内容修正 | devops-platform-demo | NFR | P1 | 2026-11-15 | #52 |
 | REQ-DVP-005 | Incident / RCA postmortem 模板 + 案例 | devops-platform-demo | DEMO | P2 | 2026-11-15 | #54 |
 | REQ-DVP-007 | Dependabot 依赖与补丁自动化 | devops-platform-demo | NFR | P2 | 2026-11-16 | #56 |
+| REQ-DVP-003 | Phase 3：本地 DevSecOps 闭环（本地 registry + Trivy→Prometheus，替代 Azure） | devops-platform-demo | FR | P1 | 2026-11-18 | #65 |
 
 ---
 
@@ -100,7 +100,7 @@
 | `CA` | `docs/claude-api-journey/` | 0 | — |
 | `AND` | `android-app/` | 1 | 2026-11-05 |
 | `ANDT` | `android-testing-demo-*/` | 0 | — |
-| `DVP` | `devops-platform-demo/` | 5 | 2026-11-18 |
+| `DVP` | `devops-platform-demo/` | 4 | 2026-11-18 |
 | `DRV` | `linux-driver/`（规划中） | 0 | — |
 
 ---
@@ -109,6 +109,7 @@
 
 | 日期 | 操作 | 内容 | 操作人 |
 |------|------|------|--------|
+| 2026-11-18 | 关闭 | REQ-DVP-003 Done：本地 DevSecOps 闭环（#65） | Michael Zhou |
 | 2026-11-18 | 变更 | REQ-DVP-003 由 Azure 集成改为本地 DevSecOps 闭环（Azure 订阅到期） | Michael Zhou |
 | 2026-11-16 | 关闭 | REQ-DVP-007 Done：Dependabot 依赖与补丁自动化（#56） | Michael Zhou |
 | 2026-11-15 | 关闭 | REQ-DVP-005 Done：Incident / RCA postmortem 模板 + 案例（#54） | Michael Zhou |
