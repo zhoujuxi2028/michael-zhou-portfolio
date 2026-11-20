@@ -2,6 +2,7 @@ import { createEngine, type EngineConfig } from '../engine/engine.ts';
 import type { Anomaly, AnyRule } from '../engine/types.ts';
 import { RULES } from '../rules/index.ts';
 import type { AdasEvent } from '../schema/events.ts';
+import { MAX_GAP_MS } from './quality.ts';
 import { createPreconditionTracker, type PreconditionTracker } from './preconditions.ts';
 import { createRingBuffer, type RingBuffer } from './ring-buffer.ts';
 
@@ -48,9 +49,24 @@ export const DEFAULTS = { bufferMs: 10000, preMs: 5000, postMs: 5000 } as const;
 export const DEFAULT_CLIP_CORE_MS = 60000;
 
 interface Window { start: number; end: number; trigger: 'rule' | 'manual'; label: string; labelTs: number; ruleIds: string[] }
-interface Scenario { buffer: RingBuffer; states: PreconditionTracker; now: number; window: Window | null }
+/** `jump`: an event far ahead of `now`, held until the next event shows whether it is a spike. */
+interface Scenario { buffer: RingBuffer; states: PreconditionTracker; now: number; window: Window | null; jump: AdasEvent | null }
 
-/** Core recorder shared by file and live sources: ring buffer + rule/manual triggers → clips. */
+/**
+ * Core recorder shared by file and live sources: ring buffer + rule/manual triggers → clips.
+ *
+ * - Window: `[startTs − pre, detectTs + post]` (manual: around the trigger ts); recording stops once
+ *   scenario time passes its end, at SCENARIO_END or at EOF.
+ * - Merging: overlapping windows in a scenario merge only while the first clip is still recording.
+ *   A later trigger whose window overlaps an already closed clip gets a new clip (the two files
+ *   share events). Merges are capped at `maxClipMs`.
+ * - Scenario time is the max accepted ts. An event more than `MAX_GAP_MS` (the C3 ts-anomaly gap)
+ *   ahead of it is held back for one event: if the next event of the scenario continues from it
+ *   (ts >= held − MAX_GAP_MS) the jump is real and both are recorded in order; otherwise the held
+ *   event is a lone ts spike and is dropped (not buffered, not seen by the rules), so it cannot
+ *   close windows early or flush the buffer. A held event at EOF is kept. SCENARIO_END is never
+ *   held. `quality.json` still counts the spike as two ts anomalies.
+ */
 export function createRecorder(opts: RecorderOptions, onClip: (c: Clip) => void): Recorder {
   const preMs = opts.preMs ?? DEFAULTS.preMs;
   const postMs = opts.postMs ?? DEFAULTS.postMs;
@@ -68,7 +84,7 @@ export function createRecorder(opts: RecorderOptions, onClip: (c: Clip) => void)
     if (!sc) {
       const states = createPreconditionTracker();
       const buffer = createRingBuffer(options.bufferMs, states.evicted);
-      scenarios.set(id, (sc = { buffer, states, now: -Infinity, window: null }));
+      scenarios.set(id, (sc = { buffer, states, now: -Infinity, window: null, jump: null }));
     }
     return sc;
   };
@@ -120,27 +136,41 @@ export function createRecorder(opts: RecorderOptions, onClip: (c: Clip) => void)
     trigger: 'rule', label: a.ruleId, labelTs: a.startTs, ruleIds: [a.ruleId],
   });
 
+  const accept = (e: AdasEvent) => {
+    const sc = open(e.scenarioId);
+    sc.now = Math.max(sc.now, e.ts);
+    sc.buffer.push(e);
+    if (e.module === 'SYS' && e.type === 'MANUAL_TRIGGER') {
+      trigger(e.scenarioId, {
+        start: e.ts - options.preMs, end: e.ts + options.postMs,
+        trigger: 'manual', label: 'MANUAL', labelTs: e.ts, ruleIds: [],
+      });
+    }
+    engine.push(e).forEach(onAnomaly);
+    if (e.module === 'SYS' && e.type === 'SCENARIO_END') {
+      close(e.scenarioId, sc);
+      scenarios.delete(e.scenarioId);
+    } else if (sc.window && sc.now > sc.window.end) {
+      close(e.scenarioId, sc);
+    }
+  };
+
   return {
     options,
     push(e) {
       const sc = open(e.scenarioId);
-      sc.now = Math.max(sc.now, e.ts);
-      sc.buffer.push(e);
-      if (e.module === 'SYS' && e.type === 'MANUAL_TRIGGER') {
-        trigger(e.scenarioId, {
-          start: e.ts - options.preMs, end: e.ts + options.postMs,
-          trigger: 'manual', label: 'MANUAL', labelTs: e.ts, ruleIds: [],
-        });
+      const held = sc.jump;
+      if (held) {
+        sc.jump = null;
+        // The jump is real if recording continues from it; otherwise it was a lone spike: drop it.
+        if (e.ts >= held.ts - MAX_GAP_MS) accept(held);
       }
-      engine.push(e).forEach(onAnomaly);
-      if (e.module === 'SYS' && e.type === 'SCENARIO_END') {
-        close(e.scenarioId, sc);
-        scenarios.delete(e.scenarioId);
-      } else if (sc.window && sc.now > sc.window.end) {
-        close(e.scenarioId, sc);
-      }
+      const isEnd = e.module === 'SYS' && e.type === 'SCENARIO_END';
+      if (!isEnd && Number.isFinite(sc.now) && e.ts - sc.now > MAX_GAP_MS) sc.jump = e;
+      else accept(e);
     },
     end() {
+      for (const sc of [...scenarios.values()]) if (sc.jump) accept(sc.jump);
       engine.end().forEach(onAnomaly);
       for (const [id, sc] of scenarios) close(id, sc);
       scenarios.clear();
