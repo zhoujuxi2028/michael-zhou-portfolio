@@ -1,0 +1,21 @@
+{
+  "meta": {
+    "input": "events.jsonl",
+    "events": 100,
+    "scenarios": 3,
+    "toolVersion": "0.1.0",
+    "rulesetVersion": "1.0.0"
+  },
+  "anomalies": [
+    {"ruleId": "HMI-01", "module": "HMI", "severity": "P2", "scenarioId": "S003", "startTs": 5000, "endTs": 5300, "detectTs": 5350, "message": "m", "evidence": {}},
+    {"ruleId": "ACC-01", "module": "ACC", "severity": "P1", "scenarioId": "S001", "startTs": 1000, "endTs": 2000, "detectTs": 2250, "message": "m", "evidence": {}},
+    {"ruleId": "ACC-01", "module": "ACC", "severity": "P1", "scenarioId": "S001", "startTs": 4999, "endTs": 5100, "detectTs": 5200, "message": "m", "evidence": {}},
+    {"ruleId": "APA-01", "module": "APA", "severity": "P1", "scenarioId": "S002", "startTs": 22000, "endTs": 22200, "detectTs": 22300, "message": "m", "evidence": {}},
+    {"ruleId": "ACC-02", "module": "ACC", "severity": "P2", "scenarioId": "S001", "startTs": 22400, "endTs": 22600, "detectTs": 22650, "message": "m", "evidence": {}}
+  ],
+  "summary": {"total": 5},
+  "dataQuality": {
+    "counts": {"invalidJson": 1, "schemaErrors": 2, "unknownEvents": 3, "outOfOrder": 4},
+    "invalidJson": [], "schemaErrors": [], "unknownEvents": {}, "outOfOrder": []
+  }
+}

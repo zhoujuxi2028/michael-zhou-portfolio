@@ -65,3 +65,17 @@ jobs:
       - run: npm run typecheck
       - run: npm run test:coverage
       - run: npm run demo
+
+  adas-analysis:
+    name: Tests (adas-log-toolchain-lab analysis)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: adas-log-toolchain-lab/analysis
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+      - run: pip install -r requirements.txt
+      - run: pytest -v
