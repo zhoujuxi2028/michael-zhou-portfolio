@@ -69,6 +69,19 @@ describe('adas-lab cases regression', () => {
     expect(readdirSync(join(out, 'data'))).toEqual([]);
   });
 
+  it('accepts a case path inside --out whose first segment merely starts with ".."', async () => {
+    const { dir, log, anomalies } = await fixture();
+    const r = JSON.parse(readFileSync(anomalies, 'utf8')) as { anomalies: { ruleId: string; scenarioId: string; startTs: number }[] };
+    // data/REG-/../../..foo-<sid>-<ts>.jsonl normalizes to <out>/..foo-<sid>-<ts>.jsonl: inside --out.
+    const first = r.anomalies[0]!;
+    first.ruleId = '/../../..foo';
+    writeFileSync(anomalies, JSON.stringify(r));
+    const out = join(dir, 'cases'), c = capture();
+    expect(await main(['cases', 'regression', '--anomalies', anomalies, '--log', log, '--out', out], c.io)).toBe(0);
+    expect(c.err.join('\n')).toBe('');
+    expect(existsSync(join(out, `..foo-${first.scenarioId}-${first.startTs}.jsonl`))).toBe(true);
+  });
+
   it.each([
     ['scenarioId', { scenarioId: '../../../escaped' }, /scenarioId/],
     ['ruleId', { ruleId: '/../../../../escaped' }, /escapes the output directory/],

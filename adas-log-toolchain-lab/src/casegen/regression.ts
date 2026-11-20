@@ -1,9 +1,10 @@
 import { access, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
-import { isAbsolute, join, relative, resolve } from 'node:path';
+import { join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
 import { UsageError } from '../config.ts';
 import { toJsonl } from '../io/jsonl.ts';
+import { containedPath } from '../io/paths.ts';
 import { ScenarioId } from '../schema/events.ts';
 import { RULESET_VERSION, TOOL_VERSION } from '../version.ts';
 import { extractWindows } from './extract.ts';
@@ -98,8 +99,7 @@ export async function buildRegressionCases(o: RegressionOptions): Promise<Regres
   const ids = regressionCaseIds(anomalies);
   const outDir = resolve(o.out);
   for (const id of ids) {
-    const rel = relative(outDir, resolve(outDir, 'data', `${id}.jsonl`));
-    if (rel.startsWith('..') || isAbsolute(rel)) throw new UsageError(`case ${id} escapes the output directory ${o.out}`);
+    if (containedPath(outDir, join('data', `${id}.jsonl`)) === null) throw new UsageError(`case ${id} escapes the output directory ${o.out}`);
   }
   const windows = await extractWindows(o.log, anomalies.map((a) => ({
     scenarioId: a.scenarioId, from: Math.max(0, a.startTs - o.preMs), to: a.detectTs + o.postMs,
