@@ -165,11 +165,13 @@ Turn every anomaly in `anomalies.json` into a self-contained regression case (ev
 16 regression cases written to out/cases/manifest.json; test file out/cases/generated/regression.test.ts
 ```
 
-Exit: `0`; `2` anomalies / log file missing or invalid. Run the generated tests with `npm run test:generated` (see [3.8](#38-generated-tests)).
+Case data goes through the same scanner as `parse`: invalid and late events are dropped and window events are sorted by `ts`. Every case file must stay under `--out`. Before writing, the command removes the previous `data/`, `generated/` and `manifest.json` under `--out`; other files are kept, so do not point `--out` at a directory that holds your own `generated/` folder.
+
+Exit: `0`; `2` anomalies / log file missing or invalid (including an invalid `scenarioId` in the anomalies file), or a case path outside `--out`. Run the generated tests with `npm run test:generated` (see [3.8](#38-generated-tests)).
 
 ### 3.5 `replay`
 
-Replay every manifest case through the rule engine (using its window) and report PASS / FAIL. A case passes when the recorded rule fires.
+Replay every manifest case through the rule engine (using its window) and report PASS / FAIL. A case passes only when the target rule fires as expected and the case data has no data quality issues.
 
 | Option | Default | Notes |
 |--------|---------|-------|
@@ -185,7 +187,7 @@ node src/cli.ts replay --manifest out/cases/manifest.json --filter module=APA
 Replayed 4 cases: 4 passed, 0 failed (pass rate 100.0%) -> out/r-apa.json
 ```
 
-Exit: `0` all passed; `1` any FAIL (`FAIL <caseId>: expected <rule> to fire as recorded; fired rules [...]` on stderr); `2` manifest missing / malformed, invalid `--filter`. Other rules firing in a case (for example `HMI-01` caused by window truncation) is recorded in `firedRules` and is not a failure.
+Exit: `0` all passed; `1` any FAIL (one line per case on stderr: `FAIL <caseId>: expected <rule> to fire; fired rules [...]`, `expected <rule> not to fire`, `case data has N data quality issues`, or `error <message>`); `2` manifest missing / malformed, invalid `--filter`. A manifest is malformed if `expect.ruleId` differs from `ruleId`, `window[0] > window[1]`, or `source` resolves outside the manifest directory. Other rules firing in a case (for example `HMI-01` caused by window truncation) is recorded in `firedRules` and is not a failure.
 
 ### 3.6 `record`
 
@@ -200,10 +202,10 @@ Simulated data logger: per-scenario ring buffer, trigger-based clip recording (r
 | `--speed <n>` | 1 | `live` playback factor (> 0; virtual clock, `100000` finishes in about 1 s) |
 | `--out <dir>` | `out/clips` | |
 | `--buffer <ms>` | 10000 | ring buffer length per scenario (positive integer) |
-| `--pre <ms>` | 5000 | recorded before the anomaly `startTs` (positive integer) |
-| `--post <ms>` | 5000 | recorded after `detectTs` (positive integer) |
+| `--pre <ms>` | 5000 | recorded before the anomaly `startTs` (integer >= 0) |
+| `--post <ms>` | 5000 | recorded after `detectTs` (integer >= 0) |
 
-Behavior: a clip covers `[startTs - pre, detectTs + post]` (or until scenario end); if the start is older than the buffer the clip is cut and flagged `truncated: true`; overlapping windows in one scenario are merged (file name uses the first trigger). Every clip starts with the preconditions (latest `ACC/STATE`, `APA/STEP`, `LKA/STATE`, `VEH/TURN_SIGNAL` before the window) so it can be replayed alone.
+Behavior: a clip covers `[startTs - pre, detectTs + post]` (or until scenario end); if the start is older than the buffer the clip is cut and flagged `truncated: true`; overlapping windows in one scenario are merged only while the first clip is still recording (file name uses the first trigger). A merged clip is capped at `maxClipMs` (default 60000 + pre + post, 70 s with the defaults); a longer merge starts a new clip. A lone event that jumps more than 1000 ms ahead and that the next event does not continue from is treated as a spike: it is not recorded, but quality still counts it. Clip file names are sanitized and always inside `--out`. Every clip starts with the preconditions (latest `ACC/STATE`, `APA/STEP`, `LKA/STATE`, `VEH/TURN_SIGNAL` before the window) so it can be replayed alone.
 
 ```bash
 node src/cli.ts record --source file --input out/events.jsonl --out out/clips
@@ -218,7 +220,7 @@ Skipped lines: invalid JSON 0, schema errors 0, unknown events 0, out of order 0
 Clips written to out/clips
 ```
 
-Outputs: `<scenarioId>_<startTs>_<ruleId|MANUAL>.jsonl` clips, `index.json`, `quality.json` ([section 7](#7-outputs-reference)). Exit: `0` (recording has no pass / fail gate); `2` missing `--input` with `--source file`, input not found, `--input` with `--source live`, bad `--source`, non-positive numeric option, `--scenarios < 8`. `record` does not accept `--config`: it always uses default rule thresholds.
+Outputs: `<scenarioId>_<startTs>_<ruleId|MANUAL>.jsonl` clips, `index.json`, `quality.json` ([section 7](#7-outputs-reference)). Exit: `0` (recording has no pass / fail gate); `2` missing `--input` with `--source file`, input not found, `--input` with `--source live`, bad `--source`, non-positive `--speed` / `--buffer`, negative `--pre` / `--post`, `--scenarios < 8`. `record` does not accept `--config`: it always uses default rule thresholds.
 
 ### 3.7 `ticket`
 
@@ -242,6 +244,8 @@ node src/cli.ts ticket fixtures/jira/export.json
 See out/tasks/unmapped.json for reasons
 ```
 
+Before writing, `ticket` removes stale `data/`, `generated/`, `unmapped.json` and its own `<KEY>.json` task files under `--out`.
+
 Unmapped reasons: `no rule label`, `unknown rule id`, `component does not match rule module`. Exit: `0` (also with unmapped tickets); `1` unmapped tickets with `--strict`; `2` export missing / not valid JSON / wrong shape / duplicate issue key.
 
 ### 3.8 Generated tests
@@ -257,7 +261,7 @@ npm run test:generated      # vitest.generated.config.ts: **/generated/**/*.test
       Tests  21 passed (21)
 ```
 
-It exits 1 if no generated tests exist yet ("No test files found"), so run `cases regression` / `ticket` first. Generated tests import `src/casegen/case-runner.ts` by relative path: keep the output inside this directory tree, and do not edit them (regenerate instead).
+It passes (exit 0) when no generated tests exist yet (`--passWithNoTests`). Generated tests import `src/casegen/case-runner.ts` by relative path: keep the output inside this directory tree, and do not edit them (regenerate instead).
 
 ### 3.9 Analysis and dashboard
 
@@ -269,7 +273,7 @@ npm run dev        # http://localhost:5173, uses public/summary.json (sample)
 npm run build      # tsc --noEmit && vite build -> dist/
 ```
 
-`adas_analysis` exit codes: `0`; `2` missing / invalid input (message on stderr, e.g. `error: anomalies file not found: ../out/nope.json`). To view your own data in the dashboard, write the summary to `dashboard/public/summary.json` before `npm run dev` / `build` (the file in the repo is a sample). The GitHub Pages workflow does this automatically on `main`.
+`adas_analysis` exit codes: `0`; `2` missing / invalid input (message on stderr, e.g. `error: anomalies file not found: ../out/nope.json`). Field types are validated (severity `P1` / `P2`, integer `ts`, `dataQuality` counts, replay summary); the message names the field and index. To view your own data in the dashboard, write the summary to `dashboard/public/summary.json` before `npm run dev` / `build` (the file in the repo is a sample). The GitHub Pages workflow does this automatically on `main`.
 
 ## 4. Event format
 
@@ -278,7 +282,7 @@ One JSON object per line (JSON Lines). Envelope:
 | Field | Type | Notes |
 |-------|------|-------|
 | `ts` | integer >= 0 | scenario time, milliseconds |
-| `scenarioId` | string | non-empty; events of one scenario share it |
+| `scenarioId` | string | `^[A-Za-z0-9_.-]{1,64}$`, not `.` or `..` (it names output files; anything else is a schema error); events of one scenario share it |
 | `module` | string | see table |
 | `type` | string | see table |
 | `data` | object | payload per `module/type` |
@@ -405,7 +409,7 @@ Case ids end in `-minus` / `-eq` / `-plus` (threshold minus epsilon, exact, plus
 | Field | Content |
 |-------|---------|
 | `meta` | versions, `manifest`, `filter` (`module=APA` or `null`) |
-| `results[]` | `caseId`, `ruleId`, `status` (`PASS` / `FAIL`), `firedRules`, `durationMs`, optional `error` (case could not run) |
+| `results[]` | `caseId`, `ruleId`, `status` (`PASS` / `FAIL`), `firedRules`, `durationMs`, optional `dataQualityIssues` (count; non-zero fails the case), optional `error` (case could not run) |
 | `summary` | `total`, `passed`, `failed`, `passRate` (0..1, 4 decimals; 0 when no cases) |
 
 ### `summary.json` (`adas_analysis`, contract C4)
@@ -446,7 +450,7 @@ Case ids end in `-minus` / `-eq` / `-plus` (threshold minus epsilon, exact, plus
 | `trackPeriodMs` | 50 |
 | `totals`, `byScenario[]` | `trackFrames`, `droppedFrames`, `dropRate`, `duplicates`, `tsAnomalies` (+ `scenarioId`) |
 
-Definitions: a gap between adjacent `ACC/TRACK` frames of one scenario above 75 ms (1.5 periods) counts `round(gap / 50) - 1` dropped frames; a duplicate is a line identical to the previous line of the same scenario; a ts anomaly is a backwards `ts` or a gap above 1000 ms between adjacent events of one scenario.
+Definitions: a gap between adjacent `ACC/TRACK` frames of one scenario above 75 ms (1.5 periods) counts `round(gap / 50) - 1` dropped frames; a duplicate is a line identical to the previous line of the same scenario; a ts anomaly is a `ts` earlier than the previous event, or a gap above 1000 ms from the previous event, in one scenario (so one isolated spike counts as two anomalies).
 
 ## 8. End-to-end workflow
 
@@ -532,7 +536,7 @@ Report written to out/bad.json
 |-------------------|---------------|
 | `error: input file not found: <path>` (exit 2) | wrong path for `parse` / `record --input`; paths are relative to the current directory |
 | `error: log file not found` / `anomalies file not found` / `... is not valid JSON` / `invalid anomalies file: ...` | `cases regression` inputs missing or not produced by `parse` |
-| `error: manifest not found: <path>` / invalid manifest | wrong `replay --manifest`; produce it with `cases regression` |
+| `error: manifest not found: <path>` / `invalid manifest: ...` (rule id mismatch, bad window, source outside the manifest directory) | wrong `replay --manifest`; produce it with `cases regression` |
 | `error: invalid filter "x": expected module=<ACC\|APA\|HMI\|LKA>` | `--filter` syntax |
 | `error: invalid config: ...` | config file missing, not JSON, unknown rule id / key, non-number value |
 | `error: scenarios must be an integer >= 8` | `gen` / `record --source live` needs at least 8 scenarios |
@@ -541,8 +545,7 @@ Report written to out/bad.json
 | `error: ticket export not found` / `invalid ticket export: ...` / `duplicate issue key` | `ticket` input |
 | `error: missing required argument 'input'` / `required option '--manifest <file>' not specified` | missing argument |
 | `error: unknown command '...'` | typo; run `--help` |
-| `npm run test:generated` -> "No test files found" | run `cases regression` or `ticket` first |
-| `npm run test:generated` fails on files in `out/reg-*`, `out/tk-*`, `out/tpl-*` | leftovers of the project's own test suite (`npm test` creates them in `out/`, some contain intentionally failing tests); delete them: `rm -rf out/reg-* out/tk-* out/tpl-*` |
+| `npm run test:generated` fails on files in `out/reg-*`, `out/tk-*`, `out/tpl-*` | leftovers of older runs of the project's own test suite (current tests clean their scratch directories); delete them: `rm -rf out/reg-* out/tk-* out/tpl-*` |
 | Node errors about `.ts` files / unknown flags | Node older than 22.18; check `node --version` |
 | `adas_analysis` fails with `error: ... file not found` | run `parse` (and `replay`) first; paths are relative to `analysis/` |
 | Dashboard shows an error panel | `public/summary.json` missing or not valid C4 |

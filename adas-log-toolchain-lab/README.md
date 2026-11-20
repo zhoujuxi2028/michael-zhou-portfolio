@@ -8,7 +8,7 @@ TypeScript toolchain for ADAS-style logs: generate synthetic data, record clips,
 
 ## Status
 
-Phases 1-4 of 4 in release 0.2.0, ruleset 1.1.0 ([REQ-ADAS-01](https://github.com/zhoujuxi2028/michael-zhou-portfolio/issues/69)). Design: [spec](../docs/superpowers/specs/2026-11-20-adas-log-toolchain-design.md). The GitHub Pages dashboard is deployed by `.github/workflows/adas-pages.yml` once the repository owner enables Pages (source: GitHub Actions).
+Phases 1-4 implemented in release 0.2.0, ruleset 1.1.0 ([REQ-ADAS-01](https://github.com/zhoujuxi2028/michael-zhou-portfolio/issues/69)). Design: [spec](../docs/superpowers/specs/2026-11-20-adas-log-toolchain-design.md). Publishing the dashboard to GitHub Pages is pending: `.github/workflows/adas-pages.yml` only deploys when Pages is enabled (source: GitHub Actions) and the repository variable `ADAS_PAGES_ENABLED` is `true` (owner action, not done yet).
 
 Docs: [User guide](docs/user-guide.md) | [Development guide](docs/dev-guide.md) | [TDD evidence](docs/tdd.md)
 
@@ -98,7 +98,7 @@ Built test-first: each behavior starts as a failing test, then the minimum code 
 - Regression replay: the demo cases must replay with a 100% pass rate
 - Coverage: lines >= 90%, `src/rules/` 100%
 - Performance smoke: 100k events < 5 s (`npm run test:perf`)
-- CI (GitHub Actions): `adas` (lint, typecheck, coverage, demo), `adas-analysis` (flake8, pytest), `adas-dashboard` (lint, typecheck, test, build); a GitLab CI example mirrors them (not executed on GitLab)
+- CI (GitHub Actions): `adas` (lint, typecheck, coverage, demo, generated regression tests), `adas-analysis` (flake8, pytest), `adas-dashboard` (lint, typecheck, test, build); a GitLab CI example mirrors them (not executed on GitLab)
 
 ## Gap to production
 

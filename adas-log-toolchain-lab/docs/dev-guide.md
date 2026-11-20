@@ -69,7 +69,7 @@ Data flow: `parseLine` -> `scanLines` (data quality) -> `createEngine(RULES)` ->
 git commit -m "feat(adas): add LKA-03 steering rate rule" -m "Why ... " -m "Refs #69"
 ```
 
-Pre-commit (`.husky/pre-commit` at the repo root): `npm run lint && npm run typecheck` when `adas-log-toolchain-lab/` is staged; `flake8` for `analysis/` (skipped when flake8 is not installed); lint + typecheck for `dashboard/`.
+Pre-commit (`.husky/pre-commit` at the repo root; it runs only if husky is installed: `npm install` at the repo root sets `core.hooksPath`, and CI enforces the same checks either way): `npm run lint && npm run typecheck` when `adas-log-toolchain-lab/` is staged; `flake8` for `analysis/` (skipped when flake8 is not installed); lint + typecheck for `dashboard/`.
 
 ## 3. Add a rule
 
@@ -176,21 +176,21 @@ cd dashboard && npm test && npm run lint && npm run typecheck && npm run build
 
 Notes:
 
-- `npm test` creates temp directories under `out/` (`out/reg-*`, `out/tk-*`, `out/tpl-*`, some with intentionally failing generated tests). They are not cleaned up and `npm run test:generated` will pick them up: run `rm -rf out/reg-* out/tk-* out/tpl-*` first.
+- Tests that write temp directories under `out/` clean them up. If leftovers from an older run (`out/reg-*`, `out/tk-*`, `out/tpl-*`, some with intentionally failing generated tests) make `npm run test:generated` fail, run `rm -rf out/reg-* out/tk-* out/tpl-*`. `npm run test:generated` passes when there are no generated tests (`--passWithNoTests`).
 - Truth and boundary tests are deterministic (seeded). Do not use `Math.random` or wall-clock time in tests; the collector uses an injectable virtual clock.
 
 ## 7. CI
 
 | Workflow / job | Trigger | Steps |
 |----------------|---------|-------|
-| `.github/workflows/ci.yml` job `adas` | PR to `main` | Node 22, `npm ci`, `lint`, `typecheck`, `test:coverage`, `npm run demo` (working dir `adas-log-toolchain-lab`) |
+| `.github/workflows/ci.yml` job `adas` | PR to `main` | Node 22, `npm ci`, `lint`, `typecheck`, `test:coverage`, `npm run demo`, `npm run test:generated -- out/cases` (working dir `adas-log-toolchain-lab`) |
 | `ci.yml` job `adas-analysis` | PR to `main` | Python 3.13, `pip install -r requirements.txt flake8==7.5.0`, `flake8 --max-line-length 100 .`, `pytest -v` |
 | `ci.yml` job `adas-dashboard` | PR to `main` | Node 22, `npm ci`, lint, typecheck, `npm test`, `npm run build` |
-| `.github/workflows/adas-pages.yml` | push to `main` touching `adas-log-toolchain-lab/**`, or manual | gen, parse, `cases regression`, `replay`, analysis -> `dashboard/public/summary.json`, dashboard build, upload and deploy to GitHub Pages |
+| `.github/workflows/adas-pages.yml` | push to `main` touching `adas-log-toolchain-lab/**`, or manual | gen, parse, `cases regression`, `replay`, analysis -> `dashboard/public/summary.json`, dashboard build, upload and deploy to GitHub Pages; the deploy job runs only when the repository variable `ADAS_PAGES_ENABLED == 'true'`; `cancel-in-progress: false` |
 | `.gitlab-ci.yml` | none (example, not executed) | stages `lint` and `test` mirroring the `adas` job; asserted by `tests/gitlab-ci.test.ts` |
 
-- Pages must be enabled in the repository settings (source: GitHub Actions) before the first deploy; the workflow does not do it.
-- The `adas` job does not run `test:perf`, `test:generated` or `record`; run them locally when touching those areas. `npm run demo` ends at `cases boundary`.
+- To enable Pages (owner action, not done yet): Settings -> Pages -> Source "GitHub Actions", then set the repository variable `ADAS_PAGES_ENABLED=true`. Until then the deploy job is skipped; the workflow does not do it.
+- The `adas` job does not run `test:perf`; run it locally when touching performance-sensitive code. `npm run demo` runs gen, record, parse, cases boundary, cases regression and replay; the job then runs the generated regression tests (`npm run test:generated -- out/cases`).
 - Keep the GitLab example in sync when changing the `adas` job (the test checks the script lists).
 
 ## 8. Versioning
@@ -210,8 +210,8 @@ Stable interfaces between components. Changing a field is a contract change: upd
 
 | Id | File | Producer -> consumer | Key fields |
 |----|------|----------------------|------------|
-| C1 | `cases/manifest.json` | `cases regression` -> `replay`, generated tests | `meta` (versions, `anomalies`, `log`, `preMs`, `postMs`); `cases[]` `{ caseId, ruleId, scenarioId, source, window [from, to], expect { ruleId, triggered } }`; `source` is relative to the manifest; data files are self-contained (window events + latest `ACC/STATE`, `APA/STEP`, `LKA/STATE`, `VEH/TURN_SIGNAL` before the window + `SCENARIO_END`), `window[0]` is moved back to the oldest precondition |
-| C2 | `replay-report.json` | `replay` -> analysis | `meta` (versions, `manifest`, `filter`); `results[]` `{ caseId, ruleId, status PASS\|FAIL, firedRules, durationMs, error? }`; `summary` `{ total, passed, failed, passRate }` |
+| C1 | `cases/manifest.json` | `cases regression` -> `replay`, generated tests | `meta` (versions, `anomalies`, `log`, `preMs`, `postMs`); `cases[]` `{ caseId, ruleId, scenarioId, source, window [from, to], expect { ruleId, triggered } }`; `source` is relative to the manifest and must resolve inside the manifest directory; the manifest requires `expect.ruleId === ruleId` and `window[0] <= window[1]`; data files are self-contained (window events + latest `ACC/STATE`, `APA/STEP`, `LKA/STATE`, `VEH/TURN_SIGNAL` before the window + `SCENARIO_END`), `window[0]` is moved back to the oldest precondition |
+| C2 | `replay-report.json` | `replay` -> analysis | `meta` (versions, `manifest`, `filter`); `results[]` `{ caseId, ruleId, status PASS\|FAIL, firedRules, durationMs, dataQualityIssues?, error? }` (PASS needs the target rule fired as expected and no data quality issues); `summary` `{ total, passed, failed, passRate }` |
 | C3 | `clips/index.json`, `quality.json` | `record` -> users | index: `meta` (versions, `source`, `bufferMs`, `preMs`, `postMs`), `clips[]` `{ file, scenarioId, trigger, ruleIds, startTs, endTs, events, sha256, truncated }`; quality: `trackPeriodMs`, `totals`, `byScenario[]` with `trackFrames, droppedFrames, dropRate, duplicates, tsAnomalies` |
 | C4 | `summary.json` | `adas_analysis` -> dashboard | `meta`, `totals`, `byRule[]`, `byModule[]`, `byScenario[]`, `timeline[]` (5 s buckets), `dataQuality`, `replay` or `null`; sample: `analysis/tests/data/summary.sample.json`; validator: `dashboard/src/summary.ts` |
 | C5 | Jira export -> `tasks/` | `ticket` | input `{ issues: [{ key, fields: { summary, description, components[{name}], labels[] } }] }`; output `tasks/<KEY>.json`, `data/<KEY>-<caseId>.jsonl`, `generated/<KEY>.test.ts`, `unmapped.json` `[{ key, reason }]` |

@@ -69,7 +69,7 @@ adas-log-toolchain-lab/
 git commit -m "feat(adas): add LKA-03 steering rate rule" -m "Why ... " -m "Refs #69"
 ```
 
-Pre-commit（仓库根目录的 `.husky/pre-commit`）：暂存了 `adas-log-toolchain-lab/` 时运行 `npm run lint && npm run typecheck`；`analysis/` 运行 `flake8`（未安装 flake8 时跳过）；`dashboard/` 运行 lint + typecheck。
+Pre-commit（仓库根目录的 `.husky/pre-commit`；只有安装了 husky 才会运行：在仓库根目录 `npm install` 会设置 `core.hooksPath`，无论如何 CI 都会执行同样的检查）：暂存了 `adas-log-toolchain-lab/` 时运行 `npm run lint && npm run typecheck`；`analysis/` 运行 `flake8`（未安装 flake8 时跳过）；`dashboard/` 运行 lint + typecheck。
 
 ## 3. 新增规则
 
@@ -176,21 +176,21 @@ cd dashboard && npm test && npm run lint && npm run typecheck && npm run build
 
 注意：
 
-- `npm test` 会在 `out/` 下创建临时目录（`out/reg-*`、`out/tk-*`、`out/tpl-*`，其中有故意失败的生成测试）。它们不会被清理，`npm run test:generated` 会把它们一并运行：先执行 `rm -rf out/reg-* out/tk-* out/tpl-*`。
+- 在 `out/` 下创建临时目录的测试会自行清理。若旧版本运行留下的目录（`out/reg-*`、`out/tk-*`、`out/tpl-*`，其中有故意失败的生成测试）让 `npm run test:generated` 失败，执行 `rm -rf out/reg-* out/tk-* out/tpl-*`。没有生成测试时 `npm run test:generated` 也会通过（`--passWithNoTests`）。
 - 真值和边界测试是确定性的（带 seed）。测试中不要用 `Math.random` 或墙上时钟；采集器使用可注入的虚拟时钟。
 
 ## 7. CI
 
 | 工作流 / job | 触发 | 步骤 |
 |--------------|------|------|
-| `.github/workflows/ci.yml` job `adas` | PR 到 `main` | Node 22、`npm ci`、`lint`、`typecheck`、`test:coverage`、`npm run demo`（工作目录 `adas-log-toolchain-lab`） |
+| `.github/workflows/ci.yml` job `adas` | PR 到 `main` | Node 22、`npm ci`、`lint`、`typecheck`、`test:coverage`、`npm run demo`、`npm run test:generated -- out/cases`（工作目录 `adas-log-toolchain-lab`） |
 | `ci.yml` job `adas-analysis` | PR 到 `main` | Python 3.13、`pip install -r requirements.txt flake8==7.5.0`、`flake8 --max-line-length 100 .`、`pytest -v` |
 | `ci.yml` job `adas-dashboard` | PR 到 `main` | Node 22、`npm ci`、lint、typecheck、`npm test`、`npm run build` |
-| `.github/workflows/adas-pages.yml` | `main` 上涉及 `adas-log-toolchain-lab/**` 的 push，或手动 | gen、parse、`cases regression`、`replay`、analysis -> `dashboard/public/summary.json`、看板构建、上传并部署到 GitHub Pages |
+| `.github/workflows/adas-pages.yml` | `main` 上涉及 `adas-log-toolchain-lab/**` 的 push，或手动 | gen、parse、`cases regression`、`replay`、analysis -> `dashboard/public/summary.json`、看板构建、上传并部署到 GitHub Pages；部署 job 仅在仓库变量 `ADAS_PAGES_ENABLED == 'true'` 时运行；`cancel-in-progress: false` |
 | `.gitlab-ci.yml` | 无（示例，未执行） | `lint` 和 `test` 两个 stage，对应 `adas` job；由 `tests/gitlab-ci.test.ts` 断言 |
 
-- 首次部署前必须在仓库设置中启用 Pages（source: GitHub Actions）；工作流不会代做。
-- `adas` job 不运行 `test:perf`、`test:generated` 或 `record`；改动这些部分时请在本地运行。`npm run demo` 止于 `cases boundary`。
+- 启用 Pages（仓库所有者操作，尚未执行）：Settings -> Pages -> Source 选 "GitHub Actions"，再设置仓库变量 `ADAS_PAGES_ENABLED=true`。在此之前部署 job 会被跳过；工作流不会代做。
+- `adas` job 不运行 `test:perf`；改动对性能敏感的代码时请在本地运行。`npm run demo` 依次运行 gen、record、parse、cases boundary、cases regression、replay；之后该 job 运行生成的回归测试（`npm run test:generated -- out/cases`）。
 - 修改 `adas` job 时同步更新 GitLab 示例（测试会检查脚本列表）。
 
 ## 8. 版本管理
@@ -210,8 +210,8 @@ cd dashboard && npm test && npm run lint && npm run typecheck && npm run build
 
 | Id | 文件 | 生产方 -> 消费方 | 关键字段 |
 |----|------|------------------|----------|
-| C1 | `cases/manifest.json` | `cases regression` -> `replay`、生成的测试 | `meta`（版本、`anomalies`、`log`、`preMs`、`postMs`）；`cases[]` `{ caseId, ruleId, scenarioId, source, window [from, to], expect { ruleId, triggered } }`；`source` 相对 manifest；数据文件自包含（窗口内事件 + 窗口前最新的 `ACC/STATE`、`APA/STEP`、`LKA/STATE`、`VEH/TURN_SIGNAL` + `SCENARIO_END`），`window[0]` 前移到最早的前置条件 |
-| C2 | `replay-report.json` | `replay` -> 分析 | `meta`（版本、`manifest`、`filter`）；`results[]` `{ caseId, ruleId, status PASS\|FAIL, firedRules, durationMs, error? }`；`summary` `{ total, passed, failed, passRate }` |
+| C1 | `cases/manifest.json` | `cases regression` -> `replay`、生成的测试 | `meta`（版本、`anomalies`、`log`、`preMs`、`postMs`）；`cases[]` `{ caseId, ruleId, scenarioId, source, window [from, to], expect { ruleId, triggered } }`；`source` 相对 manifest 且必须解析到 manifest 目录之内；manifest 要求 `expect.ruleId === ruleId` 且 `window[0] <= window[1]`；数据文件自包含（窗口内事件 + 窗口前最新的 `ACC/STATE`、`APA/STEP`、`LKA/STATE`、`VEH/TURN_SIGNAL` + `SCENARIO_END`），`window[0]` 前移到最早的前置条件 |
+| C2 | `replay-report.json` | `replay` -> 分析 | `meta`（版本、`manifest`、`filter`）；`results[]` `{ caseId, ruleId, status PASS\|FAIL, firedRules, durationMs, dataQualityIssues?, error? }`（PASS 需要目标规则按预期触发且无数据质量问题）；`summary` `{ total, passed, failed, passRate }` |
 | C3 | `clips/index.json`、`quality.json` | `record` -> 用户 | index：`meta`（版本、`source`、`bufferMs`、`preMs`、`postMs`），`clips[]` `{ file, scenarioId, trigger, ruleIds, startTs, endTs, events, sha256, truncated }`；quality：`trackPeriodMs`、`totals`、`byScenario[]`（`trackFrames, droppedFrames, dropRate, duplicates, tsAnomalies`） |
 | C4 | `summary.json` | `adas_analysis` -> 看板 | `meta`、`totals`、`byRule[]`、`byModule[]`、`byScenario[]`、`timeline[]`（5 s 分桶）、`dataQuality`、`replay` 或 `null`；样例：`analysis/tests/data/summary.sample.json`；校验器：`dashboard/src/summary.ts` |
 | C5 | Jira 导出 -> `tasks/` | `ticket` | 输入 `{ issues: [{ key, fields: { summary, description, components[{name}], labels[] } }] }`；输出 `tasks/<KEY>.json`、`data/<KEY>-<caseId>.jsonl`、`generated/<KEY>.test.ts`、`unmapped.json` `[{ key, reason }]` |

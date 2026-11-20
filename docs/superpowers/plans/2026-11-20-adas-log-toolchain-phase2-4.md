@@ -48,6 +48,7 @@
 
 - 数据文件自包含：窗口内事件，加上窗口开始前该场景每个状态维度的最新事件作为前置条件（`ACC/STATE`、`APA/STEP`、`LKA/STATE`、`VEH/TURN_SIGNAL`；保持原 `ts`），以及 `SCENARIO_END`（若在窗口内）。`window[0]` 取前置条件的最早 `ts` 与 `startTs − pre` 中较小者，保证回放时不会把前置条件切掉
 - 目标规则必须命中；其他规则也可能命中（例如截断导致 HMI-01），记录在结果里，不算失败
+- Updated after review：数据文件经与 `parse` 相同的扫描器抽取（无效 / 迟到事件丢弃，窗口内事件按 `ts` 排序）；所有用例路径必须在 `--out` 之内（否则退出 2）；写入前先删除 `--out` 下旧的 `data/`、`generated/`、`manifest.json`。manifest 校验：`expect.ruleId === ruleId`、`window[0] <= window[1]`、`source` 必须解析到 manifest 目录之内（否则退出 2）
 
 ### C2 `replay-report.json`（W3）
 
@@ -56,6 +57,8 @@
   "results": [ { "caseId", "ruleId", "status": "PASS" | "FAIL", "firedRules": [], "durationMs": 1.2 } ],
   "summary": { "total", "passed", "failed", "passRate" } }
 ```
+
+- Updated after review：PASS 当且仅当目标规则按预期触发且用例数据无数据质量问题；`results[]` 增加可选 `dataQualityIssues` 与 `error`；FAIL 行为 `expected X to fire` / `expected X not to fire` / data quality / error
 
 ### C3 `clips/index.json` + `quality.json`（W2）
 
@@ -72,6 +75,7 @@
 
 - 片段同样带前置条件（同 C1）。片段文件名中的 `<trigger>` 为规则 ID 或 `MANUAL`，合并片段用第一个触发
 - 丢帧：同场景相邻 `ACC/TRACK` 间隔 > 1.5 × 50 ms，记 `round(gap / 50) − 1` 帧；重复：与同场景上一行完全相同；时间戳异常：倒退，或同场景相邻事件间隔 > 1000 ms
+- Updated after review：时间戳异常与上一个事件比较；`--pre/--post` 可为 0；合并片段长度上限 `maxClipMs`（默认 60000 + pre + post，更长则另起新片段）；孤立的向前跳变（> 1000 ms 且下一事件不接续）视为尖峰，不录制但仍计入质量；重叠窗口仅在第一个片段仍在录制时合并；片段文件名经清理并限制在 `--out` 内
 
 ### C4 `summary.json`（W4 产出，W5 消费；样例 `analysis/tests/data/summary.sample.json` 由 W4 提交，W5 先按本契约自建同结构样例）
 
@@ -86,11 +90,14 @@
   "replay": { "total", "passed", "failed", "passRate" } | null }
 ```
 
+- Updated after review：`adas_analysis` 校验字段类型（severity P1/P2、整数 `ts`、`dataQuality` 计数、replay summary），消息含字段与下标，退出 2
+
 ### C5 Jira 工单 → 任务（W6）
 
 - 输入：合成的 Jira REST v2 导出 `{ "issues": [ { "key", "fields": { "summary", "description", "components": [{ "name" }], "labels": [] } } ] }`
 - 映射：`components[].name` → 模块（`ACC` / `APA` / `HMI` / `LKA`，大小写不敏感）；`labels` 中 `rule:<ID>` → 规则；`description` 的 `Steps` / `Expected` 段落 → `steps[]` / `expected[]`
 - 输出：`tasks/<KEY>.json`（`{ key, summary, module, ruleId, steps, expected, cases: [caseId], testFile }`）、`tasks/data/<KEY>-<caseId>.jsonl`、`tasks/generated/<KEY>.test.ts`（用 `renderCaseTest`，复现数据取该规则 `boundaryCases()` 中 `expectTriggered = true` 的用例）、`tasks/unmapped.json`（`[{ key, reason }]`）
+- Updated after review：写入前先删除 `--out` 下遗留的 `data/`、`generated/`、`unmapped.json` 及自己的任务 json
 - 与 spec 的差异：检查脚本放在 `tasks/generated/` 下（spec 写 `tasks/<KEY>.test.ts`），以便 `vitest.generated.config.ts` 统一运行
 
 ## 3. 各工作流必测行为（先写测试）
