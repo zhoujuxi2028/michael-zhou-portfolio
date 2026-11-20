@@ -18,7 +18,7 @@ Requires Node.js >= 22.18 (runs `.ts` directly, no build step).
 
 ```bash
 npm ci
-npm run demo   # gen -> parse -> cases boundary -> cases regression -> replay
+npm run demo   # gen -> record -> parse -> cases boundary -> cases regression -> replay
 npm test
 ```
 
@@ -26,6 +26,7 @@ Full pipeline, including analysis (Python 3.13) and dashboard:
 
 ```bash
 node src/cli.ts gen --out out
+node src/cli.ts record --source file --input out/events.jsonl --out out/clips
 node src/cli.ts parse out/events.jsonl --out out/anomalies.json
 node src/cli.ts cases regression --anomalies out/anomalies.json --log out/events.jsonl --out out/cases
 node src/cli.ts replay --manifest out/cases/manifest.json --out out/replay-report.json
@@ -41,7 +42,7 @@ cd ../dashboard && npm ci && npm run dev
 | Command | What it does |
 |---------|--------------|
 | `node src/cli.ts gen [--seed 42] [--scenarios 20] [--interleave] [--out out]` | Write `events.jsonl` and `labels.json` |
-| `node src/cli.ts record --source file --input <jsonl> \| --source live ... [--out dir]` | Simulated recorder: write `clips/*.jsonl`, `clips/index.json`, `quality.json` <!-- RECORD: adjust when collector merges --> |
+| `node src/cli.ts record --source file --input <jsonl> \| --source live [--seed n] [--scenarios n] [--speed n] [--out out/clips] [--buffer 10000] [--pre 5000] [--post 5000]` | Simulated recorder: ring buffer, rule / manual triggers; write self-contained `clips/*.jsonl`, `clips/index.json` (trigger, time range, event count, SHA-256), `quality.json` (drop rate, duplicates, timestamp anomalies) |
 | `node src/cli.ts parse <input> [--out file] [--config file] [--fail-on P1\|P2] [--strict]` | Write `anomalies.json` |
 | `node src/cli.ts cases boundary [--out dir] [--config file]` | Write boundary cases and verify them |
 | `node src/cli.ts cases regression --anomalies <file> --log <file> --out <dir> [--pre 3000] [--post 3000]` | Write self-contained cases (`data/<caseId>.jsonl`), `manifest.json` and `generated/regression.test.ts` (`npm run test:generated -- <dir>`) |
@@ -101,4 +102,4 @@ Built test-first: each behavior starts as a failing test, then the minimum code 
 
 ## Gap to production
 
-No vehicle bus capture (CAN / Ethernet), no durable storage, no upload pipeline, no privacy handling (anonymisation, consent, retention) for recorded data; no raw sensor data; synthetic scenarios only. The recorder only simulates a data logger. <!-- RECORD: adjust when collector merges -->
+The recorder only simulates a data logger. Missing for production: vehicle bus capture (CAN / Ethernet / DDS decoding, hardware timestamps); persistent, rotating on-vehicle storage and crash safety; an upload pipeline (bandwidth, retries, integrity and resume); privacy handling (location / video / VIN anonymisation, consent, retention). No raw sensor data; synthetic scenarios only.

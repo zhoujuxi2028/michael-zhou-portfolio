@@ -18,7 +18,7 @@
 
 ```bash
 npm ci
-npm run demo   # gen -> parse -> cases boundary -> cases regression -> replay
+npm run demo   # gen -> record -> parse -> cases boundary -> cases regression -> replay
 npm test
 ```
 
@@ -26,6 +26,7 @@ npm test
 
 ```bash
 node src/cli.ts gen --out out
+node src/cli.ts record --source file --input out/events.jsonl --out out/clips
 node src/cli.ts parse out/events.jsonl --out out/anomalies.json
 node src/cli.ts cases regression --anomalies out/anomalies.json --log out/events.jsonl --out out/cases
 node src/cli.ts replay --manifest out/cases/manifest.json --out out/replay-report.json
@@ -41,7 +42,7 @@ cd ../dashboard && npm ci && npm run dev
 | 命令 | 作用 |
 |------|------|
 | `node src/cli.ts gen [--seed 42] [--scenarios 20] [--interleave] [--out out]` | 生成 `events.jsonl` 和 `labels.json` |
-| `node src/cli.ts record --source file --input <jsonl> \| --source live ... [--out dir]` | 模拟记录器：生成 `clips/*.jsonl`、`clips/index.json`、`quality.json` <!-- RECORD: adjust when collector merges --> |
+| `node src/cli.ts record --source file --input <jsonl> \| --source live [--seed n] [--scenarios n] [--speed n] [--out out/clips] [--buffer 10000] [--pre 5000] [--post 5000]` | 模拟记录器：环形缓冲、规则 / 手动触发；生成自包含的 `clips/*.jsonl`、`clips/index.json`（触发原因、时间范围、事件数、SHA-256）、`quality.json`（丢帧率、重复、时间戳异常） |
 | `node src/cli.ts parse <input> [--out file] [--config file] [--fail-on P1\|P2] [--strict]` | 生成 `anomalies.json` |
 | `node src/cli.ts cases boundary [--out dir] [--config file]` | 生成并校验边界值用例 |
 | `node src/cli.ts cases regression --anomalies <file> --log <file> --out <dir> [--pre 3000] [--post 3000]` | 生成自包含用例（`data/<caseId>.jsonl`）、`manifest.json` 和 `generated/regression.test.ts`（`npm run test:generated -- <dir>`） |
@@ -101,4 +102,4 @@ gen ──> events.jsonl + labels.json
 
 ## 与生产环境的差距
 
-没有车辆总线采集（CAN / 以太网）、持久化存储、上传链路，也没有录制数据的隐私处理（脱敏、授权、保留期）；没有原始传感器数据；场景全部为合成。记录器只是模拟数据记录仪。 <!-- RECORD: adjust when collector merges -->
+记录器只是模拟数据记录仪。生产环境还缺：车辆总线采集（CAN / 以太网 / DDS 解码、硬件时间戳）；车端持久化与滚动存储、崩溃安全；上传链路（带宽、重试、完整性校验与断点续传）；隐私处理（位置 / 视频 / VIN 脱敏、授权、保留期）。没有原始传感器数据；场景全部为合成。

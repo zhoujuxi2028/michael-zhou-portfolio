@@ -8,7 +8,7 @@ Ruleset version: 1.1.0. Covers Phases 2-4 in a single release (deviation from on
 
 ### Added
 
-- `adas-lab record` (`--source file|live`): simulated data recorder with ring buffer, triggered recording, `clips/*.jsonl`, `clips/index.json` and `quality.json` <!-- RECORD: adjust when collector merges -->
+- `adas-lab record` (`--source file|live`): simulated data recorder with per-scenario ring buffer, rule / manual triggers, self-contained clips (precondition state events first; overlapping windows merge while recording), `clips/*.jsonl`, `clips/index.json` (trigger, time range, event count, SHA-256, truncated flag) and `quality.json` (drop rate, duplicates, timestamp anomalies)
 - `adas-lab cases regression`: self-contained regression cases (`data/<caseId>.jsonl`), `manifest.json` with versions and a generated Vitest file (`npm run test:generated -- <dir>`)
 - `adas-lab replay`: batch replay from a manifest with `--filter module=<ACC|APA|HMI|LKA>`, per-case PASS/FAIL, fired rules, duration and pass rate; exit codes 0 / 1 / 2
 - `adas-lab ticket`: synthetic Jira export to script tasks, per-ticket check scripts under `tasks/generated/`, and `tasks/unmapped.json` with stable reasons; `--strict`, `--config`
