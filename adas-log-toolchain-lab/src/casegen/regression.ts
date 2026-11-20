@@ -1,4 +1,4 @@
-import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
+import { access, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { isAbsolute, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
@@ -42,7 +42,7 @@ export interface RegressionOptions {
   anomalies: string;
   /** Original JSON Lines log. */
   log: string;
-  /** Output directory (manifest.json, data/, generated/). */
+  /** Output directory; its manifest.json, data/ and generated/ are replaced. */
   out: string;
   preMs: number;
   postMs: number;
@@ -104,6 +104,8 @@ export async function buildRegressionCases(o: RegressionOptions): Promise<Regres
   const windows = await extractWindows(o.log, anomalies.map((a) => ({
     scenarioId: a.scenarioId, from: Math.max(0, a.startTs - o.preMs), to: a.detectTs + o.postMs,
   })));
+  // Replace (never merge with) the previous run's output; nothing else under --out is touched.
+  for (const p of ['data', 'generated', 'manifest.json']) await rm(join(o.out, p), { recursive: true, force: true });
   await mkdir(join(o.out, 'data'), { recursive: true });
   const cases: ManifestCase[] = [];
   const entries: CaseTestEntry[] = [];

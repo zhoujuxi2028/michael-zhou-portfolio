@@ -1,4 +1,4 @@
-import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { main } from '../../src/cli/main.ts';
@@ -20,6 +20,23 @@ describe('adas-lab cases regression', () => {
     expect(manifest.meta).toMatchObject({ preMs: 2000, postMs: 1000 });
     expect(existsSync(join(out, 'generated', 'regression.test.ts'))).toBe(true);
     expect(c.out.join('\n')).toBe(`${count} regression cases written to ${join(out, 'manifest.json')}; test file ${join(out, 'generated', 'regression.test.ts')}`);
+  });
+
+  it('replaces previous data/ and generated/ output but leaves other files under --out alone', async () => {
+    const { dir, log, anomalies } = await fixture(), out = join(dir, 'cases');
+    mkdirSync(join(out, 'data'), { recursive: true });
+    mkdirSync(join(out, 'generated'), { recursive: true });
+    mkdirSync(join(out, 'keep'), { recursive: true });
+    writeFileSync(join(out, 'data', 'REG-STALE.jsonl'), '{}\n');
+    writeFileSync(join(out, 'generated', 'stale.test.ts'), '');
+    writeFileSync(join(out, 'notes.txt'), 'mine');
+    writeFileSync(join(out, 'keep', 'x.json'), '{}');
+    expect(await main(['cases', 'regression', '--anomalies', anomalies, '--log', log, '--out', out], capture().io)).toBe(0);
+    const manifest = JSON.parse(readFileSync(join(out, 'manifest.json'), 'utf8')) as { cases: { source: string }[] };
+    expect(readdirSync(join(out, 'data')).sort()).toEqual(manifest.cases.map((c) => c.source.slice('data/'.length)).sort());
+    expect(readdirSync(join(out, 'generated'))).toEqual(['regression.test.ts']);
+    expect(readFileSync(join(out, 'notes.txt'), 'utf8')).toBe('mine');
+    expect(existsSync(join(out, 'keep', 'x.json'))).toBe(true);
   });
 
   it('defaults --pre / --post to 3000 ms', async () => {
