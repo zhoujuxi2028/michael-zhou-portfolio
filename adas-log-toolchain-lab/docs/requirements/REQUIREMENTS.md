@@ -14,7 +14,7 @@
 
 | REQ ID | 标题 | 类型 | 优先级 | 可行性 | 依赖 | 状态 |
 |--------|------|------|--------|--------|------|------|
-| `REQ-ADAS-01` | ADAS 日志工具链：TS 解析 + 用例生成 + 数据采集 + 场景回放 + 分析看板 | DEMO | P1 | ✅ 可行（2026-11-20） | — | 🔄 Stage 4 测试 |
+| `REQ-ADAS-01` | ADAS 日志工具链：TS 解析 + 用例生成 + 数据采集 + 场景回放 + 分析看板 | DEMO | P1 | ✅ 可行（2026-11-20） | — | 🔄 Phase 1 ✅（v0.1.0）；Phase 2–4 开发中 |
 
 ## 3. 功能需求
 
@@ -61,15 +61,15 @@
 
 ### Phase 1
 
-- [ ] `generator` 用固定 seed 生成可复现的合成日志
-- [ ] `parser` 为 TypeScript（strict）CLI，流式读取，输出 JSON 异常报告
-- [ ] ACC / APA / HMI 各 2 条异常规则
-- [ ] `casegen boundary`：每个判定条件生成 阈值 −ε / 阈值 / 阈值 +ε 用例，并全部通过
-- [ ] 单元测试覆盖规则与解析，CI 通过
-- [ ] README.md（英文）+ README.zh.md（中文），写明运行方式与"合成数据"声明
-- [ ] 代码注释、CLI 输出、异常描述为英文；`CHANGELOG.md` 记录 0.1.0
-- [ ] `anomalies.json` 的 `meta` 包含工具版本与规则集版本
-- [ ] `.gitlab-ci.yml` 示例通过 YAML 校验
+- [x] `generator` 用固定 seed 生成可复现的合成日志
+- [x] `parser` 为 TypeScript（strict）CLI，流式读取，输出 JSON 异常报告
+- [x] ACC / APA / HMI 各 2 条异常规则
+- [x] `casegen boundary`：每个判定条件生成 阈值 −ε / 阈值 / 阈值 +ε 用例，并全部通过
+- [x] 单元测试覆盖规则与解析，CI 通过
+- [x] README.md（英文）+ README.zh.md（中文），写明运行方式与"合成数据"声明
+- [x] 代码注释、CLI 输出、异常描述为英文；`CHANGELOG.md` 记录 0.1.0
+- [x] `anomalies.json` 的 `meta` 包含工具版本与规则集版本
+- [x] `.gitlab-ci.yml` 示例通过 YAML 校验
 
 ### Phase 2
 
@@ -131,3 +131,4 @@
 | 2026-11-20 | Stage 2 设计文档 | ✅ 子代理评审 2 轮通过 + 用户评审通过 |
 | 2026-11-20 | Stage 2 实施计划 | ✅ 子代理评审 2 轮通过 + 用户评审通过；执行方式：子代理逐任务 |
 | 2026-11-20 | Stage 3 开发（Phase 1 T1–T14） | ✅ 3 轮代码评审修复完成 + TDD 证据补充（`docs/tdd.md`）+ 用户评审通过 |
+| 2026-11-20 | Stage 4 测试（Phase 1） | ✅ PR #75 CI 4 个 job 全绿 + 用户评审通过；合并后打 tag `adas-lab-v0.1.0` |
