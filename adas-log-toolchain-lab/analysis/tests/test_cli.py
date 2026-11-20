@@ -89,3 +89,22 @@ def test_module_entry_point(tmp_path):
     )
     assert proc.returncode == 0, proc.stderr
     assert out.exists()
+
+
+def test_malformed_anomaly_rows(tmp_path, capsys):
+    doc = json.loads(Path(ANOMALIES).read_text())
+    del doc["anomalies"][2]["startTs"]
+    bad = tmp_path / "bad.json"
+    bad.write_text(json.dumps(doc))
+    assert main(["--anomalies", str(bad), "--out", str(tmp_path / "s.json")]) == 2
+    err = capsys.readouterr().err
+    assert "startTs" in err and "anomalies[2]" in err
+
+
+def test_anomalies_must_be_a_list(tmp_path, capsys):
+    doc = json.loads(Path(ANOMALIES).read_text())
+    doc["anomalies"] = {}
+    bad = tmp_path / "bad.json"
+    bad.write_text(json.dumps(doc))
+    assert main(["--anomalies", str(bad), "--out", str(tmp_path / "s.json")]) == 2
+    assert "must be a list" in capsys.readouterr().err

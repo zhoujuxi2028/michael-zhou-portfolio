@@ -36,6 +36,21 @@ def _load(path, kind, required):
     return doc
 
 
+ROW_FIELDS = ("ruleId", "module", "severity", "scenarioId", "startTs")
+
+
+def _check_rows(doc, path):
+    rows = doc["anomalies"]
+    if not isinstance(rows, list):
+        raise InputError(f"anomalies file: 'anomalies' must be a list: {path}")
+    for i, row in enumerate(rows):
+        for field in ROW_FIELDS:
+            if not isinstance(row, dict) or field not in row:
+                raise InputError(
+                    f"anomalies file: anomalies[{i}] is missing '{field}': {path}"
+                )
+
+
 ANOMALIES_FIELDS = [
     "meta.events", "meta.scenarios", "meta.toolVersion", "meta.rulesetVersion",
     "anomalies", "dataQuality.counts",
@@ -63,6 +78,7 @@ def main(argv=None):
         return int(exc.code or 0)
     try:
         anomalies = _load(args.anomalies, "anomalies", ANOMALIES_FIELDS)
+        _check_rows(anomalies, args.anomalies)
         replay = None
         if args.replay:
             replay = _load(args.replay, "replay", REPLAY_FIELDS)
