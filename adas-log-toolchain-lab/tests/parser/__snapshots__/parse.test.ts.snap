@@ -72,7 +72,7 @@ exports[`parseFile > matches the report snapshot 1`] = `
   "meta": {
     "events": 10,
     "input": "fixtures/golden/mixed.jsonl",
-    "rulesetVersion": "1.0.0",
+    "rulesetVersion": "1.1.0",
     "scenarios": 2,
     "toolVersion": "0.1.0",
   },
