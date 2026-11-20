@@ -46,6 +46,10 @@ Override thresholds with `--config rules.config.json`, e.g. `{"rules": {"ACC-01"
 - Data quality: a first-line BOM is ignored; late events for an already-ended scenario are dropped and counted as out of order; unknown event types are bounded with an `(other)` bucket.
 - Each boundary case is verified through the parser and triggers only its target rule.
 
+## Development (TDD)
+
+Built test-first: each behavior starts as a failing test, then the minimum code to pass, one commit per cycle. Seven layers of tests: unit, rule, boundary, golden, truth, CLI, perf. See [docs/tdd.md](docs/tdd.md) for the red/green evidence of every commit (replayable with `scripts/tdd-redgreen.sh`) and the recorded exceptions.
+
 ## Quality gates
 
 - Truth labels: precision and recall must be 100% on generated data

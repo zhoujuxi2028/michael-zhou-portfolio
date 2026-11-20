@@ -15,4 +15,5 @@ Ruleset version: 1.0.0
 - Config with unknown rule ids or keys is rejected (exit 2)
 - Data quality handling: first-line BOM ignored, late events for an ended scenario dropped and counted as out of order, unknown event types bounded with an `(other)` bucket
 - Boundary cases are verified through the parser and each triggers only its target rule
+- TDD documentation (`docs/tdd.md`) with per-commit red/green evidence and `scripts/tdd-redgreen.sh` to replay it
 - GitHub Actions job and a GitLab CI example
