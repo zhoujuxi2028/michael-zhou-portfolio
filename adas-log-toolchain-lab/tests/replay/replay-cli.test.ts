@@ -61,4 +61,14 @@ describe('adas-lab replay', () => {
     expect(await main(['replay', '--manifest', path, '--out', join(path, '..', 'r.json')], c.io)).toBe(2);
     expect(c.err.join('\n')).toMatch(/invalid manifest/);
   });
+
+  it.each(['../../etc/x', '/etc/passwd', 'data/../../x.jsonl'])('exits 2 when a case source escapes the manifest directory: %s', async (source) => {
+    const { dir, manifest } = await cases();
+    const m = JSON.parse(readFileSync(manifest, 'utf8')) as { cases: { source: string }[] };
+    m.cases[0]!.source = source;
+    writeFileSync(manifest, JSON.stringify(m));
+    const c = capture();
+    expect(await main(['replay', '--manifest', manifest, '--out', join(dir, 'r.json')], c.io)).toBe(2);
+    expect(c.err.join('\n')).toMatch(/escapes the manifest directory/);
+  });
 });

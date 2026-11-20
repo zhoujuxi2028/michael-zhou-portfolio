@@ -1,8 +1,9 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { main } from '../../src/cli/main.ts';
-import { fixture } from './regression-fixture.ts';
+import { toJsonl } from '../../src/io/jsonl.ts';
+import { fixture, fixtureEvents } from './regression-fixture.ts';
 
 function capture() {
   const out: string[] = [], err: string[] = [];
@@ -36,5 +37,33 @@ describe('adas-lab cases regression', () => {
     const c = capture();
     expect(await main(['cases', 'regression', ...args], c.io)).toBe(2);
     expect(c.err.join('\n')).toMatch(msg);
+  });
+
+  it('drops log lines whose scenarioId is a path and never writes outside --out', async () => {
+    const { dir, log, anomalies } = await fixture();
+    const evil = 'x/../../../../escaped';
+    writeFileSync(log, toJsonl(fixtureEvents.map((e) => ({ ...e, scenarioId: evil }))));
+    const out = join(dir, 'a', 'b', 'cases');
+    expect(await main(['parse', log, '--out', anomalies], capture().io)).toBe(0);
+    const report = JSON.parse(readFileSync(anomalies, 'utf8')) as { anomalies: unknown[]; dataQuality: { counts: { schemaErrors: number } } };
+    expect(report.anomalies).toEqual([]);
+    expect(report.dataQuality.counts.schemaErrors).toBe(fixtureEvents.length);
+    expect(await main(['cases', 'regression', '--anomalies', anomalies, '--log', log, '--out', out], capture().io)).toBe(0);
+    expect(readdirSync(join(out, 'data'))).toEqual([]);
+  });
+
+  it.each([
+    ['scenarioId', { scenarioId: '../../../escaped' }, /scenarioId/],
+    ['ruleId', { ruleId: '/../../../../escaped' }, /escapes the output directory/],
+  ])('exits 2 and writes nothing outside --out for a crafted %s in anomalies.json', async (_n, patch, msg) => {
+    const { dir, log, anomalies } = await fixture();
+    const r = JSON.parse(readFileSync(anomalies, 'utf8')) as { anomalies: Record<string, unknown>[] };
+    Object.assign(r.anomalies[0]!, patch);
+    writeFileSync(anomalies, JSON.stringify(r));
+    const out = join(dir, 'a', 'b', 'cases'), c = capture();
+    expect(await main(['cases', 'regression', '--anomalies', anomalies, '--log', log, '--out', out], c.io)).toBe(2);
+    expect(c.err.join('\n')).toMatch(msg);
+    expect(readdirSync(dir).sort()).toEqual(['anomalies.json', 'events.jsonl']);
+    expect(existsSync(join(out, 'manifest.json'))).toBe(false);
   });
 });

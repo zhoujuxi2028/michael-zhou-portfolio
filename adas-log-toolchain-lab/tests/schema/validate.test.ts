@@ -52,3 +52,20 @@ describe('parseLine', () => {
     });
   });
 });
+
+describe('scenarioId', () => {
+  const withId = (scenarioId: unknown) => line({ ts: 1, scenarioId, module: 'SYS', type: 'SCENARIO_END', data: {} });
+
+  it.each(['S001', 'a', 'A-b_c.9', 'x'.repeat(64)])('accepts the safe id %j', (id) => {
+    expect(parseLine(withId(id)).ok).toBe(true);
+  });
+
+  it.each(['x/../../../../escaped', 'a/b', 'a\\b', '.', '..', '', 'x'.repeat(65), 'a b', 'Sé'])('rejects %j as a schemaError', (id) => {
+    const r = parseLine(withId(id));
+    expect(r.ok).toBe(false);
+    if (!r.ok) {
+      expect(r.kind).toBe('schemaError');
+      expect(r.detail).toContain('scenarioId');
+    }
+  });
+});

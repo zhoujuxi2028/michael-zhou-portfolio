@@ -1,9 +1,10 @@
 import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
-import { join, relative } from 'node:path';
+import { isAbsolute, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
 import { UsageError } from '../config.ts';
 import { toJsonl } from '../io/jsonl.ts';
+import { ScenarioId } from '../schema/events.ts';
 import { RULESET_VERSION, TOOL_VERSION } from '../version.ts';
 import { extractWindows } from './extract.ts';
 import { renderCaseTest, type CaseTestEntry } from './template.ts';
@@ -11,7 +12,7 @@ import { renderCaseTest, type CaseTestEntry } from './template.ts';
 /** The anomaly fields a regression case needs (the rest of anomalies.json is ignored). */
 const AnomaliesFile = z.object({
   anomalies: z.array(z.object({
-    ruleId: z.string().min(1), scenarioId: z.string().min(1),
+    ruleId: z.string().min(1), scenarioId: ScenarioId,
     startTs: z.number().int(), detectTs: z.number().int(), message: z.string(),
   })),
 });
@@ -95,6 +96,11 @@ export async function buildRegressionCases(o: RegressionOptions): Promise<Regres
     throw new UsageError(`log file not found: ${o.log}`);
   }
   const ids = regressionCaseIds(anomalies);
+  const outDir = resolve(o.out);
+  for (const id of ids) {
+    const rel = relative(outDir, resolve(outDir, 'data', `${id}.jsonl`));
+    if (rel.startsWith('..') || isAbsolute(rel)) throw new UsageError(`case ${id} escapes the output directory ${o.out}`);
+  }
   const windows = await extractWindows(o.log, anomalies.map((a) => ({
     scenarioId: a.scenarioId, from: Math.max(0, a.startTs - o.preMs), to: a.detectTs + o.postMs,
   })));

@@ -12,10 +12,18 @@ export type LkaState = z.infer<typeof LkaState>;
 export const HmiFeature = z.enum(['ACC', 'APA', 'LKA']);
 export type HmiFeature = z.infer<typeof HmiFeature>;
 
+/**
+ * Scenario ids end up in file names (regression case data), so only a safe subset is allowed:
+ * 1-64 chars of `[A-Za-z0-9_.-]`, and never `.` or `..`.
+ */
+export const ScenarioId = z.string()
+  .regex(/^[A-Za-z0-9_.-]{1,64}$/, 'must be 1-64 characters of [A-Za-z0-9_.-]')
+  .refine((s) => s !== '.' && s !== '..', 'must not be "." or ".."');
+
 /** Common envelope shared by every event line. */
 export const Envelope = z.object({
   ts: z.number().int().nonnegative(),
-  scenarioId: z.string().min(1),
+  scenarioId: ScenarioId,
   module: z.string().min(1),
   type: z.string().min(1),
   data: z.unknown(),
