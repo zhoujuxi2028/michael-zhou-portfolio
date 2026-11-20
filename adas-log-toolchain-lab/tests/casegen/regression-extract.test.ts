@@ -49,4 +49,11 @@ describe('extractWindows', () => {
     expect(w!.window).toEqual([4000, 6000]);
     expect(w!.events).toEqual([track(5000), track(6000)]);
   });
+
+  it('skips invalid lines and serves several windows of one scenario in a single pass', async () => {
+    const path = logFile([track(1000), '{bad', '{"ts":1}', track(2000), track(8000)]);
+    const [a, b] = await extractWindows(path, [req(S, 0, 2500), req(S, 7000, 9000)]);
+    expect(a!.events).toEqual([track(1000), track(2000)]);
+    expect(b!.events).toEqual([track(8000)]);
+  });
 });
