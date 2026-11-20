@@ -19,6 +19,8 @@ export interface ClipEntry {
   /** SHA-256 (hex) of the file bytes. */
   sha256: string;
   truncated: boolean;
+  /** Only present (`true`) when the `maxClipMs` cap closed this clip; the next clip continues it. */
+  split?: true;
 }
 
 export interface ClipIndex {
@@ -70,6 +72,7 @@ export function createClipWriter(dir: string, meta: IndexMeta): ClipWriter {
         file, scenarioId: clip.scenarioId, trigger: clip.trigger, ruleIds: clip.ruleIds,
         startTs: clip.startTs, endTs: clip.endTs, events: clip.events.length,
         sha256: createHash('sha256').update(bytes).digest('hex'), truncated: clip.truncated,
+        ...(clip.split ? { split: true as const } : {}),
       };
       clips.push(entry);
       return entry;

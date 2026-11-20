@@ -200,6 +200,14 @@ describe('recorder: clip length cap', () => {
       ['S1_28000_MANUAL.jsonl', 23000, 40000],
       ['S1_40000_MANUAL.jsonl', 35000, 45000],
     ]);
+    // The clip closed by the cap is marked; the last one ended normally and has no split key.
+    expect(clips.map((c) => c.split)).toEqual([true, true, true, undefined]);
+  });
+
+  it('does not mark clips that end normally as split', () => {
+    const clips = record(byTs(ticks(0, 40000), [hit(8000, 0), hit(30000, 0)]));
+    expect(clips).toHaveLength(2);
+    for (const c of clips) expect('split' in c).toBe(false);
   });
 });
 

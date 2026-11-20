@@ -39,6 +39,19 @@ describe('clip writer', () => {
     expect(index.clips[1]).toMatchObject({ trigger: 'manual', truncated: true });
   });
 
+  it('adds split: true only to clips closed by the maxClipMs cap (no split key otherwise)', async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'adas-clips-'));
+    const w = createClipWriter(dir, META);
+    await w.write(clip({ split: true }));
+    await w.write(clip({ file: 'S1_5000_T-1.jsonl' }));
+    await w.finish();
+    const index = JSON.parse(readFileSync(join(dir, 'index.json'), 'utf8')) as { clips: Record<string, unknown>[] };
+    expect(index.clips[0]).toMatchObject({ file: 'S1_1000_T-1.jsonl', split: true });
+    expect(Object.keys(index.clips[1]!)).not.toContain('split');
+    // `split` follows `truncated` so existing entries keep their key order.
+    expect(Object.keys(index.clips[0]!).slice(-2)).toEqual(['truncated', 'split']);
+  });
+
   it('never overwrites a clip that reuses a file name', async () => {
     const dir = mkdtempSync(join(tmpdir(), 'adas-clips-'));
     const w = createClipWriter(dir, META);

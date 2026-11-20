@@ -30,6 +30,11 @@ export interface Clip {
   startTs: number;
   endTs: number;
   truncated: boolean;
+  /**
+   * Set (only ever `true`) on a clip closed early because merging the next trigger would have
+   * exceeded `maxClipMs`; recording continues in the next clip of the scenario.
+   */
+  split?: true;
   events: AdasEvent[];
 }
 
@@ -92,7 +97,7 @@ export function createRecorder(opts: RecorderOptions, onClip: (c: Clip) => void)
     return sc;
   };
 
-  const close = (id: string, sc: Scenario) => {
+  const close = (id: string, sc: Scenario, split = false) => {
     const w = sc.window;
     if (!w) return;
     sc.window = null;
@@ -107,7 +112,8 @@ export function createRecorder(opts: RecorderOptions, onClip: (c: Clip) => void)
     const startTs = truncated ? events.reduce((m, e) => Math.min(m, e.ts), Infinity) : Math.max(0, w.start);
     onClip({
       file: `${safeName(id)}_${w.labelTs}_${safeName(w.label)}.jsonl`, scenarioId: id, trigger: w.trigger, ruleIds: w.ruleIds,
-      startTs, endTs: Math.min(w.end, sc.now), truncated, events: [...preconditions, ...events],
+      startTs, endTs: Math.min(w.end, sc.now), truncated, ...(split ? { split: true as const } : {}),
+      events: [...preconditions, ...events],
     });
   };
 
@@ -115,14 +121,15 @@ export function createRecorder(opts: RecorderOptions, onClip: (c: Clip) => void)
    * Start a window, or merge it into the one still recording when they overlap. Triggers run
    * before the close check for the same event, so after a ts jump the open window may already
    * be over: close it first. A merge that would make the window longer than `maxClipMs` closes
-   * the current clip (ending at the current scenario time) and starts a new one, so a chain of
-   * overlapping triggers cannot pin the ring buffer forever.
+   * the current clip (ending at the current scenario time, marked `split`) and starts a new one, so
+   * a chain of overlapping triggers cannot pin the ring buffer forever.
    */
   const trigger = (id: string, next: Window) => {
     const sc = open(id);
     const w = sc.window;
     const mergedMs = w ? Math.max(w.end, next.end) - Math.min(w.start, next.start) : 0;
-    if (w && (next.start > w.end || mergedMs > options.maxClipMs)) close(id, sc);
+    if (w && next.start > w.end) close(id, sc);
+    else if (w && mergedMs > options.maxClipMs) close(id, sc, true);
     const cur = sc.window;
     if (cur) {
       cur.start = Math.min(cur.start, next.start);
