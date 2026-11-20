@@ -1,0 +1,96 @@
+{
+  "issues": [
+    {
+      "key": "ADAS-101",
+      "fields": {
+        "summary": "ACC drops out without a takeover request when the lead vehicle brakes hard",
+        "description": "h3. Steps\n# Engage ACC at 80 km/h behind a lead vehicle.\n# Brake the lead vehicle hard until the gap closes below the minimum.\nh3. Expected\n# A takeover request is raised within the time budget.\n# ACC does not stay silent while the gap is unsafe.",
+        "components": [
+          {
+            "name": "ACC"
+          }
+        ],
+        "labels": [
+          "regression",
+          "rule:ACC-01"
+        ]
+      }
+    },
+    {
+      "key": "ADAS-102",
+      "fields": {
+        "summary": "Parking assist keeps moving after a steering fault",
+        "description": "*Steps*\n* Start automated parking in a perpendicular slot.\n* Inject a steering torque fault mid-maneuver.\n*Expected*\n* The maneuver aborts and the driver is notified.",
+        "components": [
+          {
+            "name": "APA"
+          }
+        ],
+        "labels": [
+          "field-report",
+          "rule:APA-02"
+        ]
+      }
+    },
+    {
+      "key": "ADAS-103",
+      "fields": {
+        "summary": "Takeover request is not shown on the instrument cluster",
+        "description": "Steps:\n1. Trigger an ACC takeover request.\n2. Watch the cluster display.\nExpected:\n1. The cluster shows the takeover prompt in time.",
+        "components": [
+          {
+            "name": "HMI"
+          }
+        ],
+        "labels": [
+          "rule:HMI-02"
+        ]
+      }
+    },
+    {
+      "key": "ADAS-104",
+      "fields": {
+        "summary": "Cluster brightness flickers at night",
+        "description": "Steps:\n- Drive at night with the cluster on auto brightness.\nExpected:\n- Brightness stays stable.",
+        "components": [
+          {
+            "name": "HMI"
+          }
+        ],
+        "labels": [
+          "ui"
+        ]
+      }
+    },
+    {
+      "key": "ADAS-105",
+      "fields": {
+        "summary": "Unexpected lane keeping chatter on a straight road",
+        "description": "Steps:\n# Drive on a straight road.\nExpected:\n# No chatter.",
+        "components": [
+          {
+            "name": "ACC"
+          }
+        ],
+        "labels": [
+          "rule:ZZZ-99"
+        ]
+      }
+    },
+    {
+      "key": "ADAS-106",
+      "fields": {
+        "summary": "Parking assist HMI prompt wording is unclear",
+        "description": "Steps:\n# Start parking.\nExpected:\n# Prompt is clear.",
+        "components": [
+          {
+            "name": "HMI"
+          }
+        ],
+        "labels": [
+          "rule:APA-01"
+        ]
+      }
+    }
+  ]
+}
