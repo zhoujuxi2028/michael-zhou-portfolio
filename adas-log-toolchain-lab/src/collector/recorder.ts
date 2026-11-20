@@ -74,6 +74,9 @@ interface Scenario { buffer: RingBuffer; states: PreconditionTracker; now: numbe
  *   event is a lone ts spike and is dropped (not buffered, not seen by the rules), so it cannot
  *   close windows early or flush the buffer. A held event at EOF is kept. SCENARIO_END is never
  *   held. `quality.json` still counts the spike as two ts anomalies.
+ *   Known limit: only a single spike event is detected. Two or more consecutive spike events
+ *   (e.g. ts 1e9 then 1e9 + 50) look like a real jump, because the second continues from the first:
+ *   both are accepted, scenario time moves to 1e9 and the open window closes early.
  */
 export function createRecorder(opts: RecorderOptions, onClip: (c: Clip) => void): Recorder {
   const preMs = opts.preMs ?? DEFAULTS.preMs;
