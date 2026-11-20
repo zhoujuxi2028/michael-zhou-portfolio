@@ -35,6 +35,14 @@ const LKA_PLAN: readonly (readonly [LkaFault, LkaFault])[] = [
   ['LKA-02', 'LKA-01'],
 ];
 
+/**
+ * Slot in ACC_PLAN / APA_PLAN for scenario index `i`: the i-th ACC (even i) or APA (odd i) scenario
+ * of the Phase 1 layout. Later scenarios get `null` (clean), so growing a plan cannot leak faults there.
+ */
+export function phase1PlanIndex(i: number): number | null {
+  return i < PHASE1_SCENARIOS ? Math.floor(i / 2) : null;
+}
+
 const round2 = (x: number) => Math.round(x * 100) / 100;
 const byTs = (es: readonly AdasEvent[]) => [...es].sort((a, b) => a.ts - b.ts);
 
@@ -49,10 +57,11 @@ export function generate(o: GenOptions): GenResult {
     const id = `S${String(i + 1).padStart(3, '0')}`;
     const rng = createRng((o.seed + Math.imul(i + 1, 0x9e3779b9)) >>> 0);
     const kind = i < PHASE1_SCENARIOS ? (i % 2 === 0 ? 'ACC' : 'APA') : (['ACC', 'APA', 'LKA'] as const)[(i - PHASE1_SCENARIOS) % 3];
+    const slot = phase1PlanIndex(i);
     const sc = kind === 'ACC'
-      ? accScenario(id, rng, ACC_PLAN[i / 2] ?? null)
+      ? accScenario(id, rng, slot === null ? null : ACC_PLAN[slot] ?? null)
       : kind === 'APA'
-        ? apaScenario(id, rng, APA_PLAN[(i - 1) / 2] ?? null)
+        ? apaScenario(id, rng, slot === null ? null : APA_PLAN[slot] ?? null)
         : lkaScenario(id, rng, LKA_PLAN[Math.floor((i - PHASE1_SCENARIOS) / 3)] ?? null);
     for (const e of byTs(sc.events)) events.push(e);
     labels.push(...sc.labels);
