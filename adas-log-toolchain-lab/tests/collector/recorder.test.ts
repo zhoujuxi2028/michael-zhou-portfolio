@@ -130,6 +130,14 @@ describe('recorder: ts spikes', () => {
   });
 });
 
+describe('recorder: clip file names', () => {
+  it('replaces characters outside [A-Za-z0-9_.-] in the scenario part of the file name', () => {
+    const s = '../../etc/x y';
+    const [c] = record(byTs(ticks(0, 20000, s), [hit(8000, 0, s)]));
+    expect(c).toMatchObject({ file: '.._.._etc_x_y_8000_T-1.jsonl', scenarioId: s });
+  });
+});
+
 describe('recorder: manual trigger', () => {
   const manual = (ts: number, s = 'S1') => ev('SYS/MANUAL_TRIGGER', ts, s, { note: 'driver button' });
 

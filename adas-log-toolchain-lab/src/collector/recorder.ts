@@ -21,7 +21,7 @@ export interface RecorderOptions {
 }
 
 export interface Clip {
-  /** `<scenario>_<ts of first trigger>_<rule id | MANUAL>.jsonl` */
+  /** `<scenario>_<ts of first trigger>_<rule id | MANUAL>.jsonl`; characters outside `[A-Za-z0-9_.-]` become `_`. */
   file: string;
   scenarioId: string;
   trigger: 'rule' | 'manual';
@@ -43,6 +43,9 @@ export interface Recorder {
   /** Events held across all ring buffers. */
   bufferedEvents(): number;
 }
+
+/** File-name-safe scenario id: anything outside `[A-Za-z0-9_.-]` becomes `_` (no path separators). */
+const safeName = (s: string) => s.replace(/[^A-Za-z0-9_.-]/g, '_');
 
 export const DEFAULTS = { bufferMs: 10000, preMs: 5000, postMs: 5000 } as const;
 /** Added to pre + post for the default `maxClipMs`. */
@@ -103,7 +106,7 @@ export function createRecorder(opts: RecorderOptions, onClip: (c: Clip) => void)
     sc.buffer.pin(null);
     const startTs = truncated ? events.reduce((m, e) => Math.min(m, e.ts), Infinity) : Math.max(0, w.start);
     onClip({
-      file: `${id}_${w.labelTs}_${w.label}.jsonl`, scenarioId: id, trigger: w.trigger, ruleIds: w.ruleIds,
+      file: `${safeName(id)}_${w.labelTs}_${safeName(w.label)}.jsonl`, scenarioId: id, trigger: w.trigger, ruleIds: w.ruleIds,
       startTs, endTs: Math.min(w.end, sc.now), truncated, events: [...preconditions, ...events],
     });
   };
