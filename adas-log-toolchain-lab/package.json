@@ -9,7 +9,7 @@
   },
   "scripts": {
     "adas": "node src/cli.ts",
-    "demo": "node src/cli.ts gen --out out && node src/cli.ts parse out/events.jsonl --out out/anomalies.json && node src/cli.ts cases boundary --out out/cases && node src/cli.ts cases regression --anomalies out/anomalies.json --log out/events.jsonl --out out/cases && node src/cli.ts replay --manifest out/cases/manifest.json --out out/replay-report.json",
+    "demo": "node src/cli.ts gen --out out && node src/cli.ts record --source file --input out/events.jsonl --out out/clips && node src/cli.ts parse out/events.jsonl --out out/anomalies.json && node src/cli.ts cases boundary --out out/cases && node src/cli.ts cases regression --anomalies out/anomalies.json --log out/events.jsonl --out out/cases && node src/cli.ts replay --manifest out/cases/manifest.json --out out/replay-report.json",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
