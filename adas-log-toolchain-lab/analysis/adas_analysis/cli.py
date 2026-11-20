@@ -79,21 +79,28 @@ def _check_rows(doc, path):
     for i, row in enumerate(rows):
         _check_row(i, row, where)
     for field in ("events", "scenarios"):
-        _need_int(doc["meta"][field], f"meta.{field}", where)
+        _need_int(doc["meta"][field], f"meta.{field}", where, minimum=0)
+    for field in ("toolVersion", "rulesetVersion"):
+        if not isinstance(doc["meta"][field], str):
+            raise InputError(f"{where}: meta.{field} must be a string")
     counts = doc["dataQuality"]["counts"]
     if not isinstance(counts, dict):
         raise InputError(f"{where}: dataQuality.counts must be an object")
     for key in COUNT_KEYS:
         if key not in counts:
             raise InputError(f"{where}: dataQuality.counts.{key} is missing")
-        _need_int(counts[key], f"dataQuality.counts.{key}", where)
+        _need_int(counts[key], f"dataQuality.counts.{key}", where, minimum=0)
 
 
 def _check_replay(doc, path):
     where = f"replay file {path}"
     summary = doc["summary"]
     for field in ("total", "passed", "failed"):
-        _need_int(summary[field], f"summary.{field}", where)
+        _need_int(summary[field], f"summary.{field}", where, minimum=0)
+    if summary["passed"] + summary["failed"] != summary["total"]:
+        raise InputError(
+            f"{where}: summary.passed + summary.failed must equal summary.total"
+        )
     rate = summary["passRate"]
     if isinstance(rate, bool) or not isinstance(rate, (int, float)):
         raise InputError(f"{where}: summary.passRate must be a number")

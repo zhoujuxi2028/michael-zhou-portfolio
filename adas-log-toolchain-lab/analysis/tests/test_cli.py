@@ -210,3 +210,51 @@ def test_data_quality_counts_not_object(tmp_path, capsys):
         doc["dataQuality"]["counts"] = 5
     code, err = _run_mutated(tmp_path, capsys, mutate)
     assert code == 2 and "dataQuality.counts must be an object" in err
+
+
+@pytest.mark.parametrize("section,key", [
+    ("meta", "events"),
+    ("meta", "scenarios"),
+    ("counts", "invalidJson"),
+    ("counts", "schemaErrors"),
+    ("counts", "unknownEvents"),
+    ("counts", "outOfOrder"),
+])
+def test_negative_counts_rejected(tmp_path, capsys, section, key):
+    def mutate(doc):
+        target = doc["meta"] if section == "meta" else doc["dataQuality"]["counts"]
+        target[key] = -1
+    code, err = _run_mutated(tmp_path, capsys, mutate)
+    assert code == 2
+    assert f"{key} must be >= 0" in err
+    assert "Traceback" not in err
+
+
+@pytest.mark.parametrize("key", ["toolVersion", "rulesetVersion"])
+@pytest.mark.parametrize("value", [1, None, ["1.0"], True])
+def test_versions_must_be_strings(tmp_path, capsys, key, value):
+    def mutate(doc):
+        doc["meta"][key] = value
+    code, err = _run_mutated(tmp_path, capsys, mutate)
+    assert code == 2
+    assert f"meta.{key} must be a string" in err
+    assert "Traceback" not in err
+
+
+@pytest.mark.parametrize("key", ["total", "passed", "failed"])
+def test_replay_negative_counts(tmp_path, capsys, key):
+    def rmut(rdoc):
+        rdoc["summary"][key] = -1
+    code, err = _run_mutated(tmp_path, capsys, lambda d: None, rmut)
+    assert code == 2
+    assert f"summary.{key} must be >= 0" in err
+
+
+def test_replay_totals_must_add_up(tmp_path, capsys):
+    def rmut(rdoc):
+        s = rdoc["summary"]
+        s["total"] = s["passed"] + s["failed"] + 1
+    code, err = _run_mutated(tmp_path, capsys, lambda d: None, rmut)
+    assert code == 2
+    assert "summary.passed + summary.failed must equal summary.total" in err
+    assert "Traceback" not in err
