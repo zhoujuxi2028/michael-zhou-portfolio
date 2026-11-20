@@ -34,19 +34,19 @@
 
 > 可行性评估日期 2026-11-12。本机：Intel i5 4C / 16 GB；容器运行时 **OrbStack 2.2.5**（VM 上限 8 GB / 8 CPU，可调至 ~12 GB），k3d 集群 `portfolio-dev` 运行于其上；docker、k3d、kubectl、helm、terraform、az 已装；`az` 已登录 Azure Pass Sponsorship（Enabled）。
 
-| REQ ID | 标题 | 类型 | 优先级 | 可行性 | 依赖 | JD 映射 | 状态 |
-|--------|------|------|--------|--------|------|---------|------|
-| `REQ-DVP-001` | 全栈 DevOps 演示（Phase 1） | DEMO | P1 | — | — | CI/CD、IaC、K8s、监控 | ✅ Done |
-| `REQ-DVP-002` | Phase 2：告警、日志、指标、文档 | DEMO | P1 | 100% | 001 | 监控/日志/告警 | ✅ Done（PR #45） |
-| `REQ-DVP-003` | Phase 3：本地 DevSecOps 闭环（本地 registry + Trivy→Prometheus，替代 Azure） | FR | P1 | — | 002 | DevSecOps、漏洞管理、registry | ✅ Done（PR #65） |
-| `REQ-DVP-004` | README / CLAUDE.md 过期内容修正 | NFR | P1 | 100% | — | 知识分享、生命周期管理 | ✅ Done |
-| `REQ-DVP-005` | Incident / RCA postmortem 模板 + 案例 | DEMO | P2 | 95% | — | 故障排查、RCA、运维支持 | ✅ Done |
-| `REQ-DVP-006` | Azure Key Vault + External Secrets + K8s RBAC | FR | P2 | 75% | 003 | 安全访问管理、合规 | 🔲 Planned |
-| `REQ-DVP-007` | Dependabot 依赖与补丁自动化 | NFR | P2 | 95% | — | 补丁策略、漏洞管理 | ✅ Done（PR #56） |
-| `REQ-DVP-008` | Elastic 集成 / Loki vs Elastic 对比 | DEMO | P3 | 60%（部署）/ 100%（文档） | — | SCOM/Elastic | 🔲 Planned |
-| `REQ-DVP-009` | 数据管道 / DB 备份自动化 | FR | P3 | 85% | — | 数据库及数据管道、运维自动化 | 🔲 Planned |
-| `REQ-DVP-010` | OPA/Kyverno 策略即代码 | FR | P3 | 90% | — | 合规与安全策略、DevSecOps | 🔲 Planned |
-| `REQ-DVP-011` | Dev Container 标准化开发环境 | NFR | P1 | 95% | — | 自动化安装与配置；指导团队最佳实践 | ✅ Done |
+| REQ ID | 标题 | 类型 | 优先级 | 可行性 | 依赖 | 状态 |
+|--------|------|------|--------|--------|------|------|
+| `REQ-DVP-001` | 全栈 DevOps 演示（Phase 1） | DEMO | P1 | — | — | ✅ Done |
+| `REQ-DVP-002` | Phase 2：告警、日志、指标、文档 | DEMO | P1 | 100% | 001 | ✅ Done（PR #45） |
+| `REQ-DVP-003` | Phase 3：本地 DevSecOps 闭环（本地 registry + Trivy→Prometheus，替代 Azure） | FR | P1 | — | 002 | ✅ Done（PR #65） |
+| `REQ-DVP-004` | README / CLAUDE.md 过期内容修正 | NFR | P1 | 100% | — | ✅ Done |
+| `REQ-DVP-005` | Incident / RCA postmortem 模板 + 案例 | DEMO | P2 | 95% | — | ✅ Done |
+| `REQ-DVP-006` | Azure Key Vault + External Secrets + K8s RBAC | FR | P2 | 75% | 003 | 🔲 Planned |
+| `REQ-DVP-007` | Dependabot 依赖与补丁自动化 | NFR | P2 | 95% | — | ✅ Done（PR #56） |
+| `REQ-DVP-008` | Elastic 集成 / Loki vs Elastic 对比 | DEMO | P3 | 60%（部署）/ 100%（文档） | — | 🔲 Planned |
+| `REQ-DVP-009` | 数据管道 / DB 备份自动化 | FR | P3 | 85% | — | 🔲 Planned |
+| `REQ-DVP-010` | OPA/Kyverno 策略即代码 | FR | P3 | 90% | — | 🔲 Planned |
+| `REQ-DVP-011` | Dev Container 标准化开发环境 | NFR | P1 | 95% | — | ✅ Done |
 
 **整体风险：** k3d 同时运行 Prometheus 栈 + Loki + ArgoCD + Kyverno + Postgres（+ Elastic）约 8–12 GB，超出 OrbStack 8 GB 上限 → 按 REQ 分开演示、不用的组件缩到 0；必要时调高 `memory_mib`（宿主机仅剩 ~4 GB）或改用 Azure VM。
 
