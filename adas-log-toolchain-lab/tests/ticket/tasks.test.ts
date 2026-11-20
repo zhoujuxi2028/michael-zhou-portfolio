@@ -1,15 +1,17 @@
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { describe, expect, it } from 'vitest';
+import { afterAll, describe, expect, it } from 'vitest';
 import { RULES } from '../../src/rules/index.ts';
 import { resolveEpsilon, resolveRuleConfig } from '../../src/engine/engine.ts';
 import { generateTasks } from '../../src/ticket/tasks.ts';
 import type { Ticket } from '../../src/ticket/parse.ts';
 
 const root = fileURLToPath(new URL('../..', import.meta.url));
-const tmp = () => { mkdirSync(join(root, 'out'), { recursive: true }); return mkdtempSync(join(root, 'out', 'tk-')); };
+const dirs: string[] = [];
+const tmp = () => { mkdirSync(join(root, 'out'), { recursive: true }); const d = mkdtempSync(join(root, 'out', 'tk-')); dirs.push(d); return d; };
+afterAll(() => { for (const d of dirs) rmSync(d, { recursive: true, force: true }); });
 const tickets: Ticket[] = [
   { key: 'ADAS-1', summary: 'hmi', description: 'Steps:\n# a\nExpected:\n# b', components: ['HMI'], labels: ['rule:HMI-02'] },
   { key: 'ADAS-2', summary: 'acc', description: '', components: ['ACC'], labels: ['rule:ACC-01'] },
@@ -34,6 +36,18 @@ describe('generateTasks', () => {
     expect(existsSync(join(out, 'ADAS-3.json'))).toBe(false);
   });
 
+  it('removes stale outputs from a previous run but leaves unrelated files', async () => {
+    const out = tmp();
+    await generateTasks(tickets, out);
+    writeFileSync(join(out, 'keep.txt'), 'x');
+    await generateTasks(tickets.slice(1, 2), out);
+    expect(readdirSync(join(out, 'generated'))).toEqual(['ADAS-2.test.ts']);
+    expect(readdirSync(join(out, 'data')).every((f) => f.startsWith('ADAS-2-'))).toBe(true);
+    expect(existsSync(join(out, 'ADAS-1.json'))).toBe(false);
+    expect(readJson(join(out, 'unmapped.json'))).toEqual([]);
+    expect(existsSync(join(out, 'keep.txt'))).toBe(true);
+  });
+
   it('writes an empty unmapped.json when everything maps', async () => {
     const out = tmp();
     await generateTasks(tickets.slice(0, 2), out);
@@ -47,7 +61,7 @@ describe('generateTasks', () => {
     writeFileSync(join(gen, 'tsconfig.json'), JSON.stringify({ extends: relative(gen, join(root, 'tsconfig.json')), include: ['*.ts'] }));
     const tsc = spawnSync('npx', ['tsc', '--noEmit', '-p', join(gen, 'tsconfig.json')], { cwd: root, encoding: 'utf8' });
     expect(tsc.stdout + tsc.stderr).toBe('');
-    const run = (f: string) => spawnSync('npx', ['vitest', 'run', '--config', 'vitest.generated.config.ts', join(gen, f)], { cwd: root, encoding: 'utf8' }).status;
+    const run = (f: string) => spawnSync('npx', ['vitest', 'run', '--pool=threads', '--maxWorkers=1', '--config', 'vitest.generated.config.ts', join(gen, f)], { cwd: root, encoding: 'utf8' }).status;
     expect(run('ADAS-1.test.ts')).toBe(0);
     expect(run('ADAS-2.test.ts')).toBe(0);
     const p = join(gen, 'ADAS-1.test.ts');

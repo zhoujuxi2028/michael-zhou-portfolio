@@ -12,7 +12,8 @@ interface Step {
 interface Workflow {
   on: { push: { branches: string[]; paths: string[] }; workflow_dispatch: unknown };
   permissions: Record<string, string>;
-  jobs: Record<string, { steps: Step[]; needs?: string | string[]; environment?: unknown }>;
+  concurrency: { group: string; 'cancel-in-progress': boolean };
+  jobs: Record<string, { steps: Step[]; needs?: string | string[]; environment?: unknown; if?: string }>;
 }
 
 const root = new URL('../../../.github/workflows/', import.meta.url);
@@ -62,6 +63,32 @@ describe('adas-pages.yml', () => {
 
   it('writes the analysis output into the dashboard public dir', () => {
     expect(runs).toContain('dashboard/public/summary.json');
+  });
+
+  it('runs each pipeline step in the right directory with the right paths', () => {
+    const step = (needle: string) => {
+      const st = build?.steps.find((x) => x.run?.includes(needle));
+      expect(st, needle).toBeDefined();
+      return st as Step;
+    };
+    const lab = 'adas-log-toolchain-lab';
+    expect(step('cli.ts gen')['working-directory']).toBe(lab);
+    expect(step('cli.ts gen').run).toContain('cli.ts gen --out out');
+    expect(step('cli.ts parse')['working-directory']).toBe(lab);
+    expect(step('cases regression')['working-directory']).toBe(lab);
+    const analysis = step('python -m adas_analysis');
+    expect(analysis['working-directory']).toBe(`${lab}/analysis`);
+    expect(analysis.run).toContain('--anomalies ../out/anomalies.json');
+    expect(analysis.run).toContain('--replay ../out/replay-report.json');
+    expect(analysis.run).toContain('--out ../dashboard/public/summary.json');
+    const dash = step('npm run build');
+    expect(dash['working-directory']).toBe(`${lab}/dashboard`);
+    expect(dash.run).toContain('npm ci');
+  });
+
+  it('guards deploy behind ADAS_PAGES_ENABLED and never cancels an in-flight deploy', () => {
+    expect(wf.jobs.deploy?.if).toContain("vars.ADAS_PAGES_ENABLED == 'true'");
+    expect(wf.concurrency['cancel-in-progress']).toBe(false);
   });
 
   it('uploads the dashboard dist and deploys to Pages', () => {

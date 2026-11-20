@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { renderCaseTest, type CaseTestEntry } from '../casegen/template.ts';
@@ -15,6 +15,27 @@ export interface TaskSummary { mapped: number; unmapped: number }
 
 const writeJson = (path: string, data: unknown) => writeFile(path, `${JSON.stringify(data, null, 2)}\n`);
 
+/** Remove outputs of a previous run (data/, generated/, task JSON files, unmapped.json); unrelated files stay. */
+async function cleanStale(outDir: string): Promise<void> {
+  await rm(join(outDir, 'data'), { recursive: true, force: true });
+  await rm(join(outDir, 'generated'), { recursive: true, force: true });
+  await rm(join(outDir, 'unmapped.json'), { force: true });
+  let names: string[];
+  try {
+    names = await readdir(outDir);
+  } catch {
+    return;
+  }
+  for (const n of names.filter((f) => f.endsWith('.json'))) {
+    try {
+      const j = JSON.parse(await readFile(join(outDir, n), 'utf8')) as Record<string, unknown>;
+      if (typeof j.testFile === 'string' && typeof j.ruleId === 'string') await rm(join(outDir, n), { force: true });
+    } catch {
+      // not ours (unreadable or invalid JSON): leave it
+    }
+  }
+}
+
 /**
  * Write `<out>/<KEY>.json`, `data/<KEY>-<caseId>.jsonl`, `generated/<KEY>.test.ts` for mapped tickets
  * and `unmapped.json` for the rest. Repro data = the rule's boundary cases that must trigger.
@@ -28,6 +49,7 @@ export async function generateTasks(
   const config = opts.config ?? {};
   const dataDir = join(outDir, 'data');
   const genDir = join(outDir, 'generated');
+  await cleanStale(outDir);
   await mkdir(dataDir, { recursive: true });
   await mkdir(genDir, { recursive: true });
   const runnerImport = relative(genDir, RUNNER).replaceAll('\\', '/');

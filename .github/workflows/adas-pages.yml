@@ -15,7 +15,7 @@ permissions:
 
 concurrency:
   group: adas-pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -60,6 +60,8 @@ jobs:
   deploy:
     name: Deploy to GitHub Pages
     needs: build
+    # Deploy only once Pages is enabled (Settings > Pages > Source: GitHub Actions) and the repo variable is set.
+    if: ${{ vars.ADAS_PAGES_ENABLED == 'true' }}
     runs-on: ubuntu-latest
     environment:
       name: github-pages
