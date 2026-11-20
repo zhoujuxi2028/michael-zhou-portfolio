@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { createRecorder, type Clip, type RecorderOptions } from '../../src/collector/recorder.ts';
 import { ev, type AdasEvent } from '../../src/schema/events.ts';
-import { fakeRule } from './fake-rule.ts';
+import { fakeRule, fakeRule2 } from './fake-rule.ts';
 
 const track = (ts: number, s = 'S1') =>
   ev('ACC/TRACK', ts, s, { egoSpeed: 20, setSpeed: 20, leadDistance: null, leadRelSpeed: 0 });
-const hit = (ts: number, lag: number, s = 'S1') => ev('ACC/TAKEOVER_REQUEST', ts, s, { reason: `lag:${lag}` });
+const hit = (ts: number, lag: number, s = 'S1', rule = 'T-1') =>
+  ev('ACC/TAKEOVER_REQUEST', ts, s, { reason: `${rule}:${lag}` });
 const ticks = (from: number, to: number, s = 'S1') => {
   const out: AdasEvent[] = [];
   for (let ts = from; ts <= to; ts += 100) out.push(track(ts, s));
@@ -14,7 +15,7 @@ const ticks = (from: number, to: number, s = 'S1') => {
 /** Merge event lists by ts (stable: earlier lists first on ties). */
 const byTs = (...lists: AdasEvent[][]) => lists.flat().sort((a, b) => a.ts - b.ts);
 
-const OPTS: RecorderOptions = { bufferMs: 10000, preMs: 2000, postMs: 3000, rules: [fakeRule] };
+const OPTS: RecorderOptions = { bufferMs: 10000, preMs: 2000, postMs: 3000, rules: [fakeRule, fakeRule2] };
 
 function record(events: readonly AdasEvent[], opts: RecorderOptions = OPTS, eof = true): Clip[] {
   const clips: Clip[] = [];
@@ -51,5 +52,31 @@ describe('recorder: rule triggers', () => {
     const clips: Clip[] = [];
     const r = createRecorder({}, (c) => clips.push(c));
     expect(r.options).toEqual({ bufferMs: 10000, preMs: 5000, postMs: 5000 });
+  });
+});
+
+describe('recorder: merging', () => {
+  it('merges overlapping windows in a scenario; the file name uses the first trigger', () => {
+    const clips = record(byTs(ticks(0, 20000), [hit(8000, 1000), hit(10000, 500, 'S1', 'T-2'), hit(10500, 0)]));
+    expect(clips).toHaveLength(1);
+    expect(clips[0]).toMatchObject({ file: 'S1_7000_T-1.jsonl', ruleIds: ['T-1', 'T-2'], startTs: 5000, endTs: 13500 });
+    expect(range(clips[0] as Clip)).toEqual([5000, 13500]);
+  });
+
+  it('extends the start backwards when a later trigger starts earlier', () => {
+    const clips = record(byTs(ticks(0, 20000), [hit(8000, 0), hit(9000, 4000, 'S1', 'T-2')]));
+    expect(clips).toHaveLength(1);
+    expect(clips[0]).toMatchObject({ file: 'S1_8000_T-1.jsonl', startTs: 3000, endTs: 12000 });
+    expect(range(clips[0] as Clip)).toEqual([3000, 12000]);
+  });
+
+  it('keeps non-overlapping windows and other scenarios apart', () => {
+    const events = byTs(ticks(0, 30000), ticks(0, 30000, 'S2'), [hit(8000, 1000), hit(16000, 0), hit(8000, 1000, 'S2')]);
+    const clips = record(events);
+    expect(clips.map((c) => [c.file, c.startTs, c.endTs])).toEqual([
+      ['S1_7000_T-1.jsonl', 5000, 11000],
+      ['S2_7000_T-1.jsonl', 5000, 11000],
+      ['S1_16000_T-1.jsonl', 14000, 19000],
+    ]);
   });
 });

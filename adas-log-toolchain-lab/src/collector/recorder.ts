@@ -65,14 +65,26 @@ export function createRecorder(opts: RecorderOptions, onClip: (c: Clip) => void)
     });
   };
 
-  const onAnomaly = (a: Anomaly) => {
-    const sc = open(a.scenarioId);
-    sc.window = {
-      start: a.startTs - options.preMs, end: a.detectTs + options.postMs,
-      trigger: 'rule', label: a.ruleId, labelTs: a.startTs, ruleIds: [a.ruleId],
-    };
+  /** Start a window, or merge it into the one still recording when they overlap. */
+  const trigger = (id: string, next: Window) => {
+    const sc = open(id);
+    const w = sc.window;
+    if (w && next.start > w.end) close(id, sc);
+    if (sc.window) {
+      const cur = sc.window;
+      cur.start = Math.min(cur.start, next.start);
+      cur.end = Math.max(cur.end, next.end);
+      for (const r of next.ruleIds) if (!cur.ruleIds.includes(r)) cur.ruleIds.push(r);
+    } else {
+      sc.window = next;
+    }
     sc.buffer.pin(sc.window.start);
   };
+
+  const onAnomaly = (a: Anomaly) => trigger(a.scenarioId, {
+    start: a.startTs - options.preMs, end: a.detectTs + options.postMs,
+    trigger: 'rule', label: a.ruleId, labelTs: a.startTs, ruleIds: [a.ruleId],
+  });
 
   return {
     options,
