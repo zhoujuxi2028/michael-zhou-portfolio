@@ -57,3 +57,34 @@ describe('scanLines', () => {
     expect(r.quality.counts.outOfOrder).toBe(0);
   });
 });
+
+describe('scanLines review hardening', () => {
+  const brake = (ts: number, id = 'A') => JSON.stringify(ev('ACC/BRAKE_PEDAL', ts, id, { pressed: false }));
+
+  it('drops a late event for an ended scenario instead of reopening it', async () => {
+    const seen: number[] = [];
+    const r = await scanLines([brake(0), JSON.stringify(scenarioEnd('A', 100)), brake(50)], (e) => seen.push(e.ts));
+    expect(seen).toEqual([0, 100]);
+    expect(r.scenarios).toBe(1);
+    expect(r.quality.outOfOrder).toEqual([{ line: 3, scenarioId: 'A', ts: 50, prevTs: 100 }]);
+  });
+
+  it('still lets an ended id start a new instance at or after its end', async () => {
+    const r = await scanLines([brake(0), JSON.stringify(scenarioEnd('A', 100)), brake(100)], () => {});
+    expect(r.scenarios).toBe(2);
+    expect(hasQualityIssues(r.quality)).toBe(false);
+  });
+
+  it('ignores a UTF-8 BOM on the first line', async () => {
+    const r = await scanLines(['﻿' + brake(0)], () => {});
+    expect(r.events).toBe(1);
+    expect(hasQualityIssues(r.quality)).toBe(false);
+  });
+
+  it('bounds distinct unknown event keys', async () => {
+    const lines = ['A', 'B', 'C'].map((t) => JSON.stringify({ ts: 0, scenarioId: 'S', module: 'X', type: t, data: {} }));
+    const r = await scanLines([...lines, lines[0]!], () => {}, { maxIssues: 2 });
+    expect(r.quality.unknownEvents).toEqual({ 'X/A': 2, 'X/B': 1, '(other)': 1 });
+    expect(r.quality.counts.unknownEvents).toBe(4);
+  });
+});

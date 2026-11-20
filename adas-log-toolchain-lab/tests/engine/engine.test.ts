@@ -71,3 +71,9 @@ describe('triplet', () => {
     ]);
   });
 });
+
+describe('createEngine guards', () => {
+  it('rejects duplicate rule ids', () => {
+    expect(() => createEngine([probe, probe])).toThrow(/duplicate rule id/);
+  });
+});

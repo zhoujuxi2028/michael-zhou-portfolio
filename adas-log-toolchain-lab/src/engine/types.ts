@@ -24,7 +24,8 @@ export interface RuleCtx<S, C> {
   scenarioId: string;
   /** Max ts seen in this scenario (never moves backwards). */
   now: number;
-  state: S;
+  /** Per-scenario rule state: mutate it in place; reassigning `ctx.state` would be lost. */
+  readonly state: S;
   cfg: C;
 }
 

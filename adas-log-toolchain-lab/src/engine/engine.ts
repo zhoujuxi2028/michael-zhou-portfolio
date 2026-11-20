@@ -24,6 +24,8 @@ export interface Engine {
 interface ScenarioState { now: number; states: Map<string, unknown> }
 
 export function createEngine(rules: readonly AnyRule[], config: EngineConfig = {}): Engine {
+  const ids = rules.map((r) => r.id);
+  if (new Set(ids).size !== ids.length) throw new Error(`duplicate rule id in: ${ids.join(', ')}`);
   const cfgs = new Map(rules.map((r) => [r.id, resolveRuleConfig(r, config)] as const));
   const scenarios = new Map<string, ScenarioState>();
 
