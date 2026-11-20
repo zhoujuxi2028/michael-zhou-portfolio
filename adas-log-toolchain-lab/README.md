@@ -10,7 +10,7 @@ TypeScript toolchain for ADAS-style logs: generate synthetic data, record clips,
 
 Phases 1-4 implemented in release 0.2.0, ruleset 1.1.0 ([REQ-ADAS-01](https://github.com/zhoujuxi2028/michael-zhou-portfolio/issues/69)). Design: [spec](../docs/superpowers/specs/2026-11-20-adas-log-toolchain-design.md). Publishing the dashboard to GitHub Pages is pending: `.github/workflows/adas-pages.yml` only deploys when Pages is enabled (source: GitHub Actions) and the repository variable `ADAS_PAGES_ENABLED` is `true` (owner action, not done yet).
 
-Docs: [User guide](docs/user-guide.md) | [Development guide](docs/dev-guide.md) | [TDD evidence](docs/tdd.md)
+Docs: [User guide](docs/user-guide.md) | [Development guide](docs/dev-guide.md) | [TDD evidence](docs/tdd.md) | [Self-check 0.2.0](docs/self-check-0.2.0.md)
 
 ## Quick start
 
