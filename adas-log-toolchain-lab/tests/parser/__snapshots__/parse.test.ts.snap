@@ -1,0 +1,92 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`parseFile > matches the report snapshot 1`] = `
+{
+  "anomalies": [
+    {
+      "detectTs": 1500,
+      "endTs": 1050,
+      "evidence": {
+        "minDistance": 6.5,
+        "threshold": 10,
+      },
+      "message": "Following distance 6.50 m below threshold 10.00 m",
+      "module": "ACC",
+      "ruleId": "ACC-01",
+      "scenarioId": "G1",
+      "severity": "P1",
+      "startTs": 1000,
+    },
+    {
+      "detectTs": 2000,
+      "endTs": 2000,
+      "evidence": {},
+      "message": "Parking maneuver unfinished at scenario end",
+      "module": "APA",
+      "ruleId": "APA-02",
+      "scenarioId": "G2",
+      "severity": "P2",
+      "startTs": 0,
+    },
+    {
+      "detectTs": 500,
+      "endTs": 300,
+      "evidence": {
+        "expected": "MANEUVERING",
+        "feature": "APA",
+        "shown": null,
+      },
+      "message": "HMI did not show APA state MANEUVERING within 300 ms",
+      "module": "HMI",
+      "ruleId": "HMI-01",
+      "scenarioId": "G2",
+      "severity": "P2",
+      "startTs": 0,
+    },
+    {
+      "detectTs": 2000,
+      "endTs": 700,
+      "evidence": {
+        "minDistance": 0.25,
+      },
+      "message": "Obstacle at 0.25 m below 0.3 m without abort within 200 ms",
+      "module": "APA",
+      "ruleId": "APA-01",
+      "scenarioId": "G2",
+      "severity": "P1",
+      "startTs": 500,
+    },
+  ],
+  "dataQuality": {
+    "counts": {
+      "invalidJson": 0,
+      "outOfOrder": 0,
+      "schemaErrors": 0,
+      "unknownEvents": 0,
+    },
+    "invalidJson": [],
+    "outOfOrder": [],
+    "schemaErrors": [],
+    "unknownEvents": {},
+  },
+  "meta": {
+    "events": 10,
+    "input": "fixtures/golden/mixed.jsonl",
+    "rulesetVersion": "1.0.0",
+    "scenarios": 2,
+    "toolVersion": "0.1.0",
+  },
+  "summary": {
+    "byRule": {
+      "ACC-01": 1,
+      "APA-01": 1,
+      "APA-02": 1,
+      "HMI-01": 1,
+    },
+    "bySeverity": {
+      "P1": 2,
+      "P2": 2,
+    },
+  },
+}
+`;

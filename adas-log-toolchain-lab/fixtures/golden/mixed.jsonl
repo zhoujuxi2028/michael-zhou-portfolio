@@ -1,0 +1,10 @@
+{"ts":0,"scenarioId":"G1","module":"ACC","type":"STATE","data":{"from":"OFF","to":"ACTIVE","reason":"golden"}}
+{"ts":100,"scenarioId":"G1","module":"HMI","type":"DISPLAY","data":{"feature":"ACC","item":"STATE","value":"ACTIVE"}}
+{"ts":1000,"scenarioId":"G1","module":"ACC","type":"TRACK","data":{"egoSpeed":10,"setSpeed":10,"leadDistance":7,"leadRelSpeed":0}}
+{"ts":1050,"scenarioId":"G1","module":"ACC","type":"TRACK","data":{"egoSpeed":10,"setSpeed":10,"leadDistance":6.5,"leadRelSpeed":0}}
+{"ts":1500,"scenarioId":"G1","module":"ACC","type":"TRACK","data":{"egoSpeed":10,"setSpeed":10,"leadDistance":20,"leadRelSpeed":0}}
+{"ts":3000,"scenarioId":"G1","module":"SYS","type":"SCENARIO_END","data":{}}
+{"ts":0,"scenarioId":"G2","module":"APA","type":"STEP","data":{"step":"MANEUVERING","reason":"golden"}}
+{"ts":500,"scenarioId":"G2","module":"APA","type":"OBSTACLE","data":{"minDistance":0.25}}
+{"ts":600,"scenarioId":"G2","module":"APA","type":"OBSTACLE","data":{"minDistance":0.9}}
+{"ts":2000,"scenarioId":"G2","module":"SYS","type":"SCENARIO_END","data":{}}

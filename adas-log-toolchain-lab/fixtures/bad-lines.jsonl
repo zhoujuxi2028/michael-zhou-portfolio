@@ -1,0 +1,9 @@
+{"ts":0,"scenarioId":"B1","module":"ACC","type":"STATE","data":{"from":"OFF","to":"ACTIVE","reason":"x"}}
+{not json
+{"ts":10,"scenarioId":"B1","module":"ACC","type":"TRACK","data":{"egoSpeed":"fast","setSpeed":1,"leadDistance":null,"leadRelSpeed":0}}
+{"ts":20,"scenarioId":"B1","module":"RADAR","type":"POINTS","data":{}}
+
+{"ts":50,"scenarioId":"B1","module":"ACC","type":"BRAKE_PEDAL","data":{"pressed":false}}
+{"ts":40,"scenarioId":"B1","module":"ACC","type":"BRAKE_PEDAL","data":{"pressed":false}}
+{"ts":-1,"scenarioId":"B1","module":"ACC","type":"BRAKE_PEDAL","data":{"pressed":false}}
+{"ts":60,"scenarioId":"B1","module":"SYS","type":"SCENARIO_END","data":{}}

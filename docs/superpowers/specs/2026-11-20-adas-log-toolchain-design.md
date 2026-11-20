@@ -268,6 +268,9 @@ interface BoundaryCase {
 | zod 校验失败 | 跳过，记行号和错误路径 | `dataQuality.schemaErrors[]` |
 | 未知 `module` / `type` | 跳过并计数（向前兼容） | `dataQuality.unknownEvents` |
 | 场景内时间戳倒退 | 仍交给规则处理，并记录；场景"当前时间"不倒退（见 §6.1） | `dataQuality.outOfOrder[]` |
+| 场景已结束后到达、且时间早于 `SCENARIO_END` 的迟到事件 | 丢弃（不重新打开场景），记为倒退；时间不早于结束时刻的同 id 事件视为新场景实例 | `dataQuality.outOfOrder[]` |
+| 未知类型种类过多 | 最多记录 `maxIssues` 种（名称截断到 64 字符），其余计入 `(other)`；总数照常计数 | `dataQuality.unknownEvents` |
+| 首行 UTF-8 BOM | 忽略 | — |
 | 场景交错 | 支持，按 `scenarioId` 隔离状态 | — |
 | 空文件 / 全部坏行 | 正常输出，异常数 0 | `meta.events = 0` |
 | 单行超过 1 MB | 记为坏行 | `dataQuality.invalidJson[]` |
