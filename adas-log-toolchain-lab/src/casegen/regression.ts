@@ -1,11 +1,21 @@
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { Anomaly } from '../engine/types.ts';
+import { z } from 'zod';
+import { UsageError } from '../config.ts';
 import { toJsonl } from '../io/jsonl.ts';
 import { RULESET_VERSION, TOOL_VERSION } from '../version.ts';
 import { extractWindows } from './extract.ts';
 import { renderCaseTest, type CaseTestEntry } from './template.ts';
+
+/** The anomaly fields a regression case needs (the rest of anomalies.json is ignored). */
+const AnomaliesFile = z.object({
+  anomalies: z.array(z.object({
+    ruleId: z.string().min(1), scenarioId: z.string().min(1),
+    startTs: z.number().int(), detectTs: z.number().int(), message: z.string(),
+  })),
+});
+export type AnomalyRef = z.infer<typeof AnomaliesFile>['anomalies'][number];
 
 const RUNNER = fileURLToPath(new URL('./case-runner.ts', import.meta.url));
 
@@ -45,7 +55,7 @@ export interface RegressionResult {
 }
 
 /** `REG-<ruleId>-<scenarioId>-<startTs>`; repeated ids get `-2`, `-3`, … in input order. */
-export function regressionCaseIds(anomalies: readonly Anomaly[]): string[] {
+export function regressionCaseIds(anomalies: readonly Pick<AnomalyRef, 'ruleId' | 'scenarioId' | 'startTs'>[]): string[] {
   const seen = new Map<string, number>();
   return anomalies.map((a) => {
     const base = `REG-${a.ruleId}-${a.scenarioId}-${a.startTs}`;
@@ -55,9 +65,35 @@ export function regressionCaseIds(anomalies: readonly Anomaly[]): string[] {
   });
 }
 
+/** Read and validate anomalies.json; any problem is a usage error (exit 2). */
+export async function loadAnomalies(path: string): Promise<AnomalyRef[]> {
+  let text: string;
+  try {
+    text = await readFile(path, 'utf8');
+  } catch {
+    throw new UsageError(`anomalies file not found: ${path}`);
+  }
+  let raw: unknown;
+  try {
+    raw = JSON.parse(text);
+  } catch {
+    throw new UsageError(`anomalies file is not valid JSON: ${path}`);
+  }
+  const r = AnomaliesFile.safeParse(raw);
+  if (!r.success) {
+    throw new UsageError(`invalid anomalies file: ${r.error.issues.map((i) => `${i.path.map(String).join('.')}: ${i.message}`).join('; ')}`);
+  }
+  return r.data.anomalies;
+}
+
 /** Turn every anomaly into a self-contained regression case. */
 export async function buildRegressionCases(o: RegressionOptions): Promise<RegressionResult> {
-  const { anomalies } = JSON.parse(await readFile(o.anomalies, 'utf8')) as { anomalies: Anomaly[] };
+  const anomalies = await loadAnomalies(o.anomalies);
+  try {
+    await access(o.log);
+  } catch {
+    throw new UsageError(`log file not found: ${o.log}`);
+  }
   const ids = regressionCaseIds(anomalies);
   const windows = await extractWindows(o.log, anomalies.map((a) => ({
     scenarioId: a.scenarioId, from: Math.max(0, a.startTs - o.preMs), to: a.detectTs + o.postMs,

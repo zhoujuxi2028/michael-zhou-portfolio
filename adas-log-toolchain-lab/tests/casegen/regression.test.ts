@@ -3,6 +3,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { UsageError } from '../../src/config.ts';
 import { buildRegressionCases, regressionCaseIds } from '../../src/casegen/regression.ts';
 import type { Anomaly } from '../../src/engine/types.ts';
 import { toJsonl } from '../../src/io/jsonl.ts';
@@ -71,4 +72,16 @@ describe('buildRegressionCases', () => {
     expect(red.status).toBe(1);
     expect(red.stdout).toContain('1 failed');
   }, 60_000);
+
+  it.each([
+    ['missing anomalies file', (d: string) => ({ anomalies: join(d, 'nope.json') }), /anomalies file not found/],
+    ['invalid JSON', (d: string) => { writeFileSync(join(d, 'bad.json'), '{'); return { anomalies: join(d, 'bad.json') }; }, /not valid JSON/],
+    ['wrong shape', (d: string) => { writeFileSync(join(d, 'bad.json'), '{"anomalies":[{"ruleId":1}]}'); return { anomalies: join(d, 'bad.json') }; }, /invalid anomalies file/],
+    ['missing log file', (d: string) => ({ log: join(d, 'nope.jsonl') }), /log file not found/],
+  ])('rejects bad input with a UsageError: %s', async (_name, override, msg) => {
+    const f = await fixture();
+    const p = buildRegressionCases({ anomalies: f.anomalies, log: f.log, out: join(f.dir, 'cases'), preMs: 3000, postMs: 3000, ...override(f.dir) });
+    await expect(p).rejects.toThrow(UsageError);
+    await expect(p).rejects.toThrow(msg);
+  });
 });
