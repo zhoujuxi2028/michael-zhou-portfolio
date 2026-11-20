@@ -16,7 +16,9 @@ const ManifestSchema = z.object({
     source: z.string().min(1),
     window: z.tuple([z.number(), z.number()]),
     expect: z.object({ ruleId: z.string().min(1), triggered: z.boolean() }),
-  })),
+  })
+    .refine((c) => c.expect.ruleId === c.ruleId, { message: 'expect.ruleId must equal ruleId', path: ['expect', 'ruleId'] })
+    .refine((c) => c.window[0] <= c.window[1], { message: 'window[0] must be <= window[1]', path: ['window'] })),
 });
 
 /** Read and validate `manifest.json` (contract C1); any problem is a usage error (exit 2). */

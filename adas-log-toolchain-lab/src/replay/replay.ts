@@ -39,6 +39,17 @@ export function parseFilter(s: string | undefined): ReplayFilter | null {
   return { module: mod as FilterModule };
 }
 
+/**
+ * Why a FAIL result failed, for the CLI. The manifest guarantees `ruleId === expect.ruleId`, so on a
+ * clean run the expectation is the opposite of what happened.
+ */
+export function failReason(r: ReplayResult): string {
+  if (r.error !== undefined) return `error ${r.error}`;
+  const fired = `fired rules [${r.firedRules.join(', ')}]`;
+  if (r.dataQualityIssues) return `case data has ${r.dataQualityIssues} data quality issues; ${fired}`;
+  return `expected ${r.ruleId} ${r.firedRules.includes(r.ruleId) ? 'not to fire' : 'to fire'}; ${fired}`;
+}
+
 /** Module of a rule id, e.g. `APA-02` → `APA`. */
 const moduleOf = (ruleId: string) => ruleId.split('-')[0];
 

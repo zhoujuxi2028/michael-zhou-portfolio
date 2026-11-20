@@ -25,6 +25,16 @@ describe('adas-lab replay', () => {
     expect(c.out.join('\n')).toBe(`Replayed ${r.summary.total} cases: ${r.summary.total} passed, 0 failed (pass rate 100.0%) -> ${report}`);
   });
 
+  it('words the FAIL line for an expected-to-fire case', async () => {
+    const { dir, manifest } = await cases();
+    const m = JSON.parse(readFileSync(manifest, 'utf8')) as { cases: { caseId: string; ruleId: string; window: [number, number] }[] };
+    m.cases[0]!.window = [0, 0];
+    writeFileSync(manifest, JSON.stringify(m));
+    const c = capture();
+    expect(await main(['replay', '--manifest', manifest, '--out', join(dir, 'r.json')], c.io)).toBe(1);
+    expect(c.err.join('\n')).toContain(`FAIL ${m.cases[0]!.caseId}: expected ${m.cases[0]!.ruleId} to fire; fired rules []`);
+  });
+
   it('exits 1 and names failing cases when any case fails', async () => {
     const { dir, manifest } = await cases();
     const m = JSON.parse(readFileSync(manifest, 'utf8')) as { cases: { caseId: string; expect: { triggered: boolean } }[] };
@@ -32,7 +42,7 @@ describe('adas-lab replay', () => {
     writeFileSync(manifest, JSON.stringify(m));
     const c = capture();
     expect(await main(['replay', '--manifest', manifest, '--out', join(dir, 'r.json')], c.io)).toBe(1);
-    expect(c.err.join('\n')).toContain(`FAIL ${m.cases[0]!.caseId}`);
+    expect(c.err.join('\n')).toContain(`FAIL ${m.cases[0]!.caseId}: expected ${(m.cases[0] as unknown as { ruleId: string }).ruleId} not to fire; fired rules [`);
   });
 
   it('applies --filter module=<M>', async () => {
@@ -70,5 +80,19 @@ describe('adas-lab replay', () => {
     const c = capture();
     expect(await main(['replay', '--manifest', manifest, '--out', join(dir, 'r.json')], c.io)).toBe(2);
     expect(c.err.join('\n')).toMatch(/escapes the manifest directory/);
+  });
+
+  it.each([
+    ['ruleId differs from expect.ruleId', (c: Record<string, unknown>) => { c.expect = { ruleId: 'APA-01', triggered: true }; }, /expect\.ruleId/],
+    ['window[0] > window[1]', (c: Record<string, unknown>) => { c.window = [5000, 1000]; }, /window/],
+  ])('exits 2 for an inconsistent manifest case: %s', async (_n, edit, msg) => {
+    const { dir, manifest } = await cases();
+    const m = JSON.parse(readFileSync(manifest, 'utf8')) as { cases: Record<string, unknown>[] };
+    edit(m.cases[0]!);
+    writeFileSync(manifest, JSON.stringify(m));
+    const c = capture();
+    expect(await main(['replay', '--manifest', manifest, '--out', join(dir, 'r.json')], c.io)).toBe(2);
+    expect(c.err.join('\n')).toMatch(/invalid manifest/);
+    expect(c.err.join('\n')).toMatch(msg);
   });
 });

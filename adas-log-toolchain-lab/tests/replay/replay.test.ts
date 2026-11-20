@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 import type { Manifest, ManifestCase } from '../../src/casegen/regression.ts';
 import { UsageError } from '../../src/config.ts';
 import { toJsonl } from '../../src/io/jsonl.ts';
-import { parseFilter, replayManifest } from '../../src/replay/replay.ts';
+import { failReason, parseFilter, replayManifest, type ReplayResult } from '../../src/replay/replay.ts';
 import { ev, scenarioEnd } from '../../src/schema/events.ts';
 import { RULESET_VERSION, TOOL_VERSION } from '../../src/version.ts';
 
@@ -74,6 +74,16 @@ describe('replayManifest', () => {
     expect(report.summary.total).toBe(1);
     const none = await replayManifest(manifestDir(), { filter: parseFilter('module=LKA') });
     expect(none.summary).toEqual({ total: 0, passed: 0, failed: 0, passRate: 0 });
+  });
+});
+
+describe('failReason', () => {
+  const r = (o: Partial<ReplayResult>): ReplayResult => ({ caseId: 'C', ruleId: 'HMI-02', status: 'FAIL', firedRules: [], durationMs: 0, ...o });
+  it('names the error, the data quality issues, or the unmet expectation', () => {
+    expect(failReason(r({ error: 'ENOENT x' }))).toBe('error ENOENT x');
+    expect(failReason(r({ dataQualityIssues: 2, firedRules: ['HMI-02'] }))).toBe('case data has 2 data quality issues; fired rules [HMI-02]');
+    expect(failReason(r({ dataQualityIssues: 0 }))).toBe('expected HMI-02 to fire; fired rules []');
+    expect(failReason(r({ dataQualityIssues: 0, firedRules: ['ACC-01', 'HMI-02'] }))).toBe('expected HMI-02 not to fire; fired rules [ACC-01, HMI-02]');
   });
 });
 
