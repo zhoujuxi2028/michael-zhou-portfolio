@@ -15,6 +15,8 @@ export interface ReplayResult {
   status: 'PASS' | 'FAIL';
   firedRules: string[];
   durationMs: number;
+  /** Data quality issue count of the replayed case data; absent when the case could not be run. */
+  dataQualityIssues?: number;
   /** Set when the case could not be run (e.g. missing data file). */
   error?: string;
 }
@@ -37,6 +39,17 @@ export function parseFilter(s: string | undefined): ReplayFilter | null {
   return { module: mod as FilterModule };
 }
 
+/**
+ * Why a FAIL result failed, for the CLI. The manifest guarantees `ruleId === expect.ruleId`, so on a
+ * clean run the expectation is the opposite of what happened.
+ */
+export function failReason(r: ReplayResult): string {
+  if (r.error !== undefined) return `error ${r.error}`;
+  const fired = `fired rules [${r.firedRules.join(', ')}]`;
+  if (r.dataQualityIssues) return `case data has ${r.dataQualityIssues} data quality issues; ${fired}`;
+  return `expected ${r.ruleId} ${r.firedRules.includes(r.ruleId) ? 'not to fire' : 'to fire'}; ${fired}`;
+}
+
 /** Module of a rule id, e.g. `APA-02` → `APA`. */
 const moduleOf = (ruleId: string) => ruleId.split('-')[0];
 
@@ -49,15 +62,19 @@ export async function replayManifest(manifestPath: string, opts: { filter?: Repl
   for (const c of manifest.cases) {
     if (filter && moduleOf(c.ruleId) !== filter.module) continue;
     const t0 = performance.now();
-    let firedRules: string[] = [], error: string | undefined;
+    let firedRules: string[] = [], dataQualityIssues: number | undefined, error: string | undefined;
     try {
-      firedRules = (await runCaseFile(resolve(base, c.source), { window: c.window })).firedRules;
+      ({ firedRules, dataQualityIssues } = await runCaseFile(resolve(base, c.source), { window: c.window }));
     } catch (e) {
       error = e instanceof Error ? e.message : String(e);
     }
     const durationMs = Math.round((performance.now() - t0) * 100) / 100;
-    const pass = error === undefined && firedRules.includes(c.expect.ruleId) === c.expect.triggered;
-    results.push({ caseId: c.caseId, ruleId: c.ruleId, status: pass ? 'PASS' : 'FAIL', firedRules, durationMs, ...(error === undefined ? {} : { error }) });
+    // Same criterion as the generated tests: clean data and the target rule fires as expected.
+    const pass = error === undefined && dataQualityIssues === 0 && firedRules.includes(c.expect.ruleId) === c.expect.triggered;
+    results.push({
+      caseId: c.caseId, ruleId: c.ruleId, status: pass ? 'PASS' : 'FAIL', firedRules, durationMs,
+      ...(dataQualityIssues === undefined ? {} : { dataQualityIssues }), ...(error === undefined ? {} : { error }),
+    });
   }
   const passed = results.filter((r) => r.status === 'PASS').length;
   const total = results.length;

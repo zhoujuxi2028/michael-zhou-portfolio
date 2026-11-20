@@ -1,8 +1,8 @@
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, onTestFinished } from 'vitest';
 import { UsageError } from '../../src/config.ts';
 import { buildRegressionCases, regressionCaseIds } from '../../src/casegen/regression.ts';
 import type { Anomaly } from '../../src/engine/types.ts';
@@ -53,6 +53,8 @@ describe('buildRegressionCases', () => {
     const { log, anomalies } = await fixture();
     mkdirSync(join(root, 'out'), { recursive: true });
     const out = mkdtempSync(join(root, 'out', 'reg-'));
+    // Must live under the project root (generated config + node_modules), so remove it afterwards.
+    onTestFinished(() => rmSync(out, { recursive: true, force: true }));
     const { manifest, testPath } = await buildRegressionCases({ anomalies, log, out, preMs: 3000, postMs: 3000 });
     expect(testPath).toBe(join(out, 'generated', 'regression.test.ts'));
     const src = readFileSync(testPath, 'utf8');

@@ -1,7 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { generate, MIN_SCENARIOS } from '../../src/generator/generate.ts';
+import { generate, MIN_SCENARIOS, phase1PlanIndex } from '../../src/generator/generate.ts';
 import { toJsonl } from '../../src/io/jsonl.ts';
 import { parseLine } from '../../src/schema/validate.ts';
+
+describe('phase1PlanIndex', () => {
+  it('maps the Phase 1 scenarios (even ACC, odd APA) to plan slots and nothing after them', () => {
+    expect([0, 1, 2, 3, 4, 5, 6, 7].map(phase1PlanIndex)).toEqual([0, 0, 1, 1, 2, 2, 3, 3]);
+    // Later scenarios must never draw from the ACC / APA plans, even if a plan grows.
+    for (const i of [8, 9, 10, 12, 13, 19]) expect(phase1PlanIndex(i)).toBeNull();
+  });
+});
 
 describe('generate', () => {
   it('is deterministic for the same seed', () => {

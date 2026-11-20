@@ -1,11 +1,11 @@
-import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { appendFileSync, mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import type { Manifest, ManifestCase } from '../../src/casegen/regression.ts';
 import { UsageError } from '../../src/config.ts';
 import { toJsonl } from '../../src/io/jsonl.ts';
-import { parseFilter, replayManifest } from '../../src/replay/replay.ts';
+import { failReason, parseFilter, replayManifest, type ReplayResult } from '../../src/replay/replay.ts';
 import { ev, scenarioEnd } from '../../src/schema/events.ts';
 import { RULESET_VERSION, TOOL_VERSION } from '../../src/version.ts';
 
@@ -35,9 +35,9 @@ describe('replayManifest', () => {
     const manifest = manifestDir();
     const report = await replayManifest(manifest);
     expect(report.meta).toEqual({ toolVersion: TOOL_VERSION, rulesetVersion: RULESET_VERSION, manifest, filter: null });
-    expect(report.results.map(({ caseId, ruleId, status, firedRules }) => ({ caseId, ruleId, status, firedRules }))).toEqual([
-      { caseId: 'REG-HMI-02-S1-1000', ruleId: 'HMI-02', status: 'PASS', firedRules: ['HMI-02'] },
-      { caseId: 'REG-APA-02-S2-0', ruleId: 'APA-02', status: 'PASS', firedRules: ['APA-02'] },
+    expect(report.results.map(({ caseId, ruleId, status, firedRules, dataQualityIssues }) => ({ caseId, ruleId, status, firedRules, dataQualityIssues }))).toEqual([
+      { caseId: 'REG-HMI-02-S1-1000', ruleId: 'HMI-02', status: 'PASS', firedRules: ['HMI-02'], dataQualityIssues: 0 },
+      { caseId: 'REG-APA-02-S2-0', ruleId: 'APA-02', status: 'PASS', firedRules: ['APA-02'], dataQualityIssues: 0 },
     ]);
     for (const r of report.results) expect(r.durationMs).toBeGreaterThanOrEqual(0);
     expect(report.summary).toEqual({ total: 2, passed: 2, failed: 0, passRate: 1 });
@@ -47,6 +47,14 @@ describe('replayManifest', () => {
     const report = await replayManifest(manifestDir((cs) => { cs[1]!.expect.triggered = false; }));
     expect(report.results.map((r) => r.status)).toEqual(['PASS', 'FAIL']);
     expect(report.summary).toEqual({ total: 2, passed: 1, failed: 1, passRate: 0.5 });
+  });
+
+  it('marks a case FAIL when its data has data quality issues even though the rule fires (same criterion as generated tests)', async () => {
+    const manifest = manifestDir();
+    appendFileSync(join(manifest, '..', 'data', 'hmi.jsonl'), '{bad json\n');
+    const report = await replayManifest(manifest);
+    expect(report.results[0]).toMatchObject({ status: 'FAIL', firedRules: ['HMI-02'], dataQualityIssues: 1 });
+    expect(report.results[1]).toMatchObject({ status: 'PASS', dataQualityIssues: 0 });
   });
 
   it('applies the window: events outside it are not replayed', async () => {
@@ -66,6 +74,16 @@ describe('replayManifest', () => {
     expect(report.summary.total).toBe(1);
     const none = await replayManifest(manifestDir(), { filter: parseFilter('module=LKA') });
     expect(none.summary).toEqual({ total: 0, passed: 0, failed: 0, passRate: 0 });
+  });
+});
+
+describe('failReason', () => {
+  const r = (o: Partial<ReplayResult>): ReplayResult => ({ caseId: 'C', ruleId: 'HMI-02', status: 'FAIL', firedRules: [], durationMs: 0, ...o });
+  it('names the error, the data quality issues, or the unmet expectation', () => {
+    expect(failReason(r({ error: 'ENOENT x' }))).toBe('error ENOENT x');
+    expect(failReason(r({ dataQualityIssues: 2, firedRules: ['HMI-02'] }))).toBe('case data has 2 data quality issues; fired rules [HMI-02]');
+    expect(failReason(r({ dataQualityIssues: 0 }))).toBe('expected HMI-02 to fire; fired rules []');
+    expect(failReason(r({ dataQualityIssues: 0, firedRules: ['ACC-01', 'HMI-02'] }))).toBe('expected HMI-02 not to fire; fired rules [ACC-01, HMI-02]');
   });
 });
 
