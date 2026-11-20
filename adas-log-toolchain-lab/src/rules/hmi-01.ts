@@ -3,7 +3,7 @@ import { ev, scenarioEnd, type AdasEvent, type HmiFeature } from '../schema/even
 import { triplet } from './boundary.ts';
 
 type Cfg = { displayWindowMs: number };
-type Pending = { expected: string; startTs: number; deadline: number; lastShown: string | null };
+type Pending = { expected: string; startTs: number; deadline: number; lastShown: string | null; lastShownTs: number };
 type State = { pending: Map<HmiFeature, Pending> };
 
 const meta = { id: 'HMI-01', module: 'HMI', severity: 'P2' } as const;
@@ -43,10 +43,14 @@ export const hmi01: Rule<State, Cfg> = {
     }
     const change = stateChange(e);
     if (change) {
-      pending.set(change.feature, { expected: change.value, startTs: e.ts, deadline: e.ts + ctx.cfg.displayWindowMs, lastShown: null });
+      pending.set(change.feature, { expected: change.value, startTs: e.ts, deadline: e.ts + ctx.cfg.displayWindowMs, lastShown: null, lastShownTs: -1 });
     } else if (e.module === 'HMI' && e.type === 'DISPLAY' && e.data.item === 'STATE') {
       const p = pending.get(e.data.feature);
-      if (p && e.ts <= p.deadline) p.lastShown = e.data.value;
+      // Only displays inside [startTs, deadline] count; the one with the latest ts wins.
+      if (p && e.ts >= p.startTs && e.ts <= p.deadline && e.ts >= p.lastShownTs) {
+        p.lastShown = e.data.value;
+        p.lastShownTs = e.ts;
+      }
     }
     return out;
   },

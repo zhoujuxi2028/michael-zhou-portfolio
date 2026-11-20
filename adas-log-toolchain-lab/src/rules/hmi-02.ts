@@ -30,7 +30,7 @@ export const hmi02: Rule<State, Cfg> = {
     }
     if (e.module === 'ACC' && e.type === 'TAKEOVER_REQUEST') {
       s.pending ??= { startTs: e.ts, deadline: e.ts + ctx.cfg.takeoverWindowMs };
-    } else if (e.module === 'HMI' && e.type === 'DISPLAY' && e.data.item === 'TAKEOVER' && s.pending && e.ts <= s.pending.deadline) {
+    } else if (e.module === 'HMI' && e.type === 'DISPLAY' && e.data.item === 'TAKEOVER' && s.pending && e.ts >= s.pending.startTs && e.ts <= s.pending.deadline) {
       s.pending = null;
     }
     return out;

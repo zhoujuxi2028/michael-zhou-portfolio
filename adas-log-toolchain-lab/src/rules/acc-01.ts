@@ -41,7 +41,9 @@ export const acc01: Rule<State, Cfg> = {
     if (d >= threshold) return out;
     const cur = ctx.state.open;
     if (cur) {
-      cur.lastHitTs = e.ts;
+      // Out-of-order hits may only widen the episode, never shrink it.
+      cur.startTs = Math.min(cur.startTs, e.ts);
+      cur.lastHitTs = Math.max(cur.lastHitTs, e.ts);
       cur.minDistance = Math.min(cur.minDistance, d);
     } else {
       ctx.state.open = { startTs: e.ts, lastHitTs: e.ts, minDistance: d, threshold };

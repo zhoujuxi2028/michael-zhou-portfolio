@@ -49,3 +49,15 @@ describe('HMI-01 HMI state mismatch', () => {
     ]);
   });
 });
+
+describe('HMI-01 out-of-order input', () => {
+  it('ignores a late-arriving display timestamped before the change', () => {
+    const out = run([hmi01], [acc(1000, 'ACTIVE'), show(900, 'ACC', 'ACTIVE'), tick(1350), scenarioEnd(S, 2000)]);
+    expect(out.map((a) => a.evidence['shown'])).toEqual([null]);
+  });
+
+  it('keeps the display with the latest ts, not the last to arrive', () => {
+    const out = run([hmi01], [acc(1000, 'ACTIVE'), show(1200, 'ACC', 'ACTIVE'), show(1100, 'ACC', 'STANDBY'), scenarioEnd(S, 2000)]);
+    expect(out).toEqual([]);
+  });
+});

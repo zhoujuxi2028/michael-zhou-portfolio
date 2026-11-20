@@ -54,3 +54,10 @@ describe('ACC-01 following distance too short', () => {
     expect(run([acc01], events, { rules: { 'ACC-01': { timeGapS: 1.5 } } })).toHaveLength(1);
   });
 });
+
+describe('ACC-01 out-of-order input', () => {
+  it('does not split an episode when a late hit arrives', () => {
+    const events: AdasEvent[] = [active(), track(1000, 20, 10), track(1100, 20, 10), track(1050, 20, 10), track(1300, 20, 10), scenarioEnd(S, 3000)];
+    expect(brief(run([acc01], events))).toEqual([{ ruleId: 'ACC-01', scenarioId: S, startTs: 1000, endTs: 1300, detectTs: 3000 }]);
+  });
+});

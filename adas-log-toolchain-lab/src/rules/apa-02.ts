@@ -37,8 +37,8 @@ export const apa02: Rule<State, Cfg> = {
   onScenarioEnd(ctx) {
     const m = ctx.state.maneuver;
     ctx.state.maneuver = null;
+    // A timeout was already reported by onEvent (SCENARIO_END runs onEvent first with the same `now`).
     if (!m || m.reported) return [];
-    if (ctx.now > m.deadline) return [timeout(ctx, m)];
     return [anomaly(meta, ctx, { startTs: m.startTs, endTs: ctx.now, message: 'Parking maneuver unfinished at scenario end' })];
   },
 

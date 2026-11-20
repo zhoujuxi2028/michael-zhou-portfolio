@@ -29,3 +29,9 @@ describe('HMI-02 takeover request not shown', () => {
     expect(run([hmi02], [req(1000), scenarioEnd(S, 1100)])).toHaveLength(1);
   });
 });
+
+describe('HMI-02 out-of-order input', () => {
+  it('ignores a late-arriving display timestamped before the request', () => {
+    expect(run([hmi02], [req(1000), shown(900), scenarioEnd(S, 2000)])).toHaveLength(1);
+  });
+});
