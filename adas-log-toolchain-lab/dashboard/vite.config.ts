@@ -1,3 +1,4 @@
 import { defineConfig } from 'vite';
 
-export default defineConfig({ base: './' });
+// Relative base so the build works under any GitHub Pages sub-path.
+export default defineConfig({ base: './', build: { chunkSizeWarningLimit: 600 } });
