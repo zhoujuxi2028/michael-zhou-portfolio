@@ -28,6 +28,16 @@ describe('matchLabels', () => {
     expect(r).toMatchObject({ matched: 1, precision: 1, recall: 0.5 });
   });
 
+  it('finds the optimal assignment where greedy matching would miss', () => {
+    const r = matchLabels(
+      [a('S1', 'ACC-01', 0, 100), a('S1', 'ACC-01', 50, 60)],
+      [l('S1', 'ACC-01', 50, 60), l('S1', 'ACC-01', 0, 10)],
+    );
+    expect(r).toMatchObject({ matched: 2, precision: 1, recall: 1 });
+    expect(r.unmatchedAnomalies).toEqual([]);
+    expect(r.unmatchedLabels).toEqual([]);
+  });
+
   it('defines precision and recall as 1 for empty sets', () => {
     expect(matchLabels([], [])).toMatchObject({ precision: 1, recall: 1 });
   });
