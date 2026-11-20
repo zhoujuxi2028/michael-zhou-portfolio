@@ -99,3 +99,24 @@ describe('recorder: manual trigger', () => {
     expect(clips[0]).toMatchObject({ file: 'S1_8000_MANUAL.jsonl', trigger: 'manual', ruleIds: ['T-1'], endTs: 12000 });
   });
 });
+
+describe('recorder: truncation', () => {
+  const short = { ...OPTS, bufferMs: 3000, preMs: 5000 };
+
+  it('truncates and flags a window that starts before the buffered data', () => {
+    const clips = record(byTs(ticks(0, 20000), [hit(10000, 0)]), short);
+    expect(clips[0]).toMatchObject({ startTs: 7000, endTs: 13000, truncated: true });
+    expect(range(clips[0] as Clip)).toEqual([7000, 13000]);
+  });
+
+  it('does not flag a window that only reaches before the first event of the scenario', () => {
+    const clips = record(byTs(ticks(4000, 20000), [hit(6000, 0)]), short);
+    expect(clips[0]).toMatchObject({ startTs: 1000, truncated: false });
+    expect(range(clips[0] as Clip)).toEqual([4000, 9000]);
+  });
+
+  it('clamps a negative window start to 0', () => {
+    const clips = record(byTs(ticks(0, 20000), [hit(1000, 0)]), short);
+    expect(clips[0]).toMatchObject({ startTs: 0, truncated: false });
+  });
+});

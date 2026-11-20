@@ -57,11 +57,16 @@ export function createRecorder(opts: RecorderOptions, onClip: (c: Clip) => void)
     const w = sc.window;
     if (!w) return;
     sc.window = null;
-    sc.buffer.pin(null);
+    // Extract before unpinning: unpinning evicts anything older than bufferMs.
     const events = sc.buffer.events().filter((e) => e.ts >= w.start && e.ts <= w.end);
+    // The pin stops eviction at w.start, so data inside the window was lost only if it was
+    // evicted before the window opened (or before a merge moved the start back).
+    const truncated = w.start <= sc.buffer.evictedUpTo();
+    sc.buffer.pin(null);
+    const startTs = truncated ? events.reduce((m, e) => Math.min(m, e.ts), Infinity) : Math.max(0, w.start);
     onClip({
       file: `${id}_${w.labelTs}_${w.label}.jsonl`, scenarioId: id, trigger: w.trigger, ruleIds: w.ruleIds,
-      startTs: Math.max(0, w.start), endTs: Math.min(w.end, sc.now), truncated: false, events,
+      startTs, endTs: Math.min(w.end, sc.now), truncated, events,
     });
   };
 
