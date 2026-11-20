@@ -1,8 +1,8 @@
 import { spawnSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, onTestFinished } from 'vitest';
 import { renderCaseTest, type CaseTestEntry } from '../../src/casegen/template.ts';
 import { toJsonl } from '../../src/io/jsonl.ts';
 import { ev, scenarioEnd } from '../../src/schema/events.ts';
@@ -32,7 +32,10 @@ describe('renderCaseTest', () => {
 
   it('produces a test that type-checks and runs green (and red when expectation is wrong)', () => {
     mkdirSync(join(root, 'out'), { recursive: true });
-    const dir = join(mkdtempSync(join(root, 'out', 'tpl-')), 'generated');
+    const tmp = mkdtempSync(join(root, 'out', 'tpl-'));
+    // Must live under the project root (generated config + node_modules), so remove it afterwards.
+    onTestFinished(() => rmSync(tmp, { recursive: true, force: true }));
+    const dir = join(tmp, 'generated');
     mkdirSync(join(dir, 'data'), { recursive: true });
     const S = 'S1';
     writeFileSync(join(dir, 'data', 'c.jsonl'), toJsonl([ev('ACC/TAKEOVER_REQUEST', 1000, S, { reason: 't' }), scenarioEnd(S, 2000)]));
