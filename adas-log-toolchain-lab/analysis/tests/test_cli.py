@@ -3,6 +3,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
 from adas_analysis.cli import main
 
 DATA = Path(__file__).parent / "data"
@@ -108,3 +110,103 @@ def test_anomalies_must_be_a_list(tmp_path, capsys):
     bad.write_text(json.dumps(doc))
     assert main(["--anomalies", str(bad), "--out", str(tmp_path / "s.json")]) == 2
     assert "must be a list" in capsys.readouterr().err
+
+
+def _run_mutated(tmp_path, capsys, mutate, replay_mutate=None):
+    doc = json.loads(Path(ANOMALIES).read_text())
+    mutate(doc)
+    bad = tmp_path / "bad.json"
+    bad.write_text(json.dumps(doc))
+    argv = ["--anomalies", str(bad), "--out", str(tmp_path / "s.json")]
+    if replay_mutate:
+        rdoc = json.loads(Path(REPLAY).read_text())
+        replay_mutate(rdoc)
+        rbad = tmp_path / "r.json"
+        rbad.write_text(json.dumps(rdoc))
+        argv += ["--replay", str(rbad)]
+    code = main(argv)
+    return code, capsys.readouterr().err
+
+
+def _set_row(i, key, value):
+    def mutate(doc):
+        doc["anomalies"][i][key] = value
+    return mutate
+
+
+@pytest.mark.parametrize("key,value,expected", [
+    ("startTs", "12", "anomalies[3].startTs must be an integer"),
+    ("startTs", True, "anomalies[3].startTs must be an integer"),
+    ("startTs", 1.5, "anomalies[3].startTs must be an integer"),
+    ("startTs", -1, "anomalies[3].startTs must be >= 0"),
+    ("endTs", "x", "anomalies[3].endTs must be an integer"),
+    ("detectTs", None, "anomalies[3].detectTs must be an integer"),
+    ("severity", "P3", "anomalies[3].severity must be one of P1, P2"),
+    ("ruleId", "", "anomalies[3].ruleId must be a non-empty string"),
+    ("ruleId", 5, "anomalies[3].ruleId must be a non-empty string"),
+    ("module", 5, "anomalies[3].module must be a string"),
+    ("scenarioId", None, "anomalies[3].scenarioId must be a string"),
+])
+def test_anomaly_field_types(tmp_path, capsys, key, value, expected):
+    code, err = _run_mutated(tmp_path, capsys, _set_row(3, key, value))
+    assert code == 2
+    assert expected in err
+    assert "Traceback" not in err
+
+
+def test_row_must_be_object(tmp_path, capsys):
+    def mutate(doc):
+        doc["anomalies"][1] = 7
+    code, err = _run_mutated(tmp_path, capsys, mutate)
+    assert code == 2 and "anomalies[1]" in err
+
+
+@pytest.mark.parametrize("path,expected", [
+    (("meta", "events"), "meta.events must be an integer"),
+    (("meta", "scenarios"), "meta.scenarios must be an integer"),
+])
+def test_meta_counts_must_be_int(tmp_path, capsys, path, expected):
+    def mutate(doc):
+        doc[path[0]][path[1]] = "3"
+    code, err = _run_mutated(tmp_path, capsys, mutate)
+    assert code == 2 and expected in err
+
+
+def test_data_quality_counts_empty(tmp_path, capsys):
+    def mutate(doc):
+        doc["dataQuality"]["counts"] = {}
+    code, err = _run_mutated(tmp_path, capsys, mutate)
+    assert code == 2
+    assert "dataQuality.counts.invalidJson" in err
+    assert "Traceback" not in err
+
+
+def test_data_quality_counts_wrong_type(tmp_path, capsys):
+    def mutate(doc):
+        doc["dataQuality"]["counts"]["outOfOrder"] = "1"
+    code, err = _run_mutated(tmp_path, capsys, mutate)
+    assert code == 2
+    assert "dataQuality.counts.outOfOrder must be an integer" in err
+
+
+@pytest.mark.parametrize("key,value,expected", [
+    ("total", "2", "summary.total must be an integer"),
+    ("passed", 1.0, "summary.passed must be an integer"),
+    ("failed", True, "summary.failed must be an integer"),
+    ("passRate", "0.5", "summary.passRate must be a number"),
+    ("passRate", 1.5, "summary.passRate must be between 0 and 1"),
+    ("passRate", -0.1, "summary.passRate must be between 0 and 1"),
+])
+def test_replay_summary_types(tmp_path, capsys, key, value, expected):
+    def rmut(rdoc):
+        rdoc["summary"][key] = value
+    code, err = _run_mutated(tmp_path, capsys, lambda d: None, rmut)
+    assert code == 2
+    assert "replay" in err and expected in err
+
+
+def test_data_quality_counts_not_object(tmp_path, capsys):
+    def mutate(doc):
+        doc["dataQuality"]["counts"] = 5
+    code, err = _run_mutated(tmp_path, capsys, mutate)
+    assert code == 2 and "dataQuality.counts must be an object" in err

@@ -37,18 +37,68 @@ def _load(path, kind, required):
 
 
 ROW_FIELDS = ("ruleId", "module", "severity", "scenarioId", "startTs")
+SEVERITIES = ("P1", "P2")
+COUNT_KEYS = ("invalidJson", "schemaErrors", "unknownEvents", "outOfOrder")
+
+
+def _is_int(value):
+    return isinstance(value, int) and not isinstance(value, bool)
+
+
+def _need_int(value, name, where, minimum=None):
+    if not _is_int(value):
+        raise InputError(f"{where}: {name} must be an integer")
+    if minimum is not None and value < minimum:
+        raise InputError(f"{where}: {name} must be >= {minimum}")
+
+
+def _check_row(i, row, where):
+    for field in ROW_FIELDS:
+        if not isinstance(row, dict) or field not in row:
+            raise InputError(f"{where}: anomalies[{i}] is missing '{field}'")
+    name = f"anomalies[{i}]"
+    if not isinstance(row["ruleId"], str) or not row["ruleId"]:
+        raise InputError(f"{where}: {name}.ruleId must be a non-empty string")
+    for field in ("module", "scenarioId"):
+        if not isinstance(row[field], str):
+            raise InputError(f"{where}: {name}.{field} must be a string")
+    if row["severity"] not in SEVERITIES:
+        raise InputError(
+            f"{where}: {name}.severity must be one of {', '.join(SEVERITIES)}"
+        )
+    for field in ("startTs", "endTs", "detectTs"):
+        if field in row:
+            _need_int(row[field], f"{name}.{field}", where, minimum=0)
 
 
 def _check_rows(doc, path):
+    where = f"anomalies file {path}"
     rows = doc["anomalies"]
     if not isinstance(rows, list):
         raise InputError(f"anomalies file: 'anomalies' must be a list: {path}")
     for i, row in enumerate(rows):
-        for field in ROW_FIELDS:
-            if not isinstance(row, dict) or field not in row:
-                raise InputError(
-                    f"anomalies file: anomalies[{i}] is missing '{field}': {path}"
-                )
+        _check_row(i, row, where)
+    for field in ("events", "scenarios"):
+        _need_int(doc["meta"][field], f"meta.{field}", where)
+    counts = doc["dataQuality"]["counts"]
+    if not isinstance(counts, dict):
+        raise InputError(f"{where}: dataQuality.counts must be an object")
+    for key in COUNT_KEYS:
+        if key not in counts:
+            raise InputError(f"{where}: dataQuality.counts.{key} is missing")
+        _need_int(counts[key], f"dataQuality.counts.{key}", where)
+
+
+def _check_replay(doc, path):
+    where = f"replay file {path}"
+    summary = doc["summary"]
+    for field in ("total", "passed", "failed"):
+        _need_int(summary[field], f"summary.{field}", where)
+    rate = summary["passRate"]
+    if isinstance(rate, bool) or not isinstance(rate, (int, float)):
+        raise InputError(f"{where}: summary.passRate must be a number")
+    if not 0 <= rate <= 1:
+        raise InputError(f"{where}: summary.passRate must be between 0 and 1")
 
 
 ANOMALIES_FIELDS = [
@@ -82,6 +132,7 @@ def main(argv=None):
         replay = None
         if args.replay:
             replay = _load(args.replay, "replay", REPLAY_FIELDS)
+            _check_replay(replay, args.replay)
         summary = build_summary(anomalies, replay, args.anomalies, args.replay)
     except InputError as exc:
         print(f"error: {exc}", file=sys.stderr)
