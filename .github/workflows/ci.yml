@@ -46,3 +46,22 @@ jobs:
       - name: Run tests
         working-directory: edi-reporting-demo/edi
         run: PYTHONPATH=. pytest tests/ -v
+
+  adas:
+    name: Tests (adas-log-toolchain-lab)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: adas-log-toolchain-lab
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: adas-log-toolchain-lab/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run test:coverage
+      - run: npm run demo

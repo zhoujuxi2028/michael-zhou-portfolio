@@ -34,3 +34,9 @@ if echo "$STAGED" | grep -q "^devops-platform-demo/"; then
   echo "→ lint: devops-platform-demo"
   (cd devops-platform-demo && npm run lint --if-present)
 fi
+
+# adas-log-toolchain-lab: lint + typecheck
+if echo "$STAGED" | grep -q "^adas-log-toolchain-lab/"; then
+  echo "→ lint: adas-log-toolchain-lab"
+  (cd adas-log-toolchain-lab && npm run lint && npm run typecheck)
+fi
