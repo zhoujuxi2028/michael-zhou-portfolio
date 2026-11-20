@@ -8,7 +8,7 @@
 
 ## 状态
 
-4 期全部完成，发布 0.2.0，规则集 1.1.0（[REQ-ADAS-01](https://github.com/zhoujuxi2028/michael-zhou-portfolio/issues/69)）。设计见 [spec](../docs/superpowers/specs/2026-11-20-adas-log-toolchain-design.md)。GitHub Pages 看板由 `.github/workflows/adas-pages.yml` 部署，需仓库所有者先开启 Pages（来源：GitHub Actions）。
+第 1-4 期已在 0.2.0 实现，规则集 1.1.0（[REQ-ADAS-01](https://github.com/zhoujuxi2028/michael-zhou-portfolio/issues/69)）。设计见 [spec](../docs/superpowers/specs/2026-11-20-adas-log-toolchain-design.md)。看板发布到 GitHub Pages 尚待完成：`.github/workflows/adas-pages.yml` 仅在已开启 Pages（来源：GitHub Actions）且仓库变量 `ADAS_PAGES_ENABLED` 为 `true` 时部署（仓库所有者操作，尚未执行）。
 
 文档：[使用手册](docs/user-guide.zh.md) | [开发规范](docs/dev-guide.zh.md) | [TDD 证据](docs/tdd.md)
 
@@ -98,7 +98,7 @@ gen ──> events.jsonl + labels.json
 - 回归回放：demo 生成的用例回放通过率 100%
 - 覆盖率：行 ≥ 90%，`src/rules/` 100%
 - 性能冒烟：10 万事件 < 5 s（`npm run test:perf`）
-- CI（GitHub Actions）：`adas`（lint、typecheck、覆盖率、demo）、`adas-analysis`（flake8、pytest）、`adas-dashboard`（lint、typecheck、test、build）；GitLab CI 示例与之对应（未在 GitLab 运行）
+- CI（GitHub Actions）：`adas`（lint、typecheck、覆盖率、demo、生成的回归测试）、`adas-analysis`（flake8、pytest）、`adas-dashboard`（lint、typecheck、test、build）；GitLab CI 示例与之对应（未在 GitLab 运行）
 
 ## 与生产环境的差距
 

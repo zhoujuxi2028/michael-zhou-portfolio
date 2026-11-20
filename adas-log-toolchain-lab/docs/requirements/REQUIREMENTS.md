@@ -84,12 +84,12 @@
 ### Phase 3
 
 - [x] `analysis`：Python 3.13 + Pandas 统计，导出 `summary.json`，pytest 通过
-- [ ] `dashboard`：静态页面构建成功并发布 GitHub Pages（构建成功；未发布：需仓库所有者先开启 Pages，来源 GitHub Actions）
+- [ ] `dashboard`：静态页面构建成功并发布 GitHub Pages（构建成功；未发布：需仓库所有者先在 Settings -> Pages 开启（来源 GitHub Actions），再设置仓库变量 `ADAS_PAGES_ENABLED=true`，部署 job 才会运行）
 
 ### Phase 4
 
 - [x] `ticket`：解析合成的 Jira 导出 JSON（component → 模块，label → 规则），生成脚本任务与检查脚本
-- [ ] 使用手册与开发规范（待合并：`docs/user-guide*.md`、`docs/dev-guide*.md` 在独立分支）
+- [x] 使用手册与开发规范（`docs/user-guide*.md`、`docs/dev-guide*.md`，中英双语）
 
 ## 7. 需求确认记录（2026-11-20）
 
@@ -113,7 +113,7 @@
 | Vite 8 + ECharts 6 静态构建 | 柱状图页面构建成功 | ✅ |
 | Python + Pandas | python3.13 venv + Pandas 3.1.1 正常（系统 3.15 未装 Pandas） | ✅ 用 3.13 |
 | CI | 沿用 `ci.yml` 每项目一个 job 的模式 | ✅ |
-| GitHub Pages | 仓库公开，可开启，当前未开 | ✅ Phase 3 开启 |
+| GitHub Pages | 仓库公开，可开启，当前未开 | 待所有者开启（Phase 3 计划；见 FR-ADAS-010 备注） |
 | 磁盘 | 剩余约 16 GB；Vite + ECharts 依赖约 140 MB | ⚠️ 够用 |
 
 | # | 风险 | 应对 |

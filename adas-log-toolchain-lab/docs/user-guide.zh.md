@@ -165,11 +165,13 @@ Report written to out/anomalies.json
 16 regression cases written to out/cases/manifest.json; test file out/cases/generated/regression.test.ts
 ```
 
-退出码：`0`；`2`：anomalies / log 文件缺失或无效。用 `npm run test:generated` 运行生成的测试（见 [3.8](#38-生成的测试)）。
+用例数据与 `parse` 走同一个扫描器：无效事件和迟到事件被丢弃，窗口内事件按 `ts` 排序。每个用例文件都必须位于 `--out` 之下。写入前会先删除 `--out` 下上一次生成的 `data/`、`generated/`、`manifest.json`；其他文件保留，因此不要把 `--out` 指向含有你自己 `generated/` 目录的位置。
+
+退出码：`0`；`2`：anomalies / log 文件缺失或无效（包括 anomalies 文件里有非法 `scenarioId`），或用例路径落在 `--out` 之外。用 `npm run test:generated` 运行生成的测试（见 [3.8](#38-生成的测试)）。
 
 ### 3.5 `replay`
 
-把每个 manifest 用例（带其窗口）送入规则引擎回放并报告 PASS / FAIL。记录的规则触发则为通过。
+把每个 manifest 用例（带其窗口）送入规则引擎回放并报告 PASS / FAIL。仅当目标规则按预期触发、且用例数据没有数据质量问题时才通过。
 
 | 选项 | 默认值 | 说明 |
 |------|--------|------|
@@ -185,7 +187,7 @@ node src/cli.ts replay --manifest out/cases/manifest.json --filter module=APA
 Replayed 4 cases: 4 passed, 0 failed (pass rate 100.0%) -> out/r-apa.json
 ```
 
-退出码：`0` 全部通过；`1` 有 FAIL（stderr：`FAIL <caseId>: expected <rule> to fire as recorded; fired rules [...]`）；`2` manifest 缺失 / 格式错误、`--filter` 无效。用例中其他规则也触发（例如窗口截断引起的 `HMI-01`）会记录在 `firedRules` 中，不算失败。
+退出码：`0` 全部通过；`1` 有 FAIL（stderr 每个用例一行：`FAIL <caseId>: expected <rule> to fire; fired rules [...]`、`expected <rule> not to fire`、`case data has N data quality issues` 或 `error <message>`）；`2` manifest 缺失 / 格式错误、`--filter` 无效。manifest 格式错误包括：`expect.ruleId` 与 `ruleId` 不一致、`window[0] > window[1]`、`source` 解析到 manifest 目录之外。用例中其他规则也触发（例如窗口截断引起的 `HMI-01`）会记录在 `firedRules` 中，不算失败。
 
 ### 3.6 `record`
 
@@ -200,10 +202,10 @@ Replayed 4 cases: 4 passed, 0 failed (pass rate 100.0%) -> out/r-apa.json
 | `--speed <n>` | 1 | `live` 播放倍速（> 0；虚拟时钟，`100000` 约 1 秒跑完） |
 | `--out <dir>` | `out/clips` | |
 | `--buffer <ms>` | 10000 | 每个场景的环形缓冲时长（正整数） |
-| `--pre <ms>` | 5000 | 异常 `startTs` 之前录制的时长（正整数） |
-| `--post <ms>` | 5000 | `detectTs` 之后录制的时长（正整数） |
+| `--pre <ms>` | 5000 | 异常 `startTs` 之前录制的时长（整数 >= 0） |
+| `--post <ms>` | 5000 | `detectTs` 之后录制的时长（整数 >= 0） |
 
-行为：片段覆盖 `[startTs - pre, detectTs + post]`（或到场景结束）；起点早于缓冲区则截断并标记 `truncated: true`；同一场景内重叠的窗口合并（文件名用第一个触发）。每个片段以前置条件开头（窗口前最新的 `ACC/STATE`、`APA/STEP`、`LKA/STATE`、`VEH/TURN_SIGNAL`），因此可单独回放。
+行为：片段覆盖 `[startTs - pre, detectTs + post]`（或到场景结束）；起点早于缓冲区则截断并标记 `truncated: true`；同一场景内重叠的窗口仅在第一个片段仍在录制时合并（文件名用第一个触发）。合并后的片段长度受 `maxClipMs` 限制（默认 60000 + pre + post，默认值下为 70 秒），更长的合并会另起新片段。孤立的单个事件若 `ts` 向前跳变超过 1000 ms 且下一个事件并不接续它，则视为尖峰：不录制，但质量统计仍计入。片段文件名经过清理，始终位于 `--out` 之内。每个片段以前置条件开头（窗口前最新的 `ACC/STATE`、`APA/STEP`、`LKA/STATE`、`VEH/TURN_SIGNAL`），因此可单独回放。
 
 ```bash
 node src/cli.ts record --source file --input out/events.jsonl --out out/clips
@@ -218,7 +220,7 @@ Skipped lines: invalid JSON 0, schema errors 0, unknown events 0, out of order 0
 Clips written to out/clips
 ```
 
-输出：`<scenarioId>_<startTs>_<ruleId|MANUAL>.jsonl` 片段、`index.json`、`quality.json`（[第 7 节](#7-输出文件参考)）。退出码：`0`（录制没有通过 / 失败门禁）；`2`：`--source file` 缺 `--input`、输入文件不存在、`live` 带 `--input`、`--source` 非法、数值选项非正、`--scenarios < 8`。`record` 不支持 `--config`，始终使用默认规则阈值。
+输出：`<scenarioId>_<startTs>_<ruleId|MANUAL>.jsonl` 片段、`index.json`、`quality.json`（[第 7 节](#7-输出文件参考)）。退出码：`0`（录制没有通过 / 失败门禁）；`2`：`--source file` 缺 `--input`、输入文件不存在、`live` 带 `--input`、`--source` 非法、`--speed` / `--buffer` 非正、`--pre` / `--post` 为负、`--scenarios < 8`。`record` 不支持 `--config`，始终使用默认规则阈值。
 
 ### 3.7 `ticket`
 
@@ -242,6 +244,8 @@ node src/cli.ts ticket fixtures/jira/export.json
 See out/tasks/unmapped.json for reasons
 ```
 
+写入前，`ticket` 会删除 `--out` 下遗留的 `data/`、`generated/`、`unmapped.json` 以及它自己的 `<KEY>.json` 任务文件。
+
 未映射原因：`no rule label`、`unknown rule id`、`component does not match rule module`。退出码：`0`（有未映射工单也是 0）；`1`：`--strict` 且有未映射工单；`2`：导出文件缺失 / 不是合法 JSON / 结构错误 / issue key 重复。
 
 ### 3.8 生成的测试
@@ -257,7 +261,7 @@ npm run test:generated      # vitest.generated.config.ts: **/generated/**/*.test
       Tests  21 passed (21)
 ```
 
-若还没有生成的测试，它会退出 1（"No test files found"），请先运行 `cases regression` / `ticket`。生成的测试通过相对路径引用 `src/casegen/case-runner.ts`：输出目录要放在本目录树内，且不要手改（重新生成即可）。
+若还没有生成的测试，它也会通过（退出 0，`--passWithNoTests`）。生成的测试通过相对路径引用 `src/casegen/case-runner.ts`：输出目录要放在本目录树内，且不要手改（重新生成即可）。
 
 ### 3.9 分析与看板
 
@@ -269,7 +273,7 @@ npm run dev        # http://localhost:5173，使用 public/summary.json（样例
 npm run build      # tsc --noEmit && vite build -> dist/
 ```
 
-`adas_analysis` 退出码：`0`；`2` 输入缺失 / 无效（stderr 消息，如 `error: anomalies file not found: ../out/nope.json`）。要在看板中查看自己的数据，请在 `npm run dev` / `build` 之前把 summary 写到 `dashboard/public/summary.json`（仓库里的是样例）。GitHub Pages 工作流在 `main` 上会自动完成这一步。
+`adas_analysis` 退出码：`0`；`2` 输入缺失 / 无效（stderr 消息，如 `error: anomalies file not found: ../out/nope.json`）。字段类型会被校验（severity 为 `P1` / `P2`、`ts` 为整数、`dataQuality` 计数、replay summary），消息会指出字段和下标。要在看板中查看自己的数据，请在 `npm run dev` / `build` 之前把 summary 写到 `dashboard/public/summary.json`（仓库里的是样例）。GitHub Pages 工作流在 `main` 上会自动完成这一步。
 
 ## 4. 事件格式
 
@@ -278,7 +282,7 @@ npm run build      # tsc --noEmit && vite build -> dist/
 | 字段 | 类型 | 说明 |
 |------|------|------|
 | `ts` | 整数 >= 0 | 场景内时间，毫秒 |
-| `scenarioId` | 字符串 | 非空；同一场景的事件共用 |
+| `scenarioId` | 字符串 | `^[A-Za-z0-9_.-]{1,64}$`，且不是 `.` 或 `..`（它会用于输出文件名；其他值为 schema 错误）；同一场景的事件共用 |
 | `module` | 字符串 | 见下表 |
 | `type` | 字符串 | 见下表 |
 | `data` | 对象 | 按 `module/type` 的负载 |
@@ -405,7 +409,7 @@ error: invalid config: unknown key "foo" for rule ACC-01
 | 字段 | 内容 |
 |------|------|
 | `meta` | 版本、`manifest`、`filter`（`module=APA` 或 `null`） |
-| `results[]` | `caseId`、`ruleId`、`status`（`PASS` / `FAIL`）、`firedRules`、`durationMs`、可选 `error`（用例无法运行） |
+| `results[]` | `caseId`、`ruleId`、`status`（`PASS` / `FAIL`）、`firedRules`、`durationMs`、可选 `dataQualityIssues`（计数；非零则用例失败）、可选 `error`（用例无法运行） |
 | `summary` | `total`、`passed`、`failed`、`passRate`（0..1，4 位小数；无用例时为 0） |
 
 ### `summary.json`（`adas_analysis`，契约 C4）
@@ -446,7 +450,7 @@ error: invalid config: unknown key "foo" for rule ACC-01
 | `trackPeriodMs` | 50 |
 | `totals`、`byScenario[]` | `trackFrames`、`droppedFrames`、`dropRate`、`duplicates`、`tsAnomalies`（另加 `scenarioId`） |
 
-定义：同一场景相邻 `ACC/TRACK` 帧间隔大于 75 ms（1.5 个周期）时，记 `round(gap / 50) - 1` 帧丢失；重复指与同场景上一行完全相同的行；时间戳异常指 `ts` 倒退，或同场景相邻事件间隔大于 1000 ms。
+定义：同一场景相邻 `ACC/TRACK` 帧间隔大于 75 ms（1.5 个周期）时，记 `round(gap / 50) - 1` 帧丢失；重复指与同场景上一行完全相同的行；时间戳异常指同场景内 `ts` 早于上一个事件，或与上一个事件间隔大于 1000 ms（因此一个孤立尖峰记为两次异常）。
 
 ## 8. 端到端工作流
 
@@ -532,7 +536,7 @@ Report written to out/bad.json
 |-------------|------------|
 | `error: input file not found: <path>`（退出 2） | `parse` / `record --input` 路径错误；路径相对于当前目录 |
 | `error: log file not found` / `anomalies file not found` / `... is not valid JSON` / `invalid anomalies file: ...` | `cases regression` 的输入缺失，或不是 `parse` 的产物 |
-| `error: manifest not found: <path>` / manifest 无效 | `replay --manifest` 路径错；用 `cases regression` 生成 |
+| `error: manifest not found: <path>` / `invalid manifest: ...`（规则 id 不一致、窗口非法、source 在 manifest 目录之外） | `replay --manifest` 路径错；用 `cases regression` 生成 |
 | `error: invalid filter "x": expected module=<ACC\|APA\|HMI\|LKA>` | `--filter` 语法 |
 | `error: invalid config: ...` | 配置文件缺失、不是 JSON、规则 id / 键未知、值不是数字 |
 | `error: scenarios must be an integer >= 8` | `gen` / `record --source live` 至少需要 8 个场景 |
@@ -541,8 +545,7 @@ Report written to out/bad.json
 | `error: ticket export not found` / `invalid ticket export: ...` / `duplicate issue key` | `ticket` 输入 |
 | `error: missing required argument 'input'` / `required option '--manifest <file>' not specified` | 缺少参数 |
 | `error: unknown command '...'` | 拼写错误；运行 `--help` |
-| `npm run test:generated` -> "No test files found" | 先运行 `cases regression` 或 `ticket` |
-| `npm run test:generated` 在 `out/reg-*`、`out/tk-*`、`out/tpl-*` 下的文件失败 | 项目自身测试套件的遗留物（`npm test` 会在 `out/` 下创建，其中有故意失败的测试）；删除：`rm -rf out/reg-* out/tk-* out/tpl-*` |
+| `npm run test:generated` 在 `out/reg-*`、`out/tk-*`、`out/tpl-*` 下的文件失败 | 项目自身测试套件旧版本运行的遗留物（现在的测试会清理自己的临时目录）；删除：`rm -rf out/reg-* out/tk-* out/tpl-*` |
 | Node 报 `.ts` 文件 / 未知参数错误 | Node 低于 22.18；检查 `node --version` |
 | `adas_analysis` 报 `error: ... file not found` | 先运行 `parse`（和 `replay`）；路径相对于 `analysis/` |
 | 看板显示错误面板 | `public/summary.json` 缺失或不符合 C4 |

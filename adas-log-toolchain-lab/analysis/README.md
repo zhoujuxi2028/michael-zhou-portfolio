@@ -19,7 +19,7 @@ node src/cli.ts parse out/events.jsonl --out out/anomalies.json
 python -m adas_analysis --anomalies ../out/anomalies.json [--replay ../out/replay-report.json] --out ../out/summary.json
 ```
 
-Exit codes: `0` success, `2` missing or invalid input (message on stderr).
+Exit codes: `0` success, `2` missing or invalid input (message on stderr). Field types are validated (severity `P1` / `P2`, integer `ts`, `dataQuality` counts, replay summary); the message names the field and index. CI runs `flake8 --max-line-length 100 .` and `pytest -v`.
 Output is deterministic (fixed key order, 2-space indent, trailing newline).
 `tests/data/summary.sample.json` is a sample of the output contract.
 
