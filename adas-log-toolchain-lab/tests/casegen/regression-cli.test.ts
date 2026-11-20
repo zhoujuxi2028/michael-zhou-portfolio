@@ -22,21 +22,51 @@ describe('adas-lab cases regression', () => {
     expect(c.out.join('\n')).toBe(`${count} regression cases written to ${join(out, 'manifest.json')}; test file ${join(out, 'generated', 'regression.test.ts')}`);
   });
 
-  it('replaces previous data/ and generated/ output but leaves other files under --out alone', async () => {
+  it('replaces the outputs of its previous run but leaves other files under --out alone', async () => {
     const { dir, log, anomalies } = await fixture(), out = join(dir, 'cases');
-    mkdirSync(join(out, 'data'), { recursive: true });
-    mkdirSync(join(out, 'generated'), { recursive: true });
+    const run = () => main(['cases', 'regression', '--anomalies', anomalies, '--log', log, '--out', out], capture().io);
+    // First run with an extra anomaly: its case file is stale once the second run drops it.
+    const original = readFileSync(anomalies, 'utf8');
+    const r = JSON.parse(original) as { anomalies: { startTs: number }[] };
+    r.anomalies.push({ ...r.anomalies[0]!, startTs: r.anomalies[0]!.startTs + 1 });
+    writeFileSync(anomalies, JSON.stringify(r));
+    expect(await run()).toBe(0);
+    const first = JSON.parse(readFileSync(join(out, 'manifest.json'), 'utf8')) as { cases: { source: string }[] };
+    writeFileSync(anomalies, original);
     mkdirSync(join(out, 'keep'), { recursive: true });
-    writeFileSync(join(out, 'data', 'REG-STALE.jsonl'), '{}\n');
-    writeFileSync(join(out, 'generated', 'stale.test.ts'), '');
     writeFileSync(join(out, 'notes.txt'), 'mine');
     writeFileSync(join(out, 'keep', 'x.json'), '{}');
-    expect(await main(['cases', 'regression', '--anomalies', anomalies, '--log', log, '--out', out], capture().io)).toBe(0);
+    expect(await run()).toBe(0);
     const manifest = JSON.parse(readFileSync(join(out, 'manifest.json'), 'utf8')) as { cases: { source: string }[] };
+    expect(first.cases).toHaveLength(manifest.cases.length + 1);
     expect(readdirSync(join(out, 'data')).sort()).toEqual(manifest.cases.map((c) => c.source.slice('data/'.length)).sort());
     expect(readdirSync(join(out, 'generated'))).toEqual(['regression.test.ts']);
     expect(readFileSync(join(out, 'notes.txt'), 'utf8')).toBe('mine');
     expect(existsSync(join(out, 'keep', 'x.json'))).toBe(true);
+  });
+
+  it('never deletes user files under --out, also inside data/ and generated/', async () => {
+    const { dir, log, anomalies } = await fixture(), out = join(dir, 'cases');
+    mkdirSync(join(out, 'data'), { recursive: true });
+    mkdirSync(join(out, 'generated'), { recursive: true });
+    writeFileSync(join(out, 'data', 'notes.txt'), 'x');
+    writeFileSync(join(out, 'data', 'REG-MINE.jsonl'), '{}\n');
+    writeFileSync(join(out, 'generated', 'mine.test.ts'), '');
+    const run = () => main(['cases', 'regression', '--anomalies', anomalies, '--log', log, '--out', out], capture().io);
+    expect(await run()).toBe(0);
+    expect(await run()).toBe(0);
+    expect(readFileSync(join(out, 'data', 'notes.txt'), 'utf8')).toBe('x');
+    expect(existsSync(join(out, 'data', 'REG-MINE.jsonl'))).toBe(true);
+    expect(existsSync(join(out, 'generated', 'mine.test.ts'))).toBe(true);
+  });
+
+  it('ignores ownership entries that point outside --out', async () => {
+    const { dir, log, anomalies } = await fixture(), out = join(dir, 'cases');
+    mkdirSync(out);
+    writeFileSync(join(dir, 'outside.txt'), 'x');
+    writeFileSync(join(out, '.adas-regression-outputs.json'), JSON.stringify({ tool: 'regression', files: ['../outside.txt', '/etc/hosts'], dirs: ['..'] }));
+    expect(await main(['cases', 'regression', '--anomalies', anomalies, '--log', log, '--out', out], capture().io)).toBe(0);
+    expect(readFileSync(join(dir, 'outside.txt'), 'utf8')).toBe('x');
   });
 
   it('defaults --pre / --post to 3000 ms', async () => {

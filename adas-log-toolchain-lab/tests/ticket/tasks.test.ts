@@ -5,8 +5,10 @@ import { fileURLToPath } from 'node:url';
 import { afterAll, describe, expect, it } from 'vitest';
 import { RULES } from '../../src/rules/index.ts';
 import { resolveEpsilon, resolveRuleConfig } from '../../src/engine/engine.ts';
+import { buildRegressionCases } from '../../src/casegen/regression.ts';
 import { generateTasks } from '../../src/ticket/tasks.ts';
 import type { Ticket } from '../../src/ticket/parse.ts';
+import { fixture } from '../casegen/regression-fixture.ts';
 
 const root = fileURLToPath(new URL('../..', import.meta.url));
 const dirs: string[] = [];
@@ -46,6 +48,34 @@ describe('generateTasks', () => {
     expect(existsSync(join(out, 'ADAS-1.json'))).toBe(false);
     expect(readJson(join(out, 'unmapped.json'))).toEqual([]);
     expect(existsSync(join(out, 'keep.txt'))).toBe(true);
+  });
+
+  it('never deletes user files, even ones shaped like task json', async () => {
+    const out = tmp();
+    mkdirSync(join(out, 'data'));
+    writeFileSync(join(out, 'data', 'notes.txt'), 'x');
+    writeFileSync(join(out, 'config.json'), JSON.stringify({ testFile: 'x', ruleId: 'y' }));
+    await generateTasks(tickets, out);
+    await generateTasks(tickets.slice(1, 2), out);
+    expect(readFileSync(join(out, 'data', 'notes.txt'), 'utf8')).toBe('x');
+    expect(readJson(join(out, 'config.json'))).toEqual({ testFile: 'x', ruleId: 'y' });
+    expect(existsSync(join(out, 'ADAS-1.json'))).toBe(false);
+  });
+
+  it('shares an output directory with cases regression without deleting its outputs (and vice versa)', async () => {
+    const out = tmp();
+    const { log, anomalies } = await fixture();
+    const regression = () => buildRegressionCases({ anomalies, log, out, preMs: 3000, postMs: 3000 });
+    const { manifest } = await regression();
+    const regFiles = ['manifest.json', 'generated/regression.test.ts', ...manifest.cases.map((c) => c.source)];
+    await generateTasks(tickets, out);
+    await generateTasks(tickets, out);
+    for (const f of regFiles) expect(existsSync(join(out, f)), f).toBe(true);
+    await regression();
+    for (const f of ['ADAS-1.json', 'ADAS-2.json', 'unmapped.json', 'generated/ADAS-1.test.ts', 'generated/ADAS-2.test.ts']) {
+      expect(existsSync(join(out, f)), f).toBe(true);
+    }
+    expect(readdirSync(join(out, 'data')).filter((f) => f.startsWith('ADAS-1-')).length).toBeGreaterThan(0);
   });
 
   it('writes an empty unmapped.json when everything maps', async () => {
