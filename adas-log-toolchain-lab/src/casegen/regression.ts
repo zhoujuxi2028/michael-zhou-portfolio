@@ -1,9 +1,13 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import { join, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import type { Anomaly } from '../engine/types.ts';
 import { toJsonl } from '../io/jsonl.ts';
 import { RULESET_VERSION, TOOL_VERSION } from '../version.ts';
 import { extractWindows } from './extract.ts';
+import { renderCaseTest, type CaseTestEntry } from './template.ts';
+
+const RUNNER = fileURLToPath(new URL('./case-runner.ts', import.meta.url));
 
 /** One regression case in `manifest.json` (contract C1). */
 export interface ManifestCase {
@@ -33,7 +37,12 @@ export interface RegressionOptions {
   postMs: number;
 }
 
-export interface RegressionResult { manifest: Manifest; manifestPath: string }
+export interface RegressionResult {
+  manifest: Manifest;
+  manifestPath: string;
+  /** `<out>/generated/regression.test.ts`. */
+  testPath: string;
+}
 
 /** `REG-<ruleId>-<scenarioId>-<startTs>`; repeated ids get `-2`, `-3`, … in input order. */
 export function regressionCaseIds(anomalies: readonly Anomaly[]): string[] {
@@ -55,11 +64,13 @@ export async function buildRegressionCases(o: RegressionOptions): Promise<Regres
   })));
   await mkdir(join(o.out, 'data'), { recursive: true });
   const cases: ManifestCase[] = [];
+  const entries: CaseTestEntry[] = [];
   for (const [i, a] of anomalies.entries()) {
     const caseId = ids[i]!, { window, events } = windows[i]!;
     const source = `data/${caseId}.jsonl`;
     await writeFile(join(o.out, source), toJsonl(events));
     cases.push({ caseId, ruleId: a.ruleId, scenarioId: a.scenarioId, source, window, expect: { ruleId: a.ruleId, triggered: true } });
+    entries.push({ caseId, ruleId: a.ruleId, file: `../${source}`, window, expectTriggered: true, description: a.message });
   }
   const manifest: Manifest = {
     meta: { toolVersion: TOOL_VERSION, rulesetVersion: RULESET_VERSION, anomalies: o.anomalies, log: o.log, preMs: o.preMs, postMs: o.postMs },
@@ -67,5 +78,11 @@ export async function buildRegressionCases(o: RegressionOptions): Promise<Regres
   };
   const manifestPath = join(o.out, 'manifest.json');
   await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
-  return { manifest, manifestPath };
+
+  const generated = join(o.out, 'generated');
+  const testPath = join(generated, 'regression.test.ts');
+  await mkdir(generated, { recursive: true });
+  const runnerImport = relative(generated, RUNNER).replaceAll('\\', '/');
+  await writeFile(testPath, renderCaseTest(entries, { title: 'regression cases', runnerImport }));
+  return { manifest, manifestPath, testPath };
 }

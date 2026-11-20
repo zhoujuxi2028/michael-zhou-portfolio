@@ -1,5 +1,7 @@
-import { existsSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { spawnSync } from 'node:child_process';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { join, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { buildRegressionCases, regressionCaseIds } from '../../src/casegen/regression.ts';
 import type { Anomaly } from '../../src/engine/types.ts';
@@ -44,4 +46,29 @@ describe('buildRegressionCases', () => {
     expect(lines.map((e) => e.ts)).toEqual([100, 6000, 7000, 8000, 8500, 9000]);
     for (const c of manifest.cases) expect(existsSync(join(out, c.source))).toBe(true);
   });
+
+  it('generates a regression test that type-checks, runs green, and fails when an expectation is flipped', async () => {
+    const root = fileURLToPath(new URL('../..', import.meta.url));
+    const { log, anomalies } = await fixture();
+    mkdirSync(join(root, 'out'), { recursive: true });
+    const out = mkdtempSync(join(root, 'out', 'reg-'));
+    const { manifest, testPath } = await buildRegressionCases({ anomalies, log, out, preMs: 3000, postMs: 3000 });
+    expect(testPath).toBe(join(out, 'generated', 'regression.test.ts'));
+    const src = readFileSync(testPath, 'utf8');
+    for (const c of manifest.cases) expect(src).toContain(`"file": "../${c.source}"`);
+
+    const dir = join(out, 'generated');
+    writeFileSync(join(dir, 'tsconfig.json'), JSON.stringify({ extends: relative(dir, join(root, 'tsconfig.json')), include: ['*.ts'] }));
+    const tsc = spawnSync('npx', ['tsc', '--noEmit', '-p', join(dir, 'tsconfig.json')], { cwd: root, encoding: 'utf8' });
+    expect(tsc.stdout + tsc.stderr).toBe('');
+    const vitest = () => spawnSync('npx', ['vitest', 'run', '--config', 'vitest.generated.config.ts', dir], { cwd: root, encoding: 'utf8' });
+    const green = vitest();
+    expect(green.status, green.stdout).toBe(0);
+    expect(green.stdout).toContain(`${manifest.cases.length} passed`);
+
+    writeFileSync(testPath, src.replace('"expectTriggered": true', '"expectTriggered": false'));
+    const red = vitest();
+    expect(red.status).toBe(1);
+    expect(red.stdout).toContain('1 failed');
+  }, 60_000);
 });
