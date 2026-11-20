@@ -158,6 +158,19 @@ Classes: **Fix** (new tests fail on the old code), **CI config** (workflow chang
 
 Counts (15 commits): 13 Fix, 1 CI config (`ddc7f7d`), 1 Test hygiene (`fba5d57`). Cumulative with the tables above (62 commits): 38 TDD, 14 Fix, 7 Characterization, 1 Refactor, 1 CI config, 1 Test hygiene.
 
+Second-round review fixes (`9d53455..HEAD`), replayed the same way (`ccf8e70` by hand with pytest from `analysis/`):
+
+| Workstream | Commit | Change | Class | Red (tests on parent code) | Green |
+|------------|--------|--------|-------|----------------------------|-------|
+| FX-F analysis | `ccf8e70` | Reject negative counts, non-string versions, inconsistent replay totals | Fix | 18 failed, 34 passed | 52 passed |
+| FX-E core | `9cc120d` | Only a real `..` segment escapes the output / manifest directory | Fix | 2 failed, 23 passed | 25 passed |
+| FX-E core | `2319e4e` | Regression and ticket delete only the files they wrote | Fix | 3 failed, 16 passed | 19 passed |
+| FX-E collector | `42e49d8` | Mark clips closed by the `maxClipMs` cap with `split: true` | Fix | 2 failed, 38 passed | 40 passed |
+| FX-E CI | `1cc043f` | CI fails if the demo produces no regression test file | CI config | no test (shell guard `test -f`; verified to exit 1 when the file is missing) | — |
+| FX-E collector | `a5f9aab` | Document the consecutive-spike limit of the recorder | Comment only | — | — |
+
+Cumulative (66 code commits with tests or CI changes): 38 TDD, 18 Fix, 7 Characterization, 1 Refactor, 2 CI config, 1 Test hygiene; plus 1 comment-only commit.
+
 ## Exceptions (recorded as they happened)
 
 | Where | What happened |
