@@ -30,7 +30,8 @@ export interface QualityMonitor {
 }
 
 type Counts = Omit<QualityCounts, 'dropRate'>;
-interface Open { maxTs: number; lastTrackTs: number | null; lastLine: string }
+/** `lastTs` is the previous event's ts (not the max), so one ts spike counts as two anomalies only. */
+interface Open { lastTs: number; lastTrackTs: number | null; lastLine: string }
 
 const zero = (): Counts => ({ trackFrames: 0, droppedFrames: 0, duplicates: 0, tsAnomalies: 0 });
 const withRate = (c: Counts): QualityCounts => {
@@ -51,16 +52,16 @@ export function createQualityMonitor(): QualityMonitor {
       const o = open.get(e.scenarioId);
       if (o) {
         if (line === o.lastLine) c.duplicates++;
-        if (e.ts < o.maxTs || e.ts - o.maxTs > MAX_GAP_MS) c.tsAnomalies++;
+        if (e.ts < o.lastTs || e.ts - o.lastTs > MAX_GAP_MS) c.tsAnomalies++;
       }
-      const next: Open = o ?? { maxTs: e.ts, lastTrackTs: null, lastLine: line };
+      const next: Open = o ?? { lastTs: e.ts, lastTrackTs: null, lastLine: line };
       if (e.module === 'ACC' && e.type === 'TRACK') {
         c.trackFrames++;
         const gap = next.lastTrackTs === null ? 0 : e.ts - next.lastTrackTs;
         if (gap > DROP_FACTOR * TRACK_PERIOD_MS) c.droppedFrames += Math.round(gap / TRACK_PERIOD_MS) - 1;
         next.lastTrackTs = Math.max(next.lastTrackTs ?? e.ts, e.ts);
       }
-      next.maxTs = Math.max(next.maxTs, e.ts);
+      next.lastTs = e.ts;
       next.lastLine = line;
       if (e.module === 'SYS' && e.type === 'SCENARIO_END') open.delete(e.scenarioId);
       else open.set(e.scenarioId, next);

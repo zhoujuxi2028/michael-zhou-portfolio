@@ -12,6 +12,13 @@ function positiveInteger(v: string): number {
   return n;
 }
 
+/** pre/post may be 0 (a window of exactly the anomaly), matching `cases regression`. */
+function nonNegativeInteger(v: string): number {
+  const n = Number(v);
+  if (!Number.isInteger(n) || n < 0) throw new InvalidArgumentError('must be a non-negative integer');
+  return n;
+}
+
 function positiveNumber(v: string): number {
   const n = Number(v);
   if (!Number.isFinite(n) || n <= 0) throw new InvalidArgumentError('must be a positive number');
@@ -54,8 +61,8 @@ export const registerRecord: RegisterCommand = ({ program, io }) => {
     .option('--speed <n>', 'live playback speed factor', positiveNumber, 1)
     .option('--out <dir>', 'output directory', 'out/clips')
     .option('--buffer <ms>', 'ring buffer length per scenario', positiveInteger, DEFAULTS.bufferMs)
-    .option('--pre <ms>', 'time recorded before the anomaly start', positiveInteger, DEFAULTS.preMs)
-    .option('--post <ms>', 'time recorded after detection', positiveInteger, DEFAULTS.postMs)
+    .option('--pre <ms>', 'time recorded before the anomaly start', nonNegativeInteger, DEFAULTS.preMs)
+    .option('--post <ms>', 'time recorded after detection', nonNegativeInteger, DEFAULTS.postMs)
     .action(async (o: RecordOpts) => {
       const recorder = { out: o.out, bufferMs: o.buffer, preMs: o.pre, postMs: o.post };
       let result: SessionResult, from: string;

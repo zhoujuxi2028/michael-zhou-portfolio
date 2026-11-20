@@ -48,6 +48,11 @@ describe('clip writer', () => {
     expect(index.clips.map((c) => c.file)).toEqual(['S1_1000_T-1.jsonl', 'S1_1000_T-1_2.jsonl']);
   });
 
+  it.each(['../escape.jsonl', 'sub/x.jsonl', '/abs.jsonl', '..'])('refuses a clip file name that leaves the output dir: %s', async (file) => {
+    const dir = mkdtempSync(join(tmpdir(), 'adas-clips-'));
+    await expect(createClipWriter(dir, META).write(clip({ file }))).rejects.toThrow(/outside the output directory/);
+  });
+
   it('writes an empty index when nothing was recorded', async () => {
     const dir = join(mkdtempSync(join(tmpdir(), 'adas-clips-')), 'nested');
     const index = await createClipWriter(dir, META).finish();

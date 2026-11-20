@@ -52,7 +52,7 @@ describe('recorder: rule triggers', () => {
   it('defaults to a 10 s buffer, 5 s pre and 5 s post with the full ruleset', () => {
     const clips: Clip[] = [];
     const r = createRecorder({}, (c) => clips.push(c));
-    expect(r.options).toEqual({ bufferMs: 10000, preMs: 5000, postMs: 5000 });
+    expect(r.options).toEqual({ bufferMs: 10000, preMs: 5000, postMs: 5000, maxClipMs: 70000 });
   });
 });
 
@@ -91,6 +91,53 @@ describe('recorder: merging', () => {
   });
 });
 
+describe('recorder: ts spikes', () => {
+  it('drops a lone event that jumps > 1000 ms ahead and comes back: windows and buffer are unaffected', () => {
+    const before = byTs(ticks(0, 9000), [hit(8000, 1000)]);
+    const after = byTs(ticks(9100, 100000), [hit(15000, 0)]);
+    const clips: Clip[] = [];
+    const r = createRecorder(OPTS, (c) => clips.push(c));
+    let peak = 0;
+    for (const e of [...before, track(1e9), ...after]) {
+      r.push(e);
+      peak = Math.max(peak, r.bufferedEvents());
+    }
+    r.end();
+    expect(clips.map((c) => [c.file, c.startTs, c.endTs, range(c)])).toEqual([
+      ['S1_7000_T-1.jsonl', 5000, 11000, [5000, 11000]],
+      ['S1_15000_T-1.jsonl', 13000, 18000, [13000, 18000]],
+    ]);
+    expect(clips.flatMap((c) => c.events).some((e) => e.ts === 1e9)).toBe(false);
+    expect(peak).toBeLessThanOrEqual(103);
+  });
+
+  it('follows a sustained jump: the first event after it is recorded', () => {
+    const clips = record([...ticks(0, 10000), hit(30000, 0), ...ticks(30100, 40000)]);
+    expect(clips).toHaveLength(1);
+    expect(clips[0]).toMatchObject({ file: 'S1_30000_T-1.jsonl', startTs: 28000, endTs: 33000 });
+    expect(range(clips[0] as Clip)).toEqual([30000, 33000]);
+  });
+
+  it('never holds the first event of a scenario', () => {
+    const clips = record([ev('SYS/MANUAL_TRIGGER', 5000, 'S1', { note: 'first' }), track(3000), ...ticks(5100, 12000)]);
+    expect(clips.map((c) => c.file)).toEqual(['S1_5000_MANUAL.jsonl']);
+  });
+
+  it('keeps a far-ahead last event at EOF', () => {
+    const clips = record([...ticks(0, 5000), ev('SYS/MANUAL_TRIGGER', 9000, 'S1', { note: 'late' })]);
+    expect(clips).toHaveLength(1);
+    expect(clips[0]).toMatchObject({ file: 'S1_9000_MANUAL.jsonl', startTs: 7000 });
+  });
+});
+
+describe('recorder: clip file names', () => {
+  it('replaces characters outside [A-Za-z0-9_.-] in the scenario part of the file name', () => {
+    const s = '../../etc/x y';
+    const [c] = record(byTs(ticks(0, 20000, s), [hit(8000, 0, s)]));
+    expect(c).toMatchObject({ file: '.._.._etc_x_y_8000_T-1.jsonl', scenarioId: s });
+  });
+});
+
 describe('recorder: manual trigger', () => {
   const manual = (ts: number, s = 'S1') => ev('SYS/MANUAL_TRIGGER', ts, s, { note: 'driver button' });
 
@@ -107,6 +154,52 @@ describe('recorder: manual trigger', () => {
     const clips = record(byTs(ticks(0, 20000), [manual(8000), hit(9000, 0)]));
     expect(clips).toHaveLength(1);
     expect(clips[0]).toMatchObject({ file: 'S1_8000_MANUAL.jsonl', trigger: 'manual', ruleIds: ['T-1'], endTs: 12000 });
+  });
+});
+
+describe('recorder: clip length cap', () => {
+  const manual = (ts: number) => ev('SYS/MANUAL_TRIGGER', ts, 'S1', { note: 'driver button' });
+  /** A manual trigger every 4 s: with 5 s post each window is still recording when the next arrives. */
+  const every4s = (n = 150) => Array.from({ length: n }, (_, i) => manual(4000 * (i + 1)));
+  const LONG: RecorderOptions = { ...OPTS, preMs: 5000, postMs: 5000 };
+
+  it('defaults maxClipMs to 60 s + pre + post', () => {
+    expect(createRecorder(OPTS, () => {}).options.maxClipMs).toBe(65000);
+  });
+
+  it('splits a 600 s chain of overlapping triggers into capped clips and keeps the buffer bounded', () => {
+    const clips: Clip[] = [];
+    const r = createRecorder(LONG, (c) => clips.push(c));
+    let peak = 0;
+    for (const e of byTs(ticks(0, 610000), every4s())) {
+      r.push(e);
+      peak = Math.max(peak, r.bufferedEvents());
+    }
+    r.end();
+    expect(clips.length).toBeGreaterThan(8);
+    for (const c of clips) expect(c.endTs - c.startTs, c.file).toBeLessThanOrEqual(70000);
+    for (const m of every4s()) expect(clips.some((c) => c.startTs <= m.ts && m.ts <= c.endTs), `${m.ts}`).toBe(true);
+    expect(clips[0]).toMatchObject({ file: 'S1_4000_MANUAL.jsonl', startTs: 0 });
+    expect(clips.every((c) => !c.truncated)).toBe(true);
+    // Bounded by maxClipMs (70 s of 100 ms ticks plus its triggers), not by the 600 s chain.
+    expect(peak).toBeLessThan(750);
+  });
+
+  it('never splits a single long window (APA-02 60 s timeout)', () => {
+    const maneuver = ev('APA/STEP', 0, 'S1', { step: 'MANEUVERING', reason: 't' });
+    const clips = record(byTs(ticks(0, 70000), [maneuver]), { ...LONG, rules: [apa02] });
+    expect(clips).toHaveLength(1);
+    expect(clips[0]).toMatchObject({ file: 'S1_0_APA-02.jsonl', ruleIds: ['APA-02'], endTs: 65100, truncated: true });
+  });
+
+  it('honours an explicit maxClipMs: the split clip ends at the trigger, the new one starts at its window', () => {
+    const clips = record(byTs(ticks(0, 60000), every4s(10)), { ...LONG, maxClipMs: 20000 });
+    expect(clips.map((c) => [c.file, c.startTs, c.endTs])).toEqual([
+      ['S1_4000_MANUAL.jsonl', 0, 16000],
+      ['S1_16000_MANUAL.jsonl', 11000, 28000],
+      ['S1_28000_MANUAL.jsonl', 23000, 40000],
+      ['S1_40000_MANUAL.jsonl', 35000, 45000],
+    ]);
   });
 });
 

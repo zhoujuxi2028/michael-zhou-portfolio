@@ -34,6 +34,15 @@ describe('adas-lab record', () => {
     expect(index.meta).toMatchObject({ source: FIXTURE, bufferMs: 20000, preMs: 1000, postMs: 2000 });
   });
 
+  it('accepts --pre 0 and --post 0 (same as cases regression)', async () => {
+    const out = tmp();
+    const args = ['record', '--input', FIXTURE, '--out', out, '--pre', '0', '--post', '0'];
+    expect(await main(args, capture().io)).toBe(0);
+    const index = JSON.parse(readFileSync(join(out, 'index.json'), 'utf8'));
+    expect(index.meta).toMatchObject({ preMs: 0, postMs: 0 });
+    expect(index.clips.length).toBeGreaterThan(0);
+  });
+
   it('records from the live generator stream', async () => {
     const out = tmp(), c = capture();
     const args = ['record', '--source', 'live', '--seed', '7', '--scenarios', '8', '--speed', '1000000', '--out', out];
@@ -48,8 +57,10 @@ describe('adas-lab record', () => {
     [['--source', 'live', '--input', FIXTURE], '--input is only valid with --source file'],
     [['--source', 'bus', '--input', FIXTURE], 'Allowed choices are file, live'],
     [['--input', FIXTURE, '--buffer', '0'], 'must be a positive integer'],
-    [['--input', FIXTURE, '--pre', '-5'], 'must be a positive integer'],
-    [['--input', FIXTURE, '--post', 'abc'], 'must be a positive integer'],
+    [['--input', FIXTURE, '--pre', '-5'], 'must be a non-negative integer'],
+    [['--input', FIXTURE, '--pre', '1.5'], 'must be a non-negative integer'],
+    [['--input', FIXTURE, '--post', 'abc'], 'must be a non-negative integer'],
+    [['--input', FIXTURE, '--buffer', '-1'], 'must be a positive integer'],
     [['--source', 'live', '--speed', '0'], 'must be a positive number'],
     [['--source', 'live', '--scenarios', '3'], 'scenarios must be an integer >= 8'],
   ])('exits 2 on usage error %j', async (args, message) => {

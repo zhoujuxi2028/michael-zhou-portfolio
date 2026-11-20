@@ -23,7 +23,8 @@ export async function recordSession(source: Source, o: SessionOptions): Promise<
   const quality = createQualityMonitor();
   let writes: Promise<unknown> = Promise.resolve();
   const recorder = createRecorder(o, (clip) => { writes = writes.then(() => writer.write(clip)); });
-  const writer = createClipWriter(o.out, { source: o.source, ...recorder.options });
+  const { bufferMs, preMs, postMs } = recorder.options;
+  const writer = createClipWriter(o.out, { source: o.source, bufferMs, preMs, postMs });
 
   const result = await source((e, line) => {
     quality.push(e, line);

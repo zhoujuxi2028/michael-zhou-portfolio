@@ -39,8 +39,14 @@ describe('quality monitor', () => {
   });
 
   it('counts ts going backwards and gaps over 1000 ms', () => {
-    // 0 -> 1000 ok (exactly 1000), 1000 -> 2001 gap, 2001 -> 1500 backwards, 1500 -> 2100 fine (max is 2001)
+    // 0 -> 1000 ok (exactly 1000), 1000 -> 2001 gap, 2001 -> 1500 backwards, 1500 -> 2100 fine (600 ms step)
     const r = measure([brake(0), brake(1000), brake(2001), brake(1500), brake(2100)]);
+    expect(r.totals.tsAnomalies).toBe(2);
+  });
+
+  it('compares each event with the previous one, so a single ts spike is exactly 2 anomalies', () => {
+    // 100 -> 1e9 jumps up, 1e9 -> 200 jumps back; the events after the spike are normal again.
+    const r = measure([brake(0), brake(100), brake(1e9), brake(200), brake(300), brake(400)]);
     expect(r.totals.tsAnomalies).toBe(2);
   });
 
