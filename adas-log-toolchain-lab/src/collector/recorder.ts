@@ -2,6 +2,7 @@ import { createEngine, type EngineConfig } from '../engine/engine.ts';
 import type { Anomaly, AnyRule } from '../engine/types.ts';
 import { RULES } from '../rules/index.ts';
 import type { AdasEvent } from '../schema/events.ts';
+import { createPreconditionTracker, type PreconditionTracker } from './preconditions.ts';
 import { createRingBuffer, type RingBuffer } from './ring-buffer.ts';
 
 export interface RecorderOptions {
@@ -35,7 +36,7 @@ export interface Recorder {
 export const DEFAULTS = { bufferMs: 10000, preMs: 5000, postMs: 5000 } as const;
 
 interface Window { start: number; end: number; trigger: 'rule' | 'manual'; label: string; labelTs: number; ruleIds: string[] }
-interface Scenario { buffer: RingBuffer; now: number; window: Window | null }
+interface Scenario { buffer: RingBuffer; states: PreconditionTracker; now: number; window: Window | null }
 
 /** Core recorder shared by file and live sources: ring buffer + rule/manual triggers → clips. */
 export function createRecorder(opts: RecorderOptions, onClip: (c: Clip) => void): Recorder {
@@ -49,7 +50,11 @@ export function createRecorder(opts: RecorderOptions, onClip: (c: Clip) => void)
 
   const open = (id: string): Scenario => {
     let sc = scenarios.get(id);
-    if (!sc) scenarios.set(id, (sc = { buffer: createRingBuffer(options.bufferMs), now: -Infinity, window: null }));
+    if (!sc) {
+      const states = createPreconditionTracker();
+      const buffer = createRingBuffer(options.bufferMs, states.evicted);
+      scenarios.set(id, (sc = { buffer, states, now: -Infinity, window: null }));
+    }
     return sc;
   };
 
@@ -58,7 +63,9 @@ export function createRecorder(opts: RecorderOptions, onClip: (c: Clip) => void)
     if (!w) return;
     sc.window = null;
     // Extract before unpinning: unpinning evicts anything older than bufferMs.
-    const events = sc.buffer.events().filter((e) => e.ts >= w.start && e.ts <= w.end);
+    const buffered = sc.buffer.events();
+    const events = buffered.filter((e) => e.ts >= w.start && e.ts <= w.end);
+    const preconditions = sc.states.before(w.start, buffered);
     // The pin stops eviction at w.start, so data inside the window was lost only if it was
     // evicted before the window opened (or before a merge moved the start back).
     const truncated = w.start <= sc.buffer.evictedUpTo();
@@ -66,7 +73,7 @@ export function createRecorder(opts: RecorderOptions, onClip: (c: Clip) => void)
     const startTs = truncated ? events.reduce((m, e) => Math.min(m, e.ts), Infinity) : Math.max(0, w.start);
     onClip({
       file: `${id}_${w.labelTs}_${w.label}.jsonl`, scenarioId: id, trigger: w.trigger, ruleIds: w.ruleIds,
-      startTs, endTs: Math.min(w.end, sc.now), truncated, events,
+      startTs, endTs: Math.min(w.end, sc.now), truncated, events: [...preconditions, ...events],
     });
   };
 

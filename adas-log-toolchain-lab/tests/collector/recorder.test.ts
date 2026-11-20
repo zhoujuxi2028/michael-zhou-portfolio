@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createRecorder, type Clip, type RecorderOptions } from '../../src/collector/recorder.ts';
-import { ev, type AdasEvent } from '../../src/schema/events.ts';
+import { ev, type AccState, type AdasEvent } from '../../src/schema/events.ts';
 import { fakeRule, fakeRule2 } from './fake-rule.ts';
 
 const track = (ts: number, s = 'S1') =>
@@ -118,5 +118,42 @@ describe('recorder: truncation', () => {
   it('clamps a negative window start to 0', () => {
     const clips = record(byTs(ticks(0, 20000), [hit(1000, 0)]), short);
     expect(clips[0]).toMatchObject({ startTs: 0, truncated: false });
+  });
+});
+
+describe('recorder: preconditions', () => {
+  const acc = (ts: number, from: AccState, to: AccState) => ev('ACC/STATE', ts, 'S1', { from, to, reason: 't' });
+  const states = [
+    acc(0, 'OFF', 'ACTIVE'), acc(1000, 'ACTIVE', 'STANDBY'), acc(2000, 'STANDBY', 'ACTIVE'),
+    ev('APA/STEP', 500, 'S1', { step: 'MANEUVERING', reason: 't' }),
+    ev('LKA/STATE', 600, 'S1', { from: 'OFF', to: 'ACTIVE' }),
+    ev('VEH/TURN_SIGNAL', 700, 'S1', { side: 'LEFT' }),
+    ev('VEH/TURN_SIGNAL', 800, 'S1', { side: 'OFF' }),
+  ];
+  const pre = (c: Clip) => c.events.filter((e) => e.ts < c.startTs).map((e) => `${e.module}/${e.type}@${e.ts}`);
+
+  it('prepends the latest state event of each dimension before the window, sorted by ts', () => {
+    const clips = record(byTs(ticks(0, 20000), states, [acc(9000, 'ACTIVE', 'OVERRIDE'), hit(10000, 0)]));
+    const c = clips[0] as Clip;
+    expect(c.startTs).toBe(8000);
+    expect(pre(c)).toEqual(['APA/STEP@500', 'LKA/STATE@600', 'VEH/TURN_SIGNAL@800', 'ACC/STATE@2000']);
+    expect(c.events.filter((e) => e.module === 'ACC' && e.type === 'STATE').map((e) => e.ts)).toEqual([2000, 9000]);
+  });
+
+  it('remembers state events already evicted from the buffer', () => {
+    const clips = record(byTs(ticks(0, 20000), states, [hit(10000, 0)]), { ...OPTS, bufferMs: 3000 });
+    expect(pre(clips[0] as Clip)).toEqual(['APA/STEP@500', 'LKA/STATE@600', 'VEH/TURN_SIGNAL@800', 'ACC/STATE@2000']);
+  });
+
+  it('restores a state event lost to truncation inside the window', () => {
+    const clips = record(byTs(ticks(0, 20000), [acc(5000, 'OFF', 'ACTIVE'), hit(12000, 7000)]), { ...OPTS, bufferMs: 3000 });
+    const c = clips[0] as Clip;
+    expect(c).toMatchObject({ truncated: true, startTs: 9000 });
+    expect(pre(c)).toEqual(['ACC/STATE@5000']);
+  });
+
+  it('adds nothing when no state event precedes the window', () => {
+    const c = record(byTs(ticks(0, 20000), [hit(10000, 0)]))[0] as Clip;
+    expect(pre(c)).toEqual([]);
   });
 });
