@@ -56,6 +56,13 @@ describe('LKA-02 lane loss not indicated', () => {
     const loss = lowRun(1000, 1700);
     expect(run([lka02], [unavailable(1100), ...loss, lane(1800, 0.9), scenarioEnd(S, 5000)].sort((a, b) => a.ts - b.ts))).toEqual([]);
     expect(run([lka02], [unavailable(900), ...loss, lane(1800, 0.9), scenarioEnd(S, 5000)])).toHaveLength(1);
+    expect(run([lka02], [...loss, unavailable(900), lane(1800, 0.9), scenarioEnd(S, 5000)])).toHaveLength(1);
+  });
+
+  it('keeps the earliest of several displays, whatever the arrival order', () => {
+    const loss = lowRun(1000, 1700);
+    expect(run([lka02], [...loss, unavailable(1790), unavailable(1100), lane(1800, 0.9), scenarioEnd(S, 5000)])).toEqual([]);
+    expect(run([lka02], [...loss, unavailable(1100), unavailable(1790), lane(1800, 0.9), scenarioEnd(S, 5000)])).toEqual([]);
   });
 
   it('ignores displays for other features or items', () => {

@@ -16,8 +16,8 @@ describe('truth labels (spec §6.4)', () => {
     const { report, result } = await evaluate(42, false);
     expect(result.unmatchedAnomalies).toEqual([]);
     expect(result.unmatchedLabels).toEqual([]);
-    expect(result).toMatchObject({ precision: 1, recall: 1, matched: 12 });
-    expect(result.pairs).toHaveLength(12);
+    expect(result).toMatchObject({ precision: 1, recall: 1, matched: 16 });
+    expect(result.pairs).toHaveLength(16);
     for (const { anomaly, label } of result.pairs) {
       expect([anomaly.startTs, anomaly.endTs]).toEqual([label.startTs, label.endTs]);
     }
@@ -26,11 +26,11 @@ describe('truth labels (spec §6.4)', () => {
 
   it('interleaved scenarios give the same result', async () => {
     const { result } = await evaluate(42, true);
-    expect(result).toMatchObject({ precision: 1, recall: 1, matched: 12 });
+    expect(result).toMatchObject({ precision: 1, recall: 1, matched: 16 });
   });
 
   it.each([1, 2, 3, 7, 2026])('seed %i stays at 100%', async (seed) => {
     const { result } = await evaluate(seed, false);
-    expect(result).toMatchObject({ precision: 1, recall: 1, matched: 12 });
+    expect(result).toMatchObject({ precision: 1, recall: 1, matched: 16 });
   });
 });
