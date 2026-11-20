@@ -53,6 +53,7 @@ describe('adas-lab CLI', () => {
     [['parse', 'x.jsonl', '--fail-on', 'P9'], /P9/],
     [['gen', '--scenarios', '3'], /scenarios must be an integer >= 8/],
     [['gen', '--seed', 'abc'], /must be an integer/],
+    [['gen', '--seed', '1.5'], /must be an integer/],
     [['parse', 'fixtures/golden/mixed.jsonl', '--config', '/nonexistent.json'], /config file not found/],
     [['unknown-command'], /unknown command/],
   ])('exits 2 on usage error: %j', async (args, msg) => {

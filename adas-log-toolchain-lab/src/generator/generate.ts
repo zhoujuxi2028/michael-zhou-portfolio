@@ -1,4 +1,5 @@
 import { ev, scenarioEnd, type AccState, type AdasEvent, type ApaStep } from '../schema/events.ts';
+import { acc01 } from '../rules/acc-01.ts';
 import { createRng, type Rng } from './prng.ts';
 
 export interface Label { scenarioId: string; ruleId: string; startTs: number; endTs: number }
@@ -7,9 +8,6 @@ export interface GenResult { events: AdasEvent[]; labels: Label[] }
 
 export const MIN_SCENARIOS = 8;
 
-// Mirrors ACC-01 defaults; only used to keep clean data at a safe margin.
-const ACC_MIN_GAP_M = 5;
-const ACC_TIME_GAP_S = 1.0;
 const ACC_END_MS = 60000;
 const TRACK_MS = 50;
 const OBSTACLE_MS = 100;
@@ -31,6 +29,7 @@ const round2 = (x: number) => Math.round(x * 100) / 100;
 const byTs = (es: readonly AdasEvent[]) => [...es].sort((a, b) => a.ts - b.ts);
 
 export function generate(o: GenOptions): GenResult {
+  if (!Number.isInteger(o.seed)) throw new RangeError('seed must be an integer');
   if (!Number.isInteger(o.scenarios) || o.scenarios < MIN_SCENARIOS) {
     throw new RangeError(`scenarios must be an integer >= ${MIN_SCENARIOS}`);
   }
@@ -118,7 +117,7 @@ function accScenario(id: string, rng: Rng, faults: readonly [AccFault, AccFault]
   const v0 = rng.range(15, 25);
   for (let t = 0; t < ACC_END_MS; t += TRACK_MS) {
     const egoSpeed = round2(v0 + rng.range(-0.2, 0.2));
-    const threshold = Math.max(ACC_MIN_GAP_M, egoSpeed * ACC_TIME_GAP_S);
+    const threshold = Math.max(acc01.defaults.minGapM, egoSpeed * acc01.defaults.timeGapS);
     const leadDistance = tooClose.has(t) ? round2(threshold - 1.5) : round2(threshold + 8 + rng.range(0, 2));
     events.push(ev('ACC/TRACK', t, id, { egoSpeed, setSpeed: round2(v0 + 2), leadDistance, leadRelSpeed: round2(rng.range(-0.5, 0.5)) }));
   }

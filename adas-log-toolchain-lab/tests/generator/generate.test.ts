@@ -1,10 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { generate, MIN_SCENARIOS } from '../../src/generator/generate.ts';
+import { toJsonl } from '../../src/io/jsonl.ts';
 import { parseLine } from '../../src/schema/validate.ts';
 
 describe('generate', () => {
   it('is deterministic for the same seed', () => {
-    expect(generate({ seed: 42, scenarios: 20 })).toEqual(generate({ seed: 42, scenarios: 20 }));
+    const a = generate({ seed: 42, scenarios: 20 }), b = generate({ seed: 42, scenarios: 20 });
+    expect(toJsonl(a.events)).toBe(toJsonl(b.events));
+    expect(JSON.stringify(a.labels)).toBe(JSON.stringify(b.labels));
   });
 
   it('changes values (not structure) across seeds', () => {
@@ -51,6 +54,12 @@ describe('generate', () => {
     expect(mixed.events.slice(0, 20).map((e) => e.scenarioId)).not.toEqual(seq.events.slice(0, 20).map((e) => e.scenarioId));
     const s1 = (es: typeof seq.events) => es.filter((e) => e.scenarioId === 'S001');
     expect(s1(mixed.events)).toEqual(s1(seq.events));
+  });
+
+  it('rejects non-integer seeds', () => {
+    for (const seed of [1.5, Number.NaN, Infinity]) {
+      expect(() => generate({ seed, scenarios: 20 })).toThrow(RangeError);
+    }
   });
 
   it(`rejects fewer than ${MIN_SCENARIOS} scenarios`, () => {
