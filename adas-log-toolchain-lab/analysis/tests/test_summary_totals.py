@@ -29,3 +29,11 @@ def test_data_quality_copied_from_counts():
     assert s["dataQuality"] == {
         "invalidJson": 1, "schemaErrors": 2, "unknownEvents": 3, "outOfOrder": 4,
     }
+
+
+def test_empty_anomalies_yield_zero_totals():
+    doc = load("anomalies.small.json")
+    doc["anomalies"] = []
+    s = build_summary(doc, None, "a.json", None)
+    assert s["totals"]["anomalies"] == 0
+    assert s["totals"]["p1"] == 0 and s["totals"]["p2"] == 0
