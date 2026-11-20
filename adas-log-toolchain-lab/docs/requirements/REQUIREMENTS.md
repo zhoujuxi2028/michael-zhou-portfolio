@@ -79,12 +79,12 @@
 - [x] `casegen regression`：生成回放清单和可直接运行的 Vitest 回归测试
 - [x] `replay` 按回放清单批量执行并汇总结果
 - [x] LKA-01 / LKA-02 规则及其边界值用例
-- [ ] 根目录 README「招聘方速查」中"数据 / 工具链开发"一行更新为本项目（待做：合并后的收尾步骤）
+- [x] 根目录 README「招聘方速查」中"数据 / 工具链开发"一行更新为本项目（PR #77）
 
 ### Phase 3
 
 - [x] `analysis`：Python 3.13 + Pandas 统计，导出 `summary.json`，pytest 通过
-- [ ] `dashboard`：静态页面构建成功并发布 GitHub Pages（构建成功；未发布：需仓库所有者先在 Settings -> Pages 开启（来源 GitHub Actions），再设置仓库变量 `ADAS_PAGES_ENABLED=true`，部署 job 才会运行）
+- [x] `dashboard`：静态页面构建成功并发布 GitHub Pages（https://zhoujuxi2028.github.io/michael-zhou-portfolio/）
 
 ### Phase 4
 
@@ -133,3 +133,4 @@
 | 2026-11-20 | Stage 3 开发（Phase 1 T1–T14） | ✅ 3 轮代码评审修复完成 + TDD 证据补充（`docs/tdd.md`）+ 用户评审通过 |
 | 2026-11-20 | Stage 4 测试（Phase 1） | ✅ PR #75 CI 4 个 job 全绿 + 用户评审通过；合并后打 tag `adas-lab-v0.1.0` |
 | 2026-11-20 | Phase 2–4 开发（并行子代理 + TDD）| 集成中 |
+| 2026-11-21 | Phase 2–4 发布（PR #76，tag `adas-lab-v0.2.0`） | ✅ 通过；Pages 已开启并部署；根 README 速查表（PR #77）已更新 |
