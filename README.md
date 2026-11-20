@@ -8,7 +8,7 @@
 
 | 目标岗位 | 先看这个 | 关键证据 |
 |---|---|---|
-| 数据 / 工具链开发 | [EDI & Reporting Demo](./edi-reporting-demo/) | Python 分层解析器（parser / schema / validator）、配置驱动校验、CLI、pytest 契约测试、Jasper 报表 |
+| 数据 / 工具链开发 | [ADAS Log Toolchain Lab](./adas-log-toolchain-lab/) | TypeScript CLI（流式解析、6+2 条规则、采集片段、回放）、边界用例与真值测试（精确率 / 召回率 100%）、Pandas 分析、ECharts 看板（[在线](https://zhoujuxi2028.github.io/michael-zhou-portfolio/)） |
 | DevOps / SRE / 平台工程 | [DevOps Platform Demo](./devops-platform-demo/) | GitHub Actions PR 门禁、Helm + SBOM、Kubernetes、Terraform、ArgoCD、Trivy、Prometheus / Grafana |
 | 全栈 / Web | [Cloud Monitoring Platform](./cloud-monitoring-platform/) | Spring Boot + MyBatis、Vue + ECharts、uni-app 移动端 |
 | Android / 移动端 | [Android Compose Demo](./android-testing-demo-compose/) | Kotlin、Jetpack Compose、MVVM + StateFlow、Room、UI 测试 |
