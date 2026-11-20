@@ -1,9 +1,11 @@
-# Example, not executed on GitLab. Mirrors the GitHub Actions `adas` job; assumes this directory is the repo root.
+# Example, not executed on GitLab. Mirrors the GitHub Actions `adas`, `adas-analysis` and `adas-dashboard` jobs; assumes this directory is the repo root.
 image: node:22
 
 stages:
   - lint
   - test
+  - analysis
+  - dashboard
 
 variables:
   npm_config_cache: "$CI_PROJECT_DIR/.npm"
@@ -35,3 +37,34 @@ test:
     when: always
     paths:
       - coverage/
+
+analysis:
+  stage: analysis
+  image: python:3.13
+  before_script: []
+  script:
+    - cd analysis
+    - pip install -r requirements.txt flake8==7.5.0
+    - flake8 --max-line-length 100 .
+    - pytest -v
+
+dashboard:
+  stage: dashboard
+  image: node:22
+  before_script: []
+  cache:
+    key:
+      files:
+        - dashboard/package-lock.json
+    paths:
+      - .npm/
+  script:
+    - cd dashboard
+    - npm ci
+    - npm run lint
+    - npm run typecheck
+    - npm test
+    - npm run build
+  artifacts:
+    paths:
+      - dashboard/dist/
