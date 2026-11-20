@@ -42,6 +42,9 @@ Exit codes: `0` ok, `1` gate triggered, `2` usage error.
 | HMI-02 | Takeover request not shown within 200 ms | P1 |
 
 Override thresholds with `--config rules.config.json`, e.g. `{"rules": {"ACC-01": {"timeGapS": 1.2}}}`.
+- Config with unknown rule ids or keys is rejected with exit code 2.
+- Data quality: a first-line BOM is ignored; late events for an already-ended scenario are dropped and counted as out of order; unknown event types are bounded with an `(other)` bucket.
+- Each boundary case is verified through the parser and triggers only its target rule.
 
 ## Quality gates
 
