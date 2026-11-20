@@ -2,7 +2,7 @@
 
 > 本仓库（michael-zhou-portfolio）的统一需求编号规范。所有新增需求必须遵循本规范。
 >
-> 状态：✅ 现行 | 最后更新：2026-11-03
+> 状态：✅ 现行 | 最后更新：2026-11-20
 
 ---
 
@@ -43,6 +43,7 @@ REQ-{PROJECT}-{SEQ}
 | `AND` | `android-app/`（规划中） | Android 应用 |
 | `DRV` | `linux-driver/`（规划中） | Linux 内核驱动 |
 | `DVP` | `devops-platform-demo/` | DevOps 平台演示（CI/CD + K8s + IaC + DevSecOps） |
+| `ADAS` | `adas-log-toolchain-lab/` | ADAS 日志工具链（TS 解析 + 用例生成 + 数据采集 + 回放 + 看板） |
 
 > 新增项目时：在本表登记前缀，并在 [REQUIREMENTS-INDEX.md](./REQUIREMENTS-INDEX.md) 增加对应小节。
 
