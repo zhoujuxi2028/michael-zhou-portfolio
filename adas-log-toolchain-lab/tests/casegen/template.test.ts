@@ -1,14 +1,17 @@
 import { spawnSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { describe, expect, it } from 'vitest';
+import { afterAll, describe, expect, it } from 'vitest';
 import { renderCaseTest, type CaseTestEntry } from '../../src/casegen/template.ts';
 import { toJsonl } from '../../src/io/jsonl.ts';
 import { ev, scenarioEnd } from '../../src/schema/events.ts';
 
 const root = fileURLToPath(new URL('../..', import.meta.url));
 const runner = join(root, 'src/casegen/case-runner.ts');
+
+const tmpDirs: string[] = [];
+afterAll(() => { for (const d of tmpDirs) rmSync(d, { recursive: true, force: true }); });
 
 describe('renderCaseTest', () => {
   it('renders a self-describing Vitest file', () => {
@@ -22,7 +25,9 @@ describe('renderCaseTest', () => {
 
   it('produces a test that type-checks and runs green (and red when expectation is wrong)', () => {
     mkdirSync(join(root, 'out'), { recursive: true });
-    const dir = join(mkdtempSync(join(root, 'out', 'tpl-')), 'generated');
+    const base = mkdtempSync(join(root, 'out', 'tpl-'));
+    tmpDirs.push(base);
+    const dir = join(base, 'generated');
     mkdirSync(join(dir, 'data'), { recursive: true });
     const S = 'S1';
     writeFileSync(join(dir, 'data', 'c.jsonl'), toJsonl([ev('ACC/TAKEOVER_REQUEST', 1000, S, { reason: 't' }), scenarioEnd(S, 2000)]));
@@ -35,7 +40,7 @@ describe('renderCaseTest', () => {
 
     const tsc = spawnSync('npx', ['tsc', '--noEmit', '-p', join(dir, 'tsconfig.json')], { cwd: root, encoding: 'utf8' });
     expect(tsc.stdout + tsc.stderr).toBe('');
-    const vitest = (f: string) => spawnSync('npx', ['vitest', 'run', '--config', 'vitest.generated.config.ts', join(dir, f)], { cwd: root, encoding: 'utf8' }).status;
+    const vitest = (f: string) => spawnSync('npx', ['vitest', 'run', '--pool=threads', '--maxWorkers=1', '--config', 'vitest.generated.config.ts', join(dir, f)], { cwd: root, encoding: 'utf8' }).status;
     expect(vitest('pass.test.ts')).toBe(0);
     expect(vitest('fail.test.ts')).toBe(1);
   }, 60_000);
