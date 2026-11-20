@@ -4,7 +4,7 @@
 >
 > 完整台账（优先级 / 类型 / 状态）见 [requirements/req-register.md](./requirements/req-register.md)。
 >
-> 状态：🟡 进行中 | 最后更新：2026-11-18
+> 状态：🟡 进行中 | 最后更新：2026-11-20
 
 ---
 
@@ -19,8 +19,9 @@
 | `AND` | android-app | 1 |
 | `ANDT` | android-testing-demo | 2 |
 | `DVP` | devops-platform-demo | 11 |
+| `ADAS` | adas-log-toolchain-lab | 1 |
 | `DRV` | （规划中） | 0 |
-| **合计** | | **29** |
+| **合计** | | **30** |
 
 ---
 
@@ -102,6 +103,16 @@
 | `REQ-DVP-009` | 数据管道 / DB 备份自动化 | 🔲 |
 | `REQ-DVP-010` | OPA/Kyverno 策略即代码 | 🔲 |
 | `REQ-DVP-011` | Dev Container 标准化开发环境（#50） | ✅ |
+
+---
+
+## ADAS — adas-log-toolchain-lab
+
+> 详细需求见 `adas-log-toolchain-lab/docs/requirements/REQUIREMENTS.md`
+
+| 编号 | 描述 | 状态 |
+|------|------|------|
+| `REQ-ADAS-01` | ADAS 日志工具链：TS 解析 + 用例生成 + 数据采集 + 场景回放 + 分析看板（#69） | 🔄 |
 
 ---
 

@@ -322,9 +322,16 @@ interface BoundaryCase {
 | R4 | 范围较大（4 期） | 每期独立交付、独立 PR，任何一期结束都是可演示状态 |
 | R5 | 时间窗口类规则的边界判定易出现 off-by-one | 边界用例覆盖截止前 / 正好 / 之后，判定统一为"`ts ≤ deadline` 视为按时" |
 
-## 16. 仓库登记（Stage 5）
+## 16. 仓库登记
 
-- `docs/REQUIREMENTS-NUMBERING.md`：新增前缀 `ADAS` → `adas-log-toolchain-lab/`
-- `docs/REQUIREMENTS-INDEX.md`：新增 ADAS 小节与 `REQ-ADAS-01`，更新统计
+**Stage 1 已完成（2026-11-20，按编号规范「创建即登记」）：**
+
+- `adas-log-toolchain-lab/docs/requirements/REQUIREMENTS.md`：项目需求、验收标准、可行性评估
+- `docs/REQUIREMENTS-NUMBERING.md`：新增前缀 `ADAS`
+- `docs/REQUIREMENTS-INDEX.md` / `docs/requirements/req-register.md`：登记 `REQ-ADAS-01`
+
+**Stage 5 收尾：**
+
+- 更新上述文件中的状态
 - 根 `README.md`「招聘方速查」：数据 / 工具链开发一行改为本项目；根 `CLAUDE.md` 项目清单增加本项目
 - `.github/workflows/ci.yml`：新增 `adas` job

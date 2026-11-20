@@ -37,6 +37,7 @@
 | REQ-DVP-008 | Elastic 集成 / Loki vs Elastic 对比 | devops-platform-demo | DEMO | P3 | 2026-11-12 | Open |
 | REQ-DVP-009 | 数据管道 / DB 备份自动化 | devops-platform-demo | FR | P3 | 2026-11-12 | Open |
 | REQ-DVP-010 | OPA/Kyverno 策略即代码 | devops-platform-demo | FR | P3 | 2026-11-12 | Open |
+| REQ-ADAS-01 | ADAS 日志工具链：TS 解析 + 用例生成 + 数据采集 + 场景回放 + 分析看板（#69） | adas-log-toolchain-lab | DEMO | P1 | 2026-11-20 | In Progress |
 
 ---
 
@@ -101,6 +102,7 @@
 | `AND` | `android-app/` | 1 | 2026-11-05 |
 | `ANDT` | `android-testing-demo-*/` | 0 | — |
 | `DVP` | `devops-platform-demo/` | 4 | 2026-11-18 |
+| `ADAS` | `adas-log-toolchain-lab/` | 1 | 2026-11-20 |
 | `DRV` | `linux-driver/`（规划中） | 0 | — |
 
 ---
@@ -109,6 +111,7 @@
 
 | 日期 | 操作 | 内容 | 操作人 |
 |------|------|------|--------|
+| 2026-11-20 | 新增 | 登记 REQ-ADAS-01（#69）；新增项目前缀 `ADAS`；§7 补 ADAS 行 | Michael Zhou |
 | 2026-11-18 | 关闭 | REQ-DVP-003 Done：本地 DevSecOps 闭环（#65） | Michael Zhou |
 | 2026-11-18 | 变更 | REQ-DVP-003 由 Azure 集成改为本地 DevSecOps 闭环（Azure 订阅到期） | Michael Zhou |
 | 2026-11-16 | 关闭 | REQ-DVP-007 Done：Dependabot 依赖与补丁自动化（#56） | Michael Zhou |
