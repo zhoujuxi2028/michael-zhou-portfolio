@@ -165,7 +165,7 @@ Report written to out/anomalies.json
 16 regression cases written to out/cases/manifest.json; test file out/cases/generated/regression.test.ts
 ```
 
-用例数据与 `parse` 走同一个扫描器：无效事件和迟到事件被丢弃，窗口内事件按 `ts` 排序。每个用例文件都必须位于 `--out` 之下。写入前会先删除 `--out` 下上一次生成的 `data/`、`generated/`、`manifest.json`；其他文件保留，因此不要把 `--out` 指向含有你自己 `generated/` 目录的位置。
+用例数据与 `parse` 走同一个扫描器：无效事件和迟到事件被丢弃，窗口内事件按 `ts` 排序。每个用例文件都必须位于 `--out` 之下。每次运行把写入的文件记录在 `--out/.adas-regression-outputs.json`；下一次运行写入前只删除这些文件（以及它创建的、已变空的目录）。`--out` 下的其他文件（包括你放在 `data/`、`generated/` 中的文件）都不会被删除；同名文件会被覆盖。没有该归属文件时（首次运行）不删除任何文件。
 
 退出码：`0`；`2`：anomalies / log 文件缺失或无效（包括 anomalies 文件里有非法 `scenarioId`），或用例路径落在 `--out` 之外。用 `npm run test:generated` 运行生成的测试（见 [3.8](#38-生成的测试)）。
 
@@ -244,7 +244,7 @@ node src/cli.ts ticket fixtures/jira/export.json
 See out/tasks/unmapped.json for reasons
 ```
 
-写入前，`ticket` 会删除 `--out` 下遗留的 `data/`、`generated/`、`unmapped.json` 以及它自己的 `<KEY>.json` 任务文件。
+写入前，`ticket` 只删除上一次运行写入、记录在 `--out/.adas-ticket-outputs.json` 中的文件（随后删除它创建的、已变空的目录）；其他文件保留。`ticket` 与 `cases regression` 使用各自的归属文件，因此可以共用同一个 `--out` 而不会删除对方的输出。
 
 未映射原因：`no rule label`、`unknown rule id`、`component does not match rule module`。退出码：`0`（有未映射工单也是 0）；`1`：`--strict` 且有未映射工单；`2`：导出文件缺失 / 不是合法 JSON / 结构错误 / issue key 重复。
 
@@ -441,7 +441,7 @@ error: invalid config: unknown key "foo" for rule ACC-01
 | 字段 | 内容 |
 |------|------|
 | `meta` | 版本、`source`（`live` 或输入路径）、`bufferMs`、`preMs`、`postMs` |
-| `clips[]` | `file`、`scenarioId`、`trigger`（`rule` / `manual`）、`ruleIds[]`、`startTs`、`endTs`、`events`（文件行数，含前置条件）、`sha256`（文件字节的哈希）、`truncated` |
+| `clips[]` | `file`、`scenarioId`、`trigger`（`rule` / `manual`）、`ruleIds[]`、`startTs`、`endTs`、`events`（文件行数，含前置条件）、`sha256`（文件字节的哈希）、`truncated`、`split`（仅当片段因 `maxClipMs` 上限被关闭时出现且为 `true`；该场景的下一个片段接续它） |
 
 `quality.json`：
 
