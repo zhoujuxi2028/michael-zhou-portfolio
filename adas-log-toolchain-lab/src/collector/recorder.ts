@@ -31,6 +31,10 @@ export interface Recorder {
   push(e: AdasEvent): void;
   /** EOF: finish open scenarios and write their clips. */
   end(): void;
+  /** Scenarios with live state (released at SCENARIO_END / EOF). */
+  activeScenarios(): number;
+  /** Events held across all ring buffers. */
+  bufferedEvents(): number;
 }
 
 export const DEFAULTS = { bufferMs: 10000, preMs: 5000, postMs: 5000 } as const;
@@ -111,12 +115,19 @@ export function createRecorder(opts: RecorderOptions, onClip: (c: Clip) => void)
         });
       }
       engine.push(e).forEach(onAnomaly);
-      if (sc.window && sc.now > sc.window.end) close(e.scenarioId, sc);
+      if (e.module === 'SYS' && e.type === 'SCENARIO_END') {
+        close(e.scenarioId, sc);
+        scenarios.delete(e.scenarioId);
+      } else if (sc.window && sc.now > sc.window.end) {
+        close(e.scenarioId, sc);
+      }
     },
     end() {
       engine.end().forEach(onAnomaly);
       for (const [id, sc] of scenarios) close(id, sc);
       scenarios.clear();
     },
+    activeScenarios: () => scenarios.size,
+    bufferedEvents: () => [...scenarios.values()].reduce((n, sc) => n + sc.buffer.size(), 0),
   };
 }

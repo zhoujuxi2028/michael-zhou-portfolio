@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { createRecorder, type Clip, type RecorderOptions } from '../../src/collector/recorder.ts';
-import { ev, type AccState, type AdasEvent } from '../../src/schema/events.ts';
+import { apa02 } from '../../src/rules/apa-02.ts';
+import { ev, scenarioEnd, type AccState, type AdasEvent } from '../../src/schema/events.ts';
 import { fakeRule, fakeRule2 } from './fake-rule.ts';
 
 const track = (ts: number, s = 'S1') =>
@@ -155,5 +156,53 @@ describe('recorder: preconditions', () => {
   it('adds nothing when no state event precedes the window', () => {
     const c = record(byTs(ticks(0, 20000), [hit(10000, 0)]))[0] as Clip;
     expect(pre(c)).toEqual([]);
+  });
+});
+
+describe('recorder: scenario lifecycle', () => {
+  const maneuver = (ts: number, s = 'S1') => ev('APA/STEP', ts, s, { step: 'MANEUVERING', reason: 't' });
+
+  it('writes the clip at SCENARIO_END and releases the scenario', () => {
+    const clips: Clip[] = [];
+    const r = createRecorder(OPTS, (c) => clips.push(c));
+    for (const e of byTs(ticks(0, 9000), [hit(8000, 0), scenarioEnd('S1', 9000)])) r.push(e);
+    expect(clips).toHaveLength(1);
+    expect(clips[0]).toMatchObject({ endTs: 9000 });
+    expect(clips[0]?.events.at(-1)?.type).toBe('SCENARIO_END');
+    expect(r.activeScenarios()).toBe(0);
+    expect(r.bufferedEvents()).toBe(0);
+  });
+
+  it('records anomalies raised at scenario end (APA-02 unfinished)', () => {
+    const clips = record(byTs(ticks(0, 9000), [maneuver(0), scenarioEnd('S1', 9000)]), { ...OPTS, rules: [apa02] }, false);
+    expect(clips).toHaveLength(1);
+    expect(clips[0]).toMatchObject({ file: 'S1_0_APA-02.jsonl', startTs: 0, endTs: 9000 });
+  });
+
+  it('flushes open scenarios and EOF anomalies on end()', () => {
+    const clips: Clip[] = [];
+    const r = createRecorder({ ...OPTS, rules: [fakeRule, apa02] }, (c) => clips.push(c));
+    for (const e of byTs(ticks(0, 9000), ticks(0, 9000, 'S2'), [hit(8000, 0), maneuver(0, 'S2')])) r.push(e);
+    expect(clips).toHaveLength(0);
+    r.end();
+    expect(clips.map((c) => c.file).sort()).toEqual(['S1_8000_T-1.jsonl', 'S2_0_APA-02.jsonl']);
+    expect(r.activeScenarios()).toBe(0);
+  });
+
+  it('starts a reused scenario id with an empty buffer', () => {
+    const events = [...ticks(0, 5000), scenarioEnd('S1', 5000), ...byTs(ticks(0, 9000), [hit(8000, 0)])];
+    const c = record(events)[0] as Clip;
+    expect(c.events.filter((e) => e.ts === 6000)).toHaveLength(1);
+    expect(c.events.some((e) => e.type === 'SCENARIO_END')).toBe(false);
+  });
+
+  it('keeps memory bounded by the buffer while scenarios run', () => {
+    const r = createRecorder({ ...OPTS, bufferMs: 1000 }, () => {});
+    let peak = 0;
+    for (const e of byTs(ticks(0, 100000), ticks(0, 100000, 'S2'))) {
+      r.push(e);
+      peak = Math.max(peak, r.bufferedEvents());
+    }
+    expect(peak).toBe(22);
   });
 });
