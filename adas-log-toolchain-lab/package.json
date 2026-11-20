@@ -14,7 +14,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "test:perf": "vitest run --config vitest.perf.config.ts"
+    "test:perf": "vitest run --config vitest.perf.config.ts",
+    "test:generated": "vitest run --config vitest.generated.config.ts"
   },
   "dependencies": {
     "commander": "15.1.0",
