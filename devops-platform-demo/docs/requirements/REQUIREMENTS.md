@@ -1,7 +1,6 @@
 # devops-platform-demo — Requirements
 
 > 历史细项沿用 `FR-CICD-*` / `NFR-CICD-*` 编号（不改写），归属 `REQ-DVP-001`/`002`。
-> REQ 级需求来源：[DSV-JD-GAP-ANALYSIS.md](../project-management/DSV-JD-GAP-ANALYSIS.md)
 
 ## 功能需求（历史）
 
