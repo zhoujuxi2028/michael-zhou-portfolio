@@ -1,7 +1,6 @@
 import { createHash } from 'node:crypto';
 import { mkdir, writeFile } from 'node:fs/promises';
-import { join } from 'node:path';
-import { writeJson } from '../cli/context.ts';
+import { dirname, join } from 'node:path';
 import { toJsonl } from '../io/jsonl.ts';
 import { RULESET_VERSION, TOOL_VERSION } from '../version.ts';
 import type { Clip } from './recorder.ts';
@@ -33,6 +32,11 @@ export interface ClipWriter {
   finish(): Promise<ClipIndex>;
 }
 
+export async function writeJsonFile(path: string, data: unknown): Promise<void> {
+  await mkdir(dirname(path), { recursive: true });
+  await writeFile(path, `${JSON.stringify(data, null, 2)}\n`);
+}
+
 /** Writes clip JSON Lines files into `dir` and collects `index.json` (contract C3). */
 export function createClipWriter(dir: string, meta: IndexMeta): ClipWriter {
   const clips: ClipEntry[] = [];
@@ -61,7 +65,7 @@ export function createClipWriter(dir: string, meta: IndexMeta): ClipWriter {
     },
     async finish() {
       const index: ClipIndex = { meta: { toolVersion: TOOL_VERSION, rulesetVersion: RULESET_VERSION, ...meta }, clips };
-      await writeJson(join(dir, 'index.json'), index);
+      await writeJsonFile(join(dir, 'index.json'), index);
       return index;
     },
   };
