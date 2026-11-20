@@ -1,8 +1,9 @@
 import { readFile } from 'node:fs/promises';
-import { dirname, isAbsolute, relative, resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
 import { z } from 'zod';
 import type { Manifest } from '../casegen/regression.ts';
 import { UsageError } from '../config.ts';
+import { containedPath } from '../io/paths.ts';
 
 const ManifestSchema = z.object({
   meta: z.object({
@@ -41,8 +42,8 @@ export async function loadManifest(path: string): Promise<Manifest> {
   }
   const base = resolve(dirname(path));
   for (const c of r.data.cases) {
-    const rel = relative(base, resolve(base, c.source));
-    if (rel === '' || rel.startsWith('..') || isAbsolute(rel)) {
+    const rel = containedPath(base, c.source);
+    if (rel === null || rel === '') {
       throw new UsageError(`invalid manifest: case ${c.caseId} source "${c.source}" escapes the manifest directory`);
     }
   }

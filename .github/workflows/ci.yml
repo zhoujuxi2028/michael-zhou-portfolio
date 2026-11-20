@@ -65,6 +65,8 @@ jobs:
       - run: npm run typecheck
       - run: npm run test:coverage
       - run: npm run demo
+      # test:generated uses --passWithNoTests: fail here if the demo produced no regression cases.
+      - run: test -f out/cases/generated/regression.test.ts
       - run: npm run test:generated -- out/cases
 
   adas-analysis:

@@ -165,7 +165,7 @@ Turn every anomaly in `anomalies.json` into a self-contained regression case (ev
 16 regression cases written to out/cases/manifest.json; test file out/cases/generated/regression.test.ts
 ```
 
-Case data goes through the same scanner as `parse`: invalid and late events are dropped and window events are sorted by `ts`. Every case file must stay under `--out`. Before writing, the command removes the previous `data/`, `generated/` and `manifest.json` under `--out`; other files are kept, so do not point `--out` at a directory that holds your own `generated/` folder.
+Case data goes through the same scanner as `parse`: invalid and late events are dropped and window events are sorted by `ts`. Every case file must stay under `--out`. Each run records the files it wrote in `--out/.adas-regression-outputs.json`; the next run deletes only those files (and the directories it created, if empty) before writing. Nothing else under `--out` is deleted, also not your own files in `data/` or `generated/`; files with the same name are overwritten. Without that ownership file (first run) nothing is deleted.
 
 Exit: `0`; `2` anomalies / log file missing or invalid (including an invalid `scenarioId` in the anomalies file), or a case path outside `--out`. Run the generated tests with `npm run test:generated` (see [3.8](#38-generated-tests)).
 
@@ -244,7 +244,7 @@ node src/cli.ts ticket fixtures/jira/export.json
 See out/tasks/unmapped.json for reasons
 ```
 
-Before writing, `ticket` removes stale `data/`, `generated/`, `unmapped.json` and its own `<KEY>.json` task files under `--out`.
+Before writing, `ticket` deletes only the files its previous run wrote, as listed in `--out/.adas-ticket-outputs.json` (then the directories it created, if empty); other files are kept. `ticket` and `cases regression` keep separate ownership files, so they can share one `--out` without deleting each other's outputs.
 
 Unmapped reasons: `no rule label`, `unknown rule id`, `component does not match rule module`. Exit: `0` (also with unmapped tickets); `1` unmapped tickets with `--strict`; `2` export missing / not valid JSON / wrong shape / duplicate issue key.
 
@@ -441,7 +441,7 @@ Case ids end in `-minus` / `-eq` / `-plus` (threshold minus epsilon, exact, plus
 | Field | Content |
 |-------|---------|
 | `meta` | versions, `source` (`live` or input path), `bufferMs`, `preMs`, `postMs` |
-| `clips[]` | `file`, `scenarioId`, `trigger` (`rule` / `manual`), `ruleIds[]`, `startTs`, `endTs`, `events` (lines in the file, preconditions included), `sha256` (of the file bytes), `truncated` |
+| `clips[]` | `file`, `scenarioId`, `trigger` (`rule` / `manual`), `ruleIds[]`, `startTs`, `endTs`, `events` (lines in the file, preconditions included), `sha256` (of the file bytes), `truncated`, `split` (only present, `true`, on a clip closed by the `maxClipMs` cap; the next clip of the scenario continues it) |
 
 `quality.json`:
 

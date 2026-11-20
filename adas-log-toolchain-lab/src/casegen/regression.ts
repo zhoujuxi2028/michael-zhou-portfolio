@@ -1,9 +1,11 @@
-import { access, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
-import { isAbsolute, join, relative, resolve } from 'node:path';
+import { access, readFile } from 'node:fs/promises';
+import { join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
 import { UsageError } from '../config.ts';
 import { toJsonl } from '../io/jsonl.ts';
+import { startOwnedOutputs } from '../io/ownership.ts';
+import { containedPath } from '../io/paths.ts';
 import { ScenarioId } from '../schema/events.ts';
 import { RULESET_VERSION, TOOL_VERSION } from '../version.ts';
 import { extractWindows } from './extract.ts';
@@ -42,7 +44,7 @@ export interface RegressionOptions {
   anomalies: string;
   /** Original JSON Lines log. */
   log: string;
-  /** Output directory; its manifest.json, data/ and generated/ are replaced. */
+  /** Output directory; the files its previous run wrote there (see `.adas-regression-outputs.json`) are replaced. */
   out: string;
   preMs: number;
   postMs: number;
@@ -98,21 +100,20 @@ export async function buildRegressionCases(o: RegressionOptions): Promise<Regres
   const ids = regressionCaseIds(anomalies);
   const outDir = resolve(o.out);
   for (const id of ids) {
-    const rel = relative(outDir, resolve(outDir, 'data', `${id}.jsonl`));
-    if (rel.startsWith('..') || isAbsolute(rel)) throw new UsageError(`case ${id} escapes the output directory ${o.out}`);
+    if (containedPath(outDir, join('data', `${id}.jsonl`)) === null) throw new UsageError(`case ${id} escapes the output directory ${o.out}`);
   }
   const windows = await extractWindows(o.log, anomalies.map((a) => ({
     scenarioId: a.scenarioId, from: Math.max(0, a.startTs - o.preMs), to: a.detectTs + o.postMs,
   })));
-  // Replace (never merge with) the previous run's output; nothing else under --out is touched.
-  for (const p of ['data', 'generated', 'manifest.json']) await rm(join(o.out, p), { recursive: true, force: true });
-  await mkdir(join(o.out, 'data'), { recursive: true });
+  // Replace the previous run's own outputs (listed in its ownership file); nothing else under --out is touched.
+  const owned = await startOwnedOutputs(o.out, 'regression');
+  await owned.mkdir('data');
   const cases: ManifestCase[] = [];
   const entries: CaseTestEntry[] = [];
   for (const [i, a] of anomalies.entries()) {
     const caseId = ids[i]!, { window, events } = windows[i]!;
     const source = `data/${caseId}.jsonl`;
-    await writeFile(join(o.out, source), toJsonl(events));
+    await owned.write(source, toJsonl(events));
     cases.push({ caseId, ruleId: a.ruleId, scenarioId: a.scenarioId, source, window, expect: { ruleId: a.ruleId, triggered: true } });
     entries.push({ caseId, ruleId: a.ruleId, file: `../${source}`, window, expectTriggered: true, description: a.message });
   }
@@ -121,12 +122,12 @@ export async function buildRegressionCases(o: RegressionOptions): Promise<Regres
     cases,
   };
   const manifestPath = join(o.out, 'manifest.json');
-  await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+  await owned.write('manifest.json', `${JSON.stringify(manifest, null, 2)}\n`);
 
   const generated = join(o.out, 'generated');
   const testPath = join(generated, 'regression.test.ts');
-  await mkdir(generated, { recursive: true });
   const runnerImport = relative(generated, RUNNER).replaceAll('\\', '/');
-  await writeFile(testPath, renderCaseTest(entries, { title: 'regression cases', runnerImport }));
+  await owned.write('generated/regression.test.ts', renderCaseTest(entries, { title: 'regression cases', runnerImport }));
+  await owned.finish();
   return { manifest, manifestPath, testPath };
 }

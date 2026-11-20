@@ -1,4 +1,4 @@
-import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -80,6 +80,19 @@ describe('adas-lab replay', () => {
     const c = capture();
     expect(await main(['replay', '--manifest', manifest, '--out', join(dir, 'r.json')], c.io)).toBe(2);
     expect(c.err.join('\n')).toMatch(/escapes the manifest directory/);
+  });
+
+  it('accepts a case source whose first segment merely starts with ".." (e.g. "..foo/x.jsonl")', async () => {
+    const { dir, manifest } = await cases();
+    const m = JSON.parse(readFileSync(manifest, 'utf8')) as { cases: { source: string }[] };
+    const base = join(dir, 'cases');
+    mkdirSync(join(base, '..foo'));
+    copyFileSync(join(base, m.cases[0]!.source), join(base, '..foo', 'x.jsonl'));
+    m.cases[0]!.source = '..foo/x.jsonl';
+    writeFileSync(manifest, JSON.stringify(m));
+    const c = capture();
+    expect(await main(['replay', '--manifest', manifest, '--out', join(dir, 'r.json')], c.io)).toBe(0);
+    expect(c.err.join('\n')).toBe('');
   });
 
   it.each([

@@ -1,10 +1,10 @@
-import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { renderCaseTest, type CaseTestEntry } from '../casegen/template.ts';
 import { resolveEpsilon, resolveRuleConfig, type EngineConfig } from '../engine/engine.ts';
 import type { AnyRule } from '../engine/types.ts';
 import { toJsonl } from '../io/jsonl.ts';
+import { startOwnedOutputs } from '../io/ownership.ts';
 import { RULES } from '../rules/index.ts';
 import { mapTicket } from './map.ts';
 import type { Ticket } from './parse.ts';
@@ -13,32 +13,13 @@ const RUNNER = fileURLToPath(new URL('../casegen/case-runner.ts', import.meta.ur
 
 export interface TaskSummary { mapped: number; unmapped: number }
 
-const writeJson = (path: string, data: unknown) => writeFile(path, `${JSON.stringify(data, null, 2)}\n`);
-
-/** Remove outputs of a previous run (data/, generated/, task JSON files, unmapped.json); unrelated files stay. */
-async function cleanStale(outDir: string): Promise<void> {
-  await rm(join(outDir, 'data'), { recursive: true, force: true });
-  await rm(join(outDir, 'generated'), { recursive: true, force: true });
-  await rm(join(outDir, 'unmapped.json'), { force: true });
-  let names: string[];
-  try {
-    names = await readdir(outDir);
-  } catch {
-    return;
-  }
-  for (const n of names.filter((f) => f.endsWith('.json'))) {
-    try {
-      const j = JSON.parse(await readFile(join(outDir, n), 'utf8')) as Record<string, unknown>;
-      if (typeof j.testFile === 'string' && typeof j.ruleId === 'string') await rm(join(outDir, n), { force: true });
-    } catch {
-      // not ours (unreadable or invalid JSON): leave it
-    }
-  }
-}
+const json = (data: unknown) => `${JSON.stringify(data, null, 2)}\n`;
 
 /**
  * Write `<out>/<KEY>.json`, `data/<KEY>-<caseId>.jsonl`, `generated/<KEY>.test.ts` for mapped tickets
  * and `unmapped.json` for the rest. Repro data = the rule's boundary cases that must trigger.
+ * Before writing, the files the previous `ticket` run wrote (listed in `.adas-ticket-outputs.json`)
+ * are removed; nothing else under `outDir` is touched.
  */
 export async function generateTasks(
   tickets: readonly Ticket[],
@@ -47,11 +28,10 @@ export async function generateTasks(
 ): Promise<TaskSummary> {
   const rules = opts.rules ?? RULES;
   const config = opts.config ?? {};
-  const dataDir = join(outDir, 'data');
   const genDir = join(outDir, 'generated');
-  await cleanStale(outDir);
-  await mkdir(dataDir, { recursive: true });
-  await mkdir(genDir, { recursive: true });
+  const owned = await startOwnedOutputs(outDir, 'ticket');
+  await owned.mkdir('data');
+  await owned.mkdir('generated');
   const runnerImport = relative(genDir, RUNNER).replaceAll('\\', '/');
   const unmapped: { key: string; reason: string }[] = [];
   let mapped = 0;
@@ -67,13 +47,14 @@ export async function generateTasks(
     const entries: CaseTestEntry[] = [];
     for (const c of cases) {
       const name = `${m.task.key}-${c.caseId}.jsonl`;
-      await writeFile(join(dataDir, name), toJsonl(c.events));
+      await owned.write(`data/${name}`, toJsonl(c.events));
       entries.push({ caseId: c.caseId, ruleId: rule.id, file: `../data/${name}`, expectTriggered: true, description: c.description });
     }
     const testFile = `generated/${m.task.key}.test.ts`;
-    await writeFile(join(outDir, testFile), renderCaseTest(entries, { title: `${m.task.key}: ${m.task.summary}`, runnerImport }));
-    await writeJson(join(outDir, `${m.task.key}.json`), { ...m.task, cases: entries.map((e) => e.caseId), testFile });
+    await owned.write(testFile, renderCaseTest(entries, { title: `${m.task.key}: ${m.task.summary}`, runnerImport }));
+    await owned.write(`${m.task.key}.json`, json({ ...m.task, cases: entries.map((e) => e.caseId), testFile }));
   }
-  await writeJson(join(outDir, 'unmapped.json'), unmapped);
+  await owned.write('unmapped.json', json(unmapped));
+  await owned.finish();
   return { mapped, unmapped: unmapped.length };
 }
