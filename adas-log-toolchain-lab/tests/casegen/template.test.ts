@@ -21,6 +21,7 @@ describe('renderCaseTest', () => {
   });
 
   it('produces a test that type-checks and runs green (and red when expectation is wrong)', () => {
+    mkdirSync(join(root, 'out'), { recursive: true });
     const dir = join(mkdtempSync(join(root, 'out', 'tpl-')), 'generated');
     mkdirSync(join(dir, 'data'), { recursive: true });
     const S = 'S1';
