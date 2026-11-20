@@ -13,6 +13,7 @@ function logFile(lines: readonly (AdasEvent | string)[]): string {
   writeFileSync(path, lines.map((l) => (typeof l === 'string' ? l : JSON.stringify(l))).join('\n') + '\n');
   return path;
 }
+const accState = (ts: number, to: 'ACTIVE' | 'STANDBY', sid = S) => ev('ACC/STATE', ts, sid, { from: 'OFF', to, reason: 'r' });
 const req = (scenarioId: string, from: number, to: number): WindowRequest => ({ scenarioId, from, to });
 
 describe('extractWindows', () => {
@@ -27,5 +28,25 @@ describe('extractWindows', () => {
     const path = logFile([track(1000), scenarioEnd(S, 2000)]);
     const [w] = await extractWindows(path, [req(S, 0, 5000)]);
     expect(w!.events.at(-1)).toEqual(scenarioEnd(S, 2000));
+  });
+
+  it('prepends the latest state event per dimension before the window and lowers window[0] to cover it', async () => {
+    const path = logFile([
+      accState(100, 'STANDBY'), ev('LKA/STATE', 200, S, { from: 'OFF', to: 'ACTIVE' }), accState(300, 'ACTIVE'),
+      ev('VEH/TURN_SIGNAL', 400, S, { side: 'LEFT' }), ev('APA/STEP', 500, S, { step: 'SEARCHING', reason: 'r' }),
+      accState(600, 'ACTIVE', T), track(700), track(5000), accState(5500, 'STANDBY'),
+    ]);
+    const [w] = await extractWindows(path, [req(S, 4000, 6000)]);
+    expect(w!.window).toEqual([200, 6000]);
+    expect(w!.events.map((e) => [e.ts, `${e.module}/${e.type}`])).toEqual([
+      [200, 'LKA/STATE'], [300, 'ACC/STATE'], [400, 'VEH/TURN_SIGNAL'], [500, 'APA/STEP'], [5000, 'ACC/TRACK'], [5500, 'ACC/STATE'],
+    ]);
+  });
+
+  it('keeps window[0] when there are no preconditions and ignores states from an earlier ended instance', async () => {
+    const path = logFile([accState(100, 'ACTIVE'), scenarioEnd(S, 1000), track(5000), track(6000)]);
+    const [w] = await extractWindows(path, [req(S, 4000, 6000)]);
+    expect(w!.window).toEqual([4000, 6000]);
+    expect(w!.events).toEqual([track(5000), track(6000)]);
   });
 });
