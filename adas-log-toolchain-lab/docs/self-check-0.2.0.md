@@ -2,7 +2,7 @@
 
 Checklist from the [Phase 2–4 plan §5](../../docs/superpowers/plans/2026-11-20-adas-log-toolchain-phase2-4.md#5-自检清单). Run on 2026-11-20 on branch `feature/adas-phase2-4`, starting from clean `out/` and `coverage/` directories. Every result below is copied from a command run on that day.
 
-**Result:** items 1–9 pass. Item 10 is checked on the pull request. Two acceptance items stay open on purpose: GitHub Pages publishing and the root README row (see item 1).
+**Result:** items 1–10 pass. Two acceptance items stay open on purpose: GitHub Pages publishing and the root README row (see item 1).
 
 | # | Check | Result |
 |---|-------|--------|
@@ -15,7 +15,7 @@ Checklist from the [Phase 2–4 plan §5](../../docs/superpowers/plans/2026-11-2
 | 7 | Tool 0.2.0 / ruleset 1.1.0 in every output | ✅ |
 | 8 | English code and output; bilingual README; CHANGELOG | ✅ |
 | 9 | Public repository hygiene | ✅ |
-| 10 | CI green on the pull request | see PR |
+| 10 | CI green on the pull request | ✅ PR #76: all 6 checks pass (run 44836730348 and re-run after `5709aa2`) |
 
 ## 1. Acceptance criteria (REQUIREMENTS §6, Phases 2–4)
 
@@ -47,6 +47,9 @@ Checklist from the [Phase 2–4 plan §5](../../docs/superpowers/plans/2026-11-2
   - `8fb35e8`, which was not green on a clean checkout until `770baa3`.
 
 ## 3. Core checks (`adas-log-toolchain-lab/`)
+
+Found in CI, not locally: the first run of PR #76 failed lint in the `adas` job (116 errors). The core ESLint config did not exclude `dashboard/`, and in CI (no dashboard `node_modules`) typescript-eslint saw two tsconfig roots. Fixed in `5709aa2` by excluding `dashboard/` and `analysis/` (own jobs) and pinning `tsconfigRootDir`. Reproduced in a clean worktree before the fix, then all six `adas` job steps were run there: lint, typecheck, coverage, demo, regression-file guard, generated tests — all ok.
+
 
 | Command | Result |
 |---------|--------|
