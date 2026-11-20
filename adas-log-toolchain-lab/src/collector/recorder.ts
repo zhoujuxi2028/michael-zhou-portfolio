@@ -81,20 +81,23 @@ export function createRecorder(opts: RecorderOptions, onClip: (c: Clip) => void)
     });
   };
 
-  /** Start a window, or merge it into the one still recording when they overlap. */
+  /**
+   * Start a window, or merge it into the one still recording when they overlap. Triggers run
+   * before the close check for the same event, so after a ts jump the open window may already
+   * be over: close it first.
+   */
   const trigger = (id: string, next: Window) => {
     const sc = open(id);
-    const w = sc.window;
-    if (w && next.start > w.end) close(id, sc);
-    if (sc.window) {
-      const cur = sc.window;
+    if (sc.window && next.start > sc.window.end) close(id, sc);
+    const cur = sc.window;
+    if (cur) {
       cur.start = Math.min(cur.start, next.start);
       cur.end = Math.max(cur.end, next.end);
       for (const r of next.ruleIds) if (!cur.ruleIds.includes(r)) cur.ruleIds.push(r);
     } else {
       sc.window = next;
     }
-    sc.buffer.pin(sc.window.start);
+    sc.buffer.pin((cur ?? next).start);
   };
 
   const onAnomaly = (a: Anomaly) => trigger(a.scenarioId, {

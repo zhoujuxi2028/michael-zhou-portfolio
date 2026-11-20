@@ -71,6 +71,15 @@ describe('recorder: merging', () => {
     expect(range(clips[0] as Clip)).toEqual([3000, 12000]);
   });
 
+  it('does not merge a trigger that arrives after a ts jump past the open window', () => {
+    // The event at 30000 both ends the [6000, 11000] window and raises a new trigger.
+    const clips = record([...byTs(ticks(0, 10000), [hit(8000, 0)]), hit(30000, 0), ...ticks(30100, 40000)]);
+    expect(clips.map((c) => [c.file, c.startTs, c.endTs])).toEqual([
+      ['S1_8000_T-1.jsonl', 6000, 11000],
+      ['S1_30000_T-1.jsonl', 28000, 33000],
+    ]);
+  });
+
   it('keeps non-overlapping windows and other scenarios apart', () => {
     const events = byTs(ticks(0, 30000), ticks(0, 30000, 'S2'), [hit(8000, 1000), hit(16000, 0), hit(8000, 1000, 'S2')]);
     const clips = record(events);
