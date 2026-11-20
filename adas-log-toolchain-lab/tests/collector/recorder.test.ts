@@ -162,6 +162,13 @@ describe('recorder: preconditions', () => {
     expect(pre(c)).toEqual(['ACC/STATE@5000']);
   });
 
+  it('picks the latest state by ts when state events arrive out of order', () => {
+    const late = [acc(2000, 'OFF', 'ACTIVE'), acc(1500, 'OFF', 'STANDBY')];
+    const buffered = record([...ticks(0, 3000), ...late, ...byTs(ticks(3100, 20000), [hit(10000, 0)])])[0] as Clip;
+    const evicted = record([...ticks(0, 3000), ...late, ...byTs(ticks(3100, 20000), [hit(10000, 0)])], { ...OPTS, bufferMs: 3000 })[0] as Clip;
+    for (const c of [buffered, evicted]) expect(c.events.filter((e) => e.type === 'STATE').map((e) => e.ts)).toEqual([2000]);
+  });
+
   it('adds nothing when no state event precedes the window', () => {
     const c = record(byTs(ticks(0, 20000), [hit(10000, 0)]))[0] as Clip;
     expect(pre(c)).toEqual([]);
