@@ -985,8 +985,9 @@ export async function scanLines(
         quality.counts.unknownEvents++;
         quality.unknownEvents[r.detail] = (quality.unknownEvents[r.detail] ?? 0) + 1;
       } else {
-        quality.counts[r.kind]++;
-        keep(r.kind === 'invalidJson' ? quality.invalidJson : quality.schemaErrors, { line: lineNo, detail: r.detail });
+        const key = r.kind === 'invalidJson' ? 'invalidJson' : 'schemaErrors';
+        quality.counts[key]++;
+        keep(quality[key], { line: lineNo, detail: r.detail });
       }
       continue;
     }
@@ -3046,7 +3047,7 @@ import { parseFile } from '../../src/parser/parse.ts';
 
 describe('performance smoke', () => {
   it('parses >= 100k events in under 5 s', async () => {
-    const { events } = generate({ seed: 7, scenarios: 140 });
+    const { events } = generate({ seed: 7, scenarios: 150 });
     expect(events.length).toBeGreaterThanOrEqual(100_000);
     const file = join(mkdtempSync(join(tmpdir(), 'adas-perf-')), 'big.jsonl');
     writeFileSync(file, toJsonl(events));
@@ -3071,7 +3072,7 @@ describe('performance smoke', () => {
 - [ ] **Step 3: 运行**
 
 Run: `npx vitest run tests/cli/e2e.test.ts && npm run test:perf`
-Expected: e2e 2 passed；perf 2 passed，并打印耗时。若 140 个场景不足 10 万事件，把 `scenarios` 调到满足为止。
+Expected: e2e 2 passed；perf 2 passed，并打印耗时。若 150 个场景不足 10 万事件，把 `scenarios` 调到满足为止。
 
 - [ ] **Step 4: 提交**
 
