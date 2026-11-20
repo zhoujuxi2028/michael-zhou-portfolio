@@ -9,6 +9,12 @@ export interface RecorderOptions {
   bufferMs?: number;
   preMs?: number;
   postMs?: number;
+  /**
+   * Upper bound for a merged clip's window (end − start). A merge that would exceed it closes the
+   * current clip and starts a new one. Default 60 s + pre + post: the window of an APA-02 60 s
+   * timeout. A single trigger window is never split, whatever its length.
+   */
+  maxClipMs?: number;
   rules?: readonly AnyRule[];
   config?: EngineConfig;
 }
@@ -27,7 +33,7 @@ export interface Clip {
 }
 
 export interface Recorder {
-  readonly options: { bufferMs: number; preMs: number; postMs: number };
+  readonly options: { bufferMs: number; preMs: number; postMs: number; maxClipMs: number };
   push(e: AdasEvent): void;
   /** EOF: finish open scenarios and write their clips. */
   end(): void;
@@ -38,16 +44,21 @@ export interface Recorder {
 }
 
 export const DEFAULTS = { bufferMs: 10000, preMs: 5000, postMs: 5000 } as const;
+/** Added to pre + post for the default `maxClipMs`. */
+export const DEFAULT_CLIP_CORE_MS = 60000;
 
 interface Window { start: number; end: number; trigger: 'rule' | 'manual'; label: string; labelTs: number; ruleIds: string[] }
 interface Scenario { buffer: RingBuffer; states: PreconditionTracker; now: number; window: Window | null }
 
 /** Core recorder shared by file and live sources: ring buffer + rule/manual triggers → clips. */
 export function createRecorder(opts: RecorderOptions, onClip: (c: Clip) => void): Recorder {
+  const preMs = opts.preMs ?? DEFAULTS.preMs;
+  const postMs = opts.postMs ?? DEFAULTS.postMs;
   const options = {
     bufferMs: opts.bufferMs ?? DEFAULTS.bufferMs,
-    preMs: opts.preMs ?? DEFAULTS.preMs,
-    postMs: opts.postMs ?? DEFAULTS.postMs,
+    preMs,
+    postMs,
+    maxClipMs: opts.maxClipMs ?? DEFAULT_CLIP_CORE_MS + preMs + postMs,
   };
   const engine = createEngine(opts.rules ?? RULES, opts.config);
   const scenarios = new Map<string, Scenario>();
@@ -84,11 +95,15 @@ export function createRecorder(opts: RecorderOptions, onClip: (c: Clip) => void)
   /**
    * Start a window, or merge it into the one still recording when they overlap. Triggers run
    * before the close check for the same event, so after a ts jump the open window may already
-   * be over: close it first.
+   * be over: close it first. A merge that would make the window longer than `maxClipMs` closes
+   * the current clip (ending at the current scenario time) and starts a new one, so a chain of
+   * overlapping triggers cannot pin the ring buffer forever.
    */
   const trigger = (id: string, next: Window) => {
     const sc = open(id);
-    if (sc.window && next.start > sc.window.end) close(id, sc);
+    const w = sc.window;
+    const mergedMs = w ? Math.max(w.end, next.end) - Math.min(w.start, next.start) : 0;
+    if (w && (next.start > w.end || mergedMs > options.maxClipMs)) close(id, sc);
     const cur = sc.window;
     if (cur) {
       cur.start = Math.min(cur.start, next.start);
