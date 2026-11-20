@@ -6,6 +6,9 @@ export type AccState = z.infer<typeof AccState>;
 export const ApaStep = z.enum(['SEARCHING', 'SLOT_SELECTED', 'MANEUVERING', 'COMPLETED', 'ABORTED']);
 export type ApaStep = z.infer<typeof ApaStep>;
 
+export const LkaState = z.enum(['OFF', 'STANDBY', 'ACTIVE', 'SUPPRESSED', 'UNAVAILABLE']);
+export type LkaState = z.infer<typeof LkaState>;
+
 export const HmiFeature = z.enum(['ACC', 'APA', 'LKA']);
 export type HmiFeature = z.infer<typeof HmiFeature>;
 
@@ -18,7 +21,7 @@ export const Envelope = z.object({
   data: z.unknown(),
 });
 
-/** Payload schema per `${module}/${type}` (Phase 1). */
+/** Payload schema per `${module}/${type}` (Phase 1 + Phase 2 LKA / VEH / manual trigger). */
 export const dataSchemas = {
   'ACC/STATE': z.object({ from: AccState, to: AccState, reason: z.string() }),
   'ACC/TRACK': z.object({
@@ -37,6 +40,15 @@ export const dataSchemas = {
     value: z.string(),
   }),
   'SYS/SCENARIO_END': z.object({}),
+  'SYS/MANUAL_TRIGGER': z.object({ note: z.string() }),
+  'LKA/STATE': z.object({ from: LkaState, to: LkaState }),
+  'LKA/LANE': z.object({
+    leftConf: z.number().min(0).max(1),
+    rightConf: z.number().min(0).max(1),
+    offset: z.number(),
+  }),
+  'LKA/STEER': z.object({ torque: z.number() }),
+  'VEH/TURN_SIGNAL': z.object({ side: z.enum(['LEFT', 'RIGHT', 'OFF']) }),
 } as const;
 
 export type EventKey = keyof typeof dataSchemas;

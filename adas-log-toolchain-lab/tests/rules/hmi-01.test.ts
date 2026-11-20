@@ -61,3 +61,17 @@ describe('HMI-01 out-of-order input', () => {
     expect(out).toEqual([]);
   });
 });
+
+describe('HMI-01 LKA state changes (Phase 2)', () => {
+  const lka = (ts: number, to: 'ACTIVE' | 'UNAVAILABLE') => ev('LKA/STATE', ts, S, { from: 'OFF', to });
+  const showLka = (ts: number, value: string) => ev('HMI/DISPLAY', ts, S, { feature: 'LKA', item: 'STATE', value });
+
+  it('passes when HMI shows the new LKA state in time', () => {
+    expect(run([hmi01], [lka(1000, 'ACTIVE'), showLka(1100, 'ACTIVE'), scenarioEnd(S, 2000)])).toEqual([]);
+  });
+
+  it('fires when the LKA state is not shown', () => {
+    const out = run([hmi01], [lka(1000, 'UNAVAILABLE'), tick(1350), scenarioEnd(S, 2000)]);
+    expect(out.map((a) => a.evidence)).toEqual([{ feature: 'LKA', expected: 'UNAVAILABLE', shown: null }]);
+  });
+});
