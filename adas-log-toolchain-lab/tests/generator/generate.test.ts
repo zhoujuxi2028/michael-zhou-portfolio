@@ -1,7 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { generate, MIN_SCENARIOS } from '../../src/generator/generate.ts';
+import { generate, MIN_SCENARIOS, phase1PlanIndex } from '../../src/generator/generate.ts';
 import { toJsonl } from '../../src/io/jsonl.ts';
 import { parseLine } from '../../src/schema/validate.ts';
+
+describe('phase1PlanIndex', () => {
+  it('maps the Phase 1 scenarios (even ACC, odd APA) to plan slots and nothing after them', () => {
+    expect([0, 1, 2, 3, 4, 5, 6, 7].map(phase1PlanIndex)).toEqual([0, 0, 1, 1, 2, 2, 3, 3]);
+    // Later scenarios must never draw from the ACC / APA plans, even if a plan grows.
+    for (const i of [8, 9, 10, 12, 13, 19]) expect(phase1PlanIndex(i)).toBeNull();
+  });
+});
 
 describe('generate', () => {
   it('is deterministic for the same seed', () => {
@@ -16,12 +24,33 @@ describe('generate', () => {
     expect(a.labels).toEqual(b.labels);
   });
 
-  it('injects 12 labelled faults, 2 per Phase 1 rule', () => {
+  it('injects 16 labelled faults, 2 per rule, in at most half of the scenarios', () => {
     const { labels } = generate({ seed: 42, scenarios: 20 });
-    expect(labels).toHaveLength(12);
+    expect(labels).toHaveLength(16);
     const perRule = Object.groupBy(labels, (l) => l.ruleId);
-    for (const id of ['ACC-01', 'ACC-02', 'APA-01', 'APA-02', 'HMI-01', 'HMI-02']) expect(perRule[id]).toHaveLength(2);
-    expect(new Set(labels.map((l) => l.scenarioId)).size).toBe(8);
+    for (const id of ['ACC-01', 'ACC-02', 'APA-01', 'APA-02', 'HMI-01', 'HMI-02', 'LKA-01', 'LKA-02']) expect(perRule[id]).toHaveLength(2);
+    expect(new Set(labels.map((l) => l.scenarioId)).size).toBe(10);
+  });
+
+  it('writes LKA scenarios with lane / steer / turn signal events and injects LKA faults only there', () => {
+    const { events, labels } = generate({ seed: 42, scenarios: 20 });
+    const lkaIds = new Set(events.filter((e) => e.module === 'LKA').map((e) => e.scenarioId));
+    expect([...lkaIds]).toEqual(['S011', 'S014', 'S017', 'S020']);
+    expect(labels.filter((l) => l.ruleId.startsWith('LKA')).every((l) => lkaIds.has(l.scenarioId))).toBe(true);
+    const s11 = events.filter((e) => e.scenarioId === 'S011');
+    const lanes = s11.filter((e) => e.type === 'LANE').map((e) => e.ts);
+    expect(lanes).toHaveLength(600);
+    expect(lanes[1]! - lanes[0]!).toBe(100);
+    expect(s11.some((e) => e.module === 'VEH')).toBe(true);
+    expect(s11.some((e) => e.module === 'LKA' && e.type === 'STEER')).toBe(true);
+  });
+
+  it('keeps clean LKA signals inside the safety margins', () => {
+    const { events } = generate({ seed: 42, scenarios: 20 });
+    const clean = events.filter((e) => e.scenarioId === 'S020');
+    const steers = clean.filter((e) => e.module === 'LKA' && e.type === 'STEER');
+    expect(steers.length).toBeGreaterThan(100);
+    for (const e of steers) if (e.type === 'STEER') expect(Math.abs((e.data as { torque: number }).torque)).toBeLessThanOrEqual(0.3);
   });
 
   it('emits valid, per-scenario ordered events ending with SCENARIO_END', () => {

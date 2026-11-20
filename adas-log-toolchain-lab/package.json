@@ -1,6 +1,6 @@
 {
   "name": "adas-log-toolchain-lab",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "ADAS log toolchain lab: synthetic logs, anomaly detection, test case generation (simulation only)",
   "private": true,
   "type": "module",
@@ -9,12 +9,13 @@
   },
   "scripts": {
     "adas": "node src/cli.ts",
-    "demo": "node src/cli.ts gen --out out && node src/cli.ts parse out/events.jsonl --out out/anomalies.json && node src/cli.ts cases boundary --out out/cases",
+    "demo": "node src/cli.ts gen --out out && node src/cli.ts record --source file --input out/events.jsonl --out out/clips && node src/cli.ts parse out/events.jsonl --out out/anomalies.json && node src/cli.ts cases boundary --out out/cases && node src/cli.ts cases regression --anomalies out/anomalies.json --log out/events.jsonl --out out/cases && node src/cli.ts replay --manifest out/cases/manifest.json --out out/replay-report.json",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "test:perf": "vitest run --config vitest.perf.config.ts"
+    "test:perf": "vitest run --config vitest.perf.config.ts",
+    "test:generated": "vitest run --passWithNoTests --config vitest.generated.config.ts"
   },
   "dependencies": {
     "commander": "15.1.0",

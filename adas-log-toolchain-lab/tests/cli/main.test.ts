@@ -16,8 +16,8 @@ describe('adas-lab CLI', () => {
     const dir = tmp(), c = capture();
     expect(await main(['gen', '--out', dir, '--seed', '7'], c.io)).toBe(0);
     expect(existsSync(join(dir, 'events.jsonl'))).toBe(true);
-    expect(JSON.parse(readFileSync(join(dir, 'labels.json'), 'utf8'))).toHaveLength(12);
-    expect(c.out.join('\n')).toMatch(/Generated \d+ events in 20 scenarios \(12 injected faults\)/);
+    expect(JSON.parse(readFileSync(join(dir, 'labels.json'), 'utf8'))).toHaveLength(16);
+    expect(c.out.join('\n')).toMatch(/Generated \d+ events in 20 scenarios \(16 injected faults\)/);
   });
 
   it('parse writes a report and applies --fail-on', async () => {
@@ -26,8 +26,8 @@ describe('adas-lab CLI', () => {
     const input = join(dir, 'events.jsonl'), report = join(dir, 'anomalies.json');
     const c = capture();
     expect(await main(['parse', input, '--out', report], c.io)).toBe(0);
-    expect(JSON.parse(readFileSync(report, 'utf8')).anomalies).toHaveLength(12);
-    expect(c.out.join('\n')).toContain('Anomalies: 12 (P1: 8, P2: 4)');
+    expect(JSON.parse(readFileSync(report, 'utf8')).anomalies).toHaveLength(16);
+    expect(c.out.join('\n')).toContain('Anomalies: 16 (P1: 10, P2: 6)');
     expect(await main(['parse', input, '--out', report, '--fail-on', 'P1'], capture().io)).toBe(1);
     expect(await main(['parse', input, '--out', report, '--fail-on', 'P2'], capture().io)).toBe(1);
   });
@@ -45,7 +45,7 @@ describe('adas-lab CLI', () => {
     const dir = tmp(), c = capture();
     expect(await main(['cases', 'boundary', '--out', dir], c.io)).toBe(0);
     expect(existsSync(join(dir, 'boundary', 'expected.json'))).toBe(true);
-    expect(c.out.join('\n')).toContain('26 passed, 0 failed');
+    expect(c.out.join('\n')).toContain('38 passed, 0 failed');
   });
 
   it.each([
@@ -65,6 +65,6 @@ describe('adas-lab CLI', () => {
   it('prints the version', async () => {
     const c = capture();
     expect(await main(['--version'], c.io)).toBe(0);
-    expect(c.out.join('\n')).toContain('0.1.0');
+    expect(c.out.join('\n')).toContain('0.2.0');
   });
 });

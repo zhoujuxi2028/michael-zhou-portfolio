@@ -23,6 +23,7 @@ function judge(ctx: RuleCtx<State, Cfg>, feature: HmiFeature, p: Pending): Anoma
 function stateChange(e: AdasEvent): { feature: HmiFeature; value: string } | null {
   if (e.module === 'ACC' && e.type === 'STATE') return { feature: 'ACC', value: e.data.to };
   if (e.module === 'APA' && e.type === 'STEP') return { feature: 'APA', value: e.data.step };
+  if (e.module === 'LKA' && e.type === 'STATE') return { feature: 'LKA', value: e.data.to };
   return null;
 }
 

@@ -1,0 +1,8 @@
+{
+  "meta": {"toolVersion": "0.1.0", "rulesetVersion": "1.0.0", "manifest": "cases/manifest.json", "filter": null},
+  "results": [
+    {"caseId": "c1", "ruleId": "ACC-01", "status": "PASS", "firedRules": ["ACC-01"], "durationMs": 1.2},
+    {"caseId": "c2", "ruleId": "APA-01", "status": "FAIL", "firedRules": [], "durationMs": 0.9}
+  ],
+  "summary": {"total": 2, "passed": 1, "failed": 1, "passRate": 0.5}
+}

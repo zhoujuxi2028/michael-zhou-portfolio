@@ -1,0 +1,110 @@
+{
+  "meta": {
+    "toolVersion": "0.1.0",
+    "rulesetVersion": "1.0.0",
+    "analysisVersion": "0.1.0",
+    "anomalies": "tests/data/anomalies.small.json",
+    "replay": "tests/data/replay.small.json"
+  },
+  "totals": {
+    "events": 100,
+    "scenarios": 3,
+    "anomalies": 5,
+    "p1": 3,
+    "p2": 2
+  },
+  "byRule": [
+    {
+      "ruleId": "ACC-01",
+      "module": "ACC",
+      "severity": "P1",
+      "count": 2
+    },
+    {
+      "ruleId": "ACC-02",
+      "module": "ACC",
+      "severity": "P2",
+      "count": 1
+    },
+    {
+      "ruleId": "APA-01",
+      "module": "APA",
+      "severity": "P1",
+      "count": 1
+    },
+    {
+      "ruleId": "HMI-01",
+      "module": "HMI",
+      "severity": "P2",
+      "count": 1
+    }
+  ],
+  "byModule": [
+    {
+      "module": "ACC",
+      "count": 3
+    },
+    {
+      "module": "APA",
+      "count": 1
+    },
+    {
+      "module": "HMI",
+      "count": 1
+    }
+  ],
+  "byScenario": [
+    {
+      "scenarioId": "S001",
+      "count": 3,
+      "p1": 2,
+      "p2": 1
+    },
+    {
+      "scenarioId": "S002",
+      "count": 1,
+      "p1": 1,
+      "p2": 0
+    },
+    {
+      "scenarioId": "S003",
+      "count": 1,
+      "p1": 0,
+      "p2": 1
+    }
+  ],
+  "timeline": [
+    {
+      "bucketStartMs": 0,
+      "count": 2
+    },
+    {
+      "bucketStartMs": 5000,
+      "count": 1
+    },
+    {
+      "bucketStartMs": 10000,
+      "count": 0
+    },
+    {
+      "bucketStartMs": 15000,
+      "count": 0
+    },
+    {
+      "bucketStartMs": 20000,
+      "count": 2
+    }
+  ],
+  "dataQuality": {
+    "invalidJson": 1,
+    "schemaErrors": 2,
+    "unknownEvents": 3,
+    "outOfOrder": 4
+  },
+  "replay": {
+    "total": 2,
+    "passed": 1,
+    "failed": 1,
+    "passRate": 0.5
+  }
+}

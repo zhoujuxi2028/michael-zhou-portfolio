@@ -6,19 +6,30 @@ export type AccState = z.infer<typeof AccState>;
 export const ApaStep = z.enum(['SEARCHING', 'SLOT_SELECTED', 'MANEUVERING', 'COMPLETED', 'ABORTED']);
 export type ApaStep = z.infer<typeof ApaStep>;
 
+export const LkaState = z.enum(['OFF', 'STANDBY', 'ACTIVE', 'SUPPRESSED', 'UNAVAILABLE']);
+export type LkaState = z.infer<typeof LkaState>;
+
 export const HmiFeature = z.enum(['ACC', 'APA', 'LKA']);
 export type HmiFeature = z.infer<typeof HmiFeature>;
+
+/**
+ * Scenario ids end up in file names (regression case data), so only a safe subset is allowed:
+ * 1-64 chars of `[A-Za-z0-9_.-]`, and never `.` or `..`.
+ */
+export const ScenarioId = z.string()
+  .regex(/^[A-Za-z0-9_.-]{1,64}$/, 'must be 1-64 characters of [A-Za-z0-9_.-]')
+  .refine((s) => s !== '.' && s !== '..', 'must not be "." or ".."');
 
 /** Common envelope shared by every event line. */
 export const Envelope = z.object({
   ts: z.number().int().nonnegative(),
-  scenarioId: z.string().min(1),
+  scenarioId: ScenarioId,
   module: z.string().min(1),
   type: z.string().min(1),
   data: z.unknown(),
 });
 
-/** Payload schema per `${module}/${type}` (Phase 1). */
+/** Payload schema per `${module}/${type}` (Phase 1 + Phase 2 LKA / VEH / manual trigger). */
 export const dataSchemas = {
   'ACC/STATE': z.object({ from: AccState, to: AccState, reason: z.string() }),
   'ACC/TRACK': z.object({
@@ -37,6 +48,15 @@ export const dataSchemas = {
     value: z.string(),
   }),
   'SYS/SCENARIO_END': z.object({}),
+  'SYS/MANUAL_TRIGGER': z.object({ note: z.string() }),
+  'LKA/STATE': z.object({ from: LkaState, to: LkaState }),
+  'LKA/LANE': z.object({
+    leftConf: z.number().min(0).max(1),
+    rightConf: z.number().min(0).max(1),
+    offset: z.number(),
+  }),
+  'LKA/STEER': z.object({ torque: z.number() }),
+  'VEH/TURN_SIGNAL': z.object({ side: z.enum(['LEFT', 'RIGHT', 'OFF']) }),
 } as const;
 
 export type EventKey = keyof typeof dataSchemas;

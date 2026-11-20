@@ -1,0 +1,71 @@
+name: ADAS Dashboard (GitHub Pages)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'adas-log-toolchain-lab/**'
+      - '.github/workflows/adas-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: adas-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build dashboard
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+      - name: Install toolchain
+        working-directory: adas-log-toolchain-lab
+        run: npm ci
+      - name: Generate synthetic log and detect anomalies
+        working-directory: adas-log-toolchain-lab
+        run: |
+          node src/cli.ts gen --out out
+          node src/cli.ts parse out/events.jsonl --out out/anomalies.json
+      - name: Generate regression cases and replay them
+        working-directory: adas-log-toolchain-lab
+        run: |
+          node src/cli.ts cases regression --anomalies out/anomalies.json --log out/events.jsonl --out out/cases
+          node src/cli.ts replay --manifest out/cases/manifest.json --out out/replay-report.json
+      - name: Install analysis dependencies
+        working-directory: adas-log-toolchain-lab/analysis
+        run: pip install -r requirements.txt
+      - name: Build summary.json
+        working-directory: adas-log-toolchain-lab/analysis
+        run: python -m adas_analysis --anomalies ../out/anomalies.json --replay ../out/replay-report.json --out ../dashboard/public/summary.json
+      - name: Build dashboard
+        working-directory: adas-log-toolchain-lab/dashboard
+        run: |
+          npm ci
+          npm run build
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: adas-log-toolchain-lab/dashboard/dist
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    # Deploy only once Pages is enabled (Settings > Pages > Source: GitHub Actions) and the repo variable is set.
+    if: ${{ vars.ADAS_PAGES_ENABLED == 'true' }}
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

@@ -65,3 +65,40 @@ jobs:
       - run: npm run typecheck
       - run: npm run test:coverage
       - run: npm run demo
+      # test:generated uses --passWithNoTests: fail here if the demo produced no regression cases.
+      - run: test -f out/cases/generated/regression.test.ts
+      - run: npm run test:generated -- out/cases
+
+  adas-analysis:
+    name: Tests (adas-log-toolchain-lab analysis)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: adas-log-toolchain-lab/analysis
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+      - run: pip install -r requirements.txt flake8==7.5.0
+      - run: flake8 --max-line-length 100 .
+      - run: pytest -v
+
+  adas-dashboard:
+    name: Tests (adas-log-toolchain-lab dashboard)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: adas-log-toolchain-lab/dashboard
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: adas-log-toolchain-lab/dashboard/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
