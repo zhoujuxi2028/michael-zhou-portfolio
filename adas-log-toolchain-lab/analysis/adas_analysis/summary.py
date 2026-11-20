@@ -62,6 +62,18 @@ def _timeline(df):
     ]
 
 
+def _replay(replay_doc):
+    if replay_doc is None:
+        return None
+    summary = replay_doc["summary"]
+    return {
+        "total": int(summary["total"]),
+        "passed": int(summary["passed"]),
+        "failed": int(summary["failed"]),
+        "passRate": summary["passRate"],
+    }
+
+
 def build_summary(anomalies_doc, replay_doc, anomalies_label, replay_label):
     df = _frame(anomalies_doc)
     meta = anomalies_doc["meta"]
@@ -90,4 +102,5 @@ def build_summary(anomalies_doc, replay_doc, anomalies_label, replay_label):
             key: int(counts[key])
             for key in ("invalidJson", "schemaErrors", "unknownEvents", "outOfOrder")
         },
+        "replay": _replay(replay_doc),
     }
