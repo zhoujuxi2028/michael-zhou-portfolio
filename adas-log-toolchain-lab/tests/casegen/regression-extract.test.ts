@@ -56,4 +56,17 @@ describe('extractWindows', () => {
     expect(a!.events).toEqual([track(1000), track(2000)]);
     expect(b!.events).toEqual([track(8000)]);
   });
+
+  it('writes window events sorted by ts (stable) so an out-of-order line does not dirty the case data', async () => {
+    const hmi = ev('HMI/DISPLAY', 5000, S, { feature: 'ACC', item: 'STATE', value: 'ACTIVE' });
+    const path = logFile([track(4000), track(5050), track(5000), hmi, track(6000)]);
+    const [w] = await extractWindows(path, [req(S, 4000, 6000)]);
+    expect(w!.events).toEqual([track(4000), track(5000), hmi, track(5050), track(6000)]);
+  });
+
+  it('drops late events of an ended scenario exactly like parse does', async () => {
+    const path = logFile([track(1000), scenarioEnd(S, 2000), track(1500), track(3000), scenarioEnd(S, 4000)]);
+    const [w] = await extractWindows(path, [req(S, 0, 5000)]);
+    expect(w!.events).toEqual([track(1000), scenarioEnd(S, 2000), track(3000), scenarioEnd(S, 4000)]);
+  });
 });
