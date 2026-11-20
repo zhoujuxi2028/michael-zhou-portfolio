@@ -118,6 +118,6 @@
 | 2026-11-15 | 关闭 | REQ-DVP-005 Done：Incident / RCA postmortem 模板 + 案例（#54） | Michael Zhou |
 | 2026-11-15 | 关闭 | REQ-DVP-004 Done：README / CLAUDE.md 过期内容修正（#52） | Michael Zhou |
 | 2026-11-14 | 关闭 | REQ-DVP-011 Done：Dev Container 标准化开发环境（#50） | Michael Zhou |
-| 2026-11-12 | 新增 | 登记 REQ-DVP-003~011（来源：DSV JD 差距分析）；补登已关闭的 REQ-DVP-001/002；§7 补 ANDT、DVP 行 | Michael Zhou |
+| 2026-11-12 | 新增 | 登记 REQ-DVP-003~011（来源：技能差距分析）；补登已关闭的 REQ-DVP-001/002；§7 补 ANDT、DVP 行 | Michael Zhou |
 | 2026-11-06 | 关闭 | REQ-AND-001 Verified：android-app 初始化完成，真机测试通过（Vivo Folder） | Michael Zhou |
 | 2026-11-05 | 初始化 | 创建 Portfolio 需求台账，迁移历史需求（REQ-CMP-001、REQ-EDI-01、REQ-CC-* × 13）；登记 REQ-AND-001 | Michael Zhou |
