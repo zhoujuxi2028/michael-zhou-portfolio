@@ -64,9 +64,11 @@ export const apa01: Rule<State, Cfg> = {
         description: `obstacle at ${d.toFixed(2)} m vs ${cfg.minDistanceM} m, never aborted`,
         events: [
           ev('APA/STEP', 0, id, { step: 'MANEUVERING', reason: 'boundary' }),
+          ev('HMI/DISPLAY', 50, id, { feature: 'APA', item: 'STATE', value: 'MANEUVERING' }),
           ev('APA/OBSTACLE', 1000, id, { minDistance: d }),
           ev('APA/OBSTACLE', 1100, id, { minDistance: 0.8 }),
           ev('APA/STEP', 5000, id, { step: 'COMPLETED', reason: 'parked' }),
+          ev('HMI/DISPLAY', 5050, id, { feature: 'APA', item: 'STATE', value: 'COMPLETED' }),
           scenarioEnd(id, 6000),
         ],
       };
@@ -77,8 +79,10 @@ export const apa01: Rule<State, Cfg> = {
         description: `abort ${abortTs - 1000} ms after obstacle (window ${cfg.abortWindowMs} ms)`,
         events: [
           ev('APA/STEP', 0, id, { step: 'MANEUVERING', reason: 'boundary' }),
+          ev('HMI/DISPLAY', 50, id, { feature: 'APA', item: 'STATE', value: 'MANEUVERING' }),
           ev('APA/OBSTACLE', 1000, id, { minDistance: 0.2 }),
           ev('APA/STEP', abortTs, id, { step: 'ABORTED', reason: 'obstacle' }),
+          ev('HMI/DISPLAY', abortTs + 50, id, { feature: 'APA', item: 'STATE', value: 'ABORTED' }),
           scenarioEnd(id, 3000),
         ],
       };

@@ -62,6 +62,7 @@ export const acc01: Rule<State, Cfg> = {
           description: `lead distance ${lead.toFixed(2)} m vs threshold ${threshold.toFixed(2)} m at ${speed} m/s`,
           events: [
             ev('ACC/STATE', 0, id, { from: 'OFF', to: 'ACTIVE', reason: 'boundary' }),
+            ev('HMI/DISPLAY', 50, id, { feature: 'ACC', item: 'STATE', value: 'ACTIVE' }),
             ev('ACC/TRACK', 1000, id, { egoSpeed: speed, setSpeed: speed, leadDistance: lead, leadRelSpeed: 0 }),
             scenarioEnd(id, 2000),
           ],

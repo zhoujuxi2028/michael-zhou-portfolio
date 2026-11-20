@@ -101,9 +101,9 @@ export async function main(argv: readonly string[], io: Io = processIo): Promise
       const cfg = await config(o.config);
       const list = buildBoundaryCases(undefined, cfg);
       await writeBoundaryCases(o.out, list);
-      const results = verifyBoundaryCases(list, undefined, cfg);
+      const results = await verifyBoundaryCases(list, undefined, cfg);
       const failed = results.filter((r) => !r.pass);
-      for (const f of failed) io.err(`FAIL ${f.caseId}: expected triggered=${f.expectTriggered}, got ${f.triggered}`);
+      for (const f of failed) io.err(`FAIL ${f.caseId}: expected triggered=${f.expectTriggered}, got ${f.triggered}; fired rules [${f.firedRules.join(', ')}]; data quality issues ${f.dataQualityIssues}`);
       io.out(`${results.length} boundary cases written to ${join(o.out, 'boundary')}; ${results.length - failed.length} passed, ${failed.length} failed`);
       code = failed.length > 0 ? 1 : 0;
     });

@@ -49,7 +49,9 @@ export const apa02: Rule<State, Cfg> = {
         description: `maneuver completes after ${doneTs} ms (timeout ${cfg.timeoutMs} ms)`,
         events: [
           ev('APA/STEP', 0, id, { step: 'MANEUVERING', reason: 'boundary' }),
+          ev('HMI/DISPLAY', 50, id, { feature: 'APA', item: 'STATE', value: 'MANEUVERING' }),
           ev('APA/STEP', doneTs, id, { step: 'COMPLETED', reason: 'parked' }),
+          ev('HMI/DISPLAY', doneTs + 50, id, { feature: 'APA', item: 'STATE', value: 'COMPLETED' }),
           scenarioEnd(id, doneTs + 1000),
         ],
       };
@@ -59,7 +61,11 @@ export const apa02: Rule<State, Cfg> = {
       caseId: id,
       description: 'scenario ends while still maneuvering',
       expectTriggered: true,
-      events: [ev('APA/STEP', 0, id, { step: 'MANEUVERING', reason: 'boundary' }), scenarioEnd(id, 10000)],
+      events: [
+        ev('APA/STEP', 0, id, { step: 'MANEUVERING', reason: 'boundary' }),
+        ev('HMI/DISPLAY', 50, id, { feature: 'APA', item: 'STATE', value: 'MANEUVERING' }),
+        scenarioEnd(id, 10000),
+      ],
     }];
   },
 };

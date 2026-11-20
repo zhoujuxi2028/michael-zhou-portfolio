@@ -51,8 +51,10 @@ export const acc02: Rule<State, Cfg> = {
         description: `ACC exits ${exitTs - 1000} ms after brake pedal (window ${cfg.exitWindowMs} ms)`,
         events: [
           ev('ACC/STATE', 0, id, { from: 'OFF', to: 'ACTIVE', reason: 'boundary' }),
+          ev('HMI/DISPLAY', 50, id, { feature: 'ACC', item: 'STATE', value: 'ACTIVE' }),
           ev('ACC/BRAKE_PEDAL', 1000, id, { pressed: true }),
           ev('ACC/STATE', exitTs, id, { from: 'ACTIVE', to: 'STANDBY', reason: 'brake' }),
+          ev('HMI/DISPLAY', exitTs + 50, id, { feature: 'ACC', item: 'STATE', value: 'STANDBY' }),
           scenarioEnd(id, 3000),
         ],
       };
