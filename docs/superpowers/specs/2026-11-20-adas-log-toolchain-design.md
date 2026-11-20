@@ -2,7 +2,7 @@
 
 **Date:** 2026-11-20
 **Author:** michael_zhou
-**Status:** Spec review round 1 fixed — Pending re-review
+**Status:** Spec review approved (round 2) — Pending user review
 **Requirement:** [`REQ-ADAS-01`](https://github.com/zhoujuxi2028/michael-zhou-portfolio/issues/69)（Stage 1 评审通过：可行性评估见 issue 评论）
 
 ---
@@ -134,6 +134,12 @@ interface Rule {
 - "X ms 内未发生"用待确认列表实现，不使用定时器：
   - 场景"当前时间" = 该场景已见到的最大 `ts`（乱序事件不会让时间倒退）
   - 当前时间 `> deadline` 或场景结束时判定；`ts ≤ deadline` 的事件视为按时
+  - 场景在截止前结束、待确认项仍未满足 → 判为异常（期望的响应没有出现）；generator 因此保证触发事件距场景结束 ≥ 1 s（APA-02 "未到终态"的有意注入除外）
+- **异常时间戳约定**：
+  - `startTs`：引发判定的事件时刻（阈值类为首次命中；窗口类为触发事件，如 `BRAKE_PEDAL`、`TAKEOVER_REQUEST`、状态变化、进入 MANEUVERING）
+  - `endTs`：阈值类为末次命中；窗口类为 `deadline`；"场景结束未完成"为 `SCENARIO_END` 的 `ts`
+  - `detectTs`：规则判定时的场景当前时间（collector 用它定片段窗口，见 §8）
+  - generator 写 `labels.json` 时按同一约定
 - **合并**：同一场景、同一规则的连续命中，若相邻两次命中事件间隔 ≤ `mergeGapMs`（默认 200 ms）且前置状态未中断（如 ACC 未离开 ACTIVE），合并为一条异常（`startTs` = 首次命中，`endTs` = 末次命中）；否则开新异常
 - 阈值默认值写在规则内，可用 `--config rules.config.json` 覆盖
 - 新增规则 = 新文件 + `rules/index.ts` 注册一行
@@ -145,7 +151,7 @@ interface Rule {
 | ACC-01 | Following distance too short | ACC 为 ACTIVE 时 `leadDistance < max(5 m, egoSpeed × 1.0 s)`；`leadDistance = null`（无前车）跳过 | P1 | 1 |
 | ACC-02 | No exit after brake pedal | ACTIVE 时 `BRAKE_PEDAL pressed=true`，200 ms 内未切到 STANDBY / OFF | P1 | 1 |
 | APA-01 | Obstacle too close without abort | MANEUVERING 时 `minDistance < 0.3 m`，200 ms 内未 ABORTED | P1 | 1 |
-| APA-02 | Parking timeout | MANEUVERING → COMPLETED / ABORTED 超过 60 s，或场景结束未到终态 | P2 | 1 |
+| APA-02 | Parking timeout | MANEUVERING → COMPLETED / ABORTED 超过 60 s，或场景结束未到终态。**每次泊车最多报一条**：已报超时的，场景结束时不再报"未到终态" | P2 | 1 |
 | HMI-01 | HMI state mismatch | 功能状态变化（ACC `STATE`、APA `STEP`；Phase 2 加 LKA `STATE`）后 300 ms 内，取该窗口内**最后一次** `DISPLAY(feature, STATE)`：没有，或 `value` ≠ 新状态名 → 异常。到截止时间才判定；窗口内若功能再次变化，前一个待确认作废，以新变化重新计时 | P2 | 1 |
 | HMI-02 | Takeover request not shown | `TAKEOVER_REQUEST` 后 200 ms 内无 HMI `TAKEOVER` 显示 | P1 | 1 |
 | LKA-01 | Steering intervention with turn signal on | `TURN_SIGNAL` 为 LEFT / RIGHT 时出现 `|torque| > 0.5 Nm` 的 `STEER` | P1 | 2 |
@@ -157,7 +163,7 @@ interface Rule {
 {
   "meta": { "input": "...", "events": 0, "scenarios": 0, "toolVersion": "0.1.0", "rulesetVersion": "1.0.0" },
   "anomalies": [ { "ruleId": "ACC-01", "module": "ACC", "severity": "P1", "scenarioId": "S007",
-                   "startTs": 12340, "endTs": 13020, "message": "Following distance 4.2 m below 6.9 m", "evidence": {} } ],
+                   "startTs": 12340, "endTs": 13020, "detectTs": 13020, "message": "Following distance 4.2 m below 6.9 m", "evidence": {} } ],
   "summary": { "byRule": {}, "bySeverity": {} },
   "dataQuality": { "invalidJson": [], "schemaErrors": [], "unknownEvents": {}, "outOfOrder": [] }
 }
@@ -167,7 +173,7 @@ interface Rule {
 
 - `generator` 注入故障时同时写 `labels.json`：`[{ scenarioId, ruleId, startTs, endTs }]`
 - **匹配**：异常与标签 `scenarioId`、`ruleId` 相同，且时间段 `[startTs, endTs]` 有重叠（闭区间）即匹配；一一匹配，一个标签最多匹配一条异常
-- 准确率 = 匹配的异常数 / 异常总数；召回率 = 匹配的标签数 / 标签总数
+- 精确率（precision）= 匹配的异常数 / 异常总数；召回率（recall）= 匹配的标签数 / 标签总数
 - 测试用 seed 42 生成数据，要求两者均为 100%（数据与规则均为确定性）
 
 ### 6.5 `generator`（Phase 1）
@@ -180,6 +186,7 @@ interface Rule {
 | 频率 | `ACC / TRACK` 每 50 ms；`APA / OBSTACLE` 每 100 ms；状态类事件按场景脚本发生；每个场景末尾写 `SYS / SCENARIO_END` |
 | HMI | 正常情况下每次功能状态变化后 50–150 ms 写对应 `DISPLAY`；每个 `TAKEOVER_REQUEST` 后 50–150 ms 写 `TAKEOVER` |
 | 故障注入 | 默认每条 Phase 1 规则注入 2 次（共 12 次），故障之间间隔 ≥ 2 s；至少一半场景为无故障场景 |
+| 故障隔离 | 每次注入只触发目标规则，不引发连带异常：如 APA-01 注入后在窗口外（约 400 ms）补 ABORTED，不触发 APA-02；ACC-02 注入后约 500 ms 补 STANDBY，且 HMI 正常显示，不触发 HMI-01。由真值测试验证 |
 | 干净数据 | 无故障时信号与阈值保持 ≥ 安全余量（如跟车距离比阈值大 ≥ 1 m、HMI 延迟 ≤ 150 ms），保证不产生误报 |
 | 输出 | 默认按场景顺序写出；`--interleave` 交错多个场景，用于测试 §11 |
 
@@ -218,7 +225,7 @@ interface BoundaryCase {
 - 回放清单条目：
 
   ```jsonc
-  { "caseId": "REG-ACC-01-S007-12340", "ruleId": "ACC-01", "source": "clips/S007_12340.jsonl",
+  { "caseId": "REG-ACC-01-S007-12340", "ruleId": "ACC-01", "source": "clips/S007_12340_ACC-01.jsonl",
     "window": [9340, 15340], "expect": { "ruleId": "ACC-01", "triggered": true } }
   ```
 
@@ -284,7 +291,7 @@ interface BoundaryCase {
 |------|------|------|
 | 单元 | 每条规则 ≥ 3 例（正常 / 触发 / 边界）；zod schema；generator 同 seed 输出一致 | Vitest |
 | 黄金样本 | `fixtures/` 小 JSONL（故障样本 + 坏行样本），输出与预期 JSON 一致 | Vitest snapshot |
-| 真值比对 | seed 42 生成 → parser → 与 `labels.json` 比对，准确率 / 召回率 100% | Vitest |
+| 真值比对 | seed 42 生成 → parser → 与 `labels.json` 比对，精确率 / 召回率 100% | Vitest |
 | 边界用例 | `cases boundary` 产出全部通过 | Vitest |
 | 生成的回归测试 | `cases regression` 产出可编译并通过（Phase 2） | tsc + Vitest |
 | CLI 端到端 | 子进程运行 `gen` / `parse` / `cases` / `record`，检查退出码与产出 | Vitest + execa |
