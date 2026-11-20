@@ -132,6 +132,32 @@ Classes: **TDD** (red, then green), **Fix** (red on the old code), **Char** (cha
 
 Counts (47 commits): 38 TDD, 1 Fix (`5c3e7c1`), 7 Characterization (`770baa3`, `30e5bf1`, `fae34bd`, `18f1fd6`, `82f06ad`, `663becc`, `b87455e`), 1 Refactor (`a539ea9`). Not unit-tested: dashboard `main.ts` and `index.html` (W5, covered by `npm run build`).
 
+### Review fixes (0.2.0)
+
+Commits after the Phase 2–4 stage review (`469b8c9..HEAD`, non-merge, code commits only; `424fb30` is docs-only and skipped). TypeScript commits replayed with `scripts/tdd-redgreen.sh`; the analysis commit (`b953020`, pytest from `analysis/`) and the dashboard commit (`ddc7f7d`, Vitest from `dashboard/`) were replayed by hand the same way. Numbers are copied from those runs. Workstreams: FX-A core (schema, regression, replay, generator, templates), FX-B collector, FX-C analysis, FX-D CI / ticket; the mapping is inferred from commit scope.
+
+Classes: **Fix** (new tests fail on the old code), **CI config** (workflow change; only the part with a test can show red), **Test hygiene** (test-only change, no red expected).
+
+| Workstream | Commit | Change | Class | Red (tests on parent code) | Green |
+|------------|--------|--------|-------|----------------------------|-------|
+| FX-C analysis | `b953020` | Validate input field types with clear exit-2 errors | Fix | 22 failed, 28 passed, 1 skipped | 50 passed, 1 skipped |
+| FX-D CI | `ddc7f7d` | Guard Pages deploy, run generated tests in CI | CI config | 1 failed, 9 passed (deploy guard; the `ci.yml` change has no test) | 10 passed |
+| FX-D ticket | `d562b49` | Clean stale ticket outputs, de-flake nested runs | Fix | 1 failed, 5 passed | 6 passed |
+| FX-B collector | `127268d` | Compare ts anomalies with the previous event | Fix | 1 failed, 7 passed | 8 passed |
+| FX-B collector | `185978d` | Allow 0 for `record --pre/--post` | Fix | 4 failed, 11 passed | 15 passed |
+| FX-A core | `f86543e` | Reject path-like scenario ids, contain case paths | Fix | 14 failed, 24 passed | 38 passed |
+| FX-A core | `0f4ed37` | Extract regression data like parse, gate replay on data quality | Fix | 5 failed, 18 passed | 23 passed |
+| FX-B collector | `391053d` | Cap merged clip length to bound recorder memory | Fix | 4 failed, 22 passed | 26 passed |
+| FX-A core | `f515fda` | Validate manifest case consistency, word replay FAILs correctly | Fix | 5 failed, 19 passed | 24 passed |
+| FX-B collector | `8963832` | Keep a lone ts spike from breaking recording | Fix | 1 failed, 29 passed | 30 passed |
+| FX-A core | `54be080` | Replace stale regression output instead of merging | Fix | 1 failed, 9 passed | 10 passed |
+| FX-A core | `1d858d7` | Escape the runner import specifier in generated tests | Fix | 2 failed, 1 passed | 3 passed |
+| FX-B collector | `1abbdf9` | Keep clip file names inside the output directory | Fix | 5 failed, 33 passed | 38 passed |
+| FX-A core | `fba5d57` | Remove generated-test scratch dirs under `out/` after each run | Test hygiene | 10 passed | 10 passed |
+| FX-A core | `6f02e85` | Guard ACC/APA fault plan lookups on the Phase 1 range | Fix | 1 failed, 10 passed | 11 passed |
+
+Counts (15 commits): 13 Fix, 1 CI config (`ddc7f7d`), 1 Test hygiene (`fba5d57`). Cumulative with the tables above (62 commits): 38 TDD, 14 Fix, 7 Characterization, 1 Refactor, 1 CI config, 1 Test hygiene.
+
 ## Exceptions (recorded as they happened)
 
 | Where | What happened |
@@ -143,6 +169,9 @@ Counts (47 commits): 38 TDD, 1 Fix (`5c3e7c1`), 7 Characterization (`770baa3`, `
 | `770baa3` | Fix to a test's environment (missing `out/` dir) that made the `8fb35e8` template test fail on a clean checkout. The tests pass on the parent, so it is not a red/green pair. |
 | `82f06ad` | `liveSource` was first committed inside `6a2d75a` before its test; it was then removed and restored in `82f06ad` with a failing test first. The replay on the parent shows the test passing, because the parent still contained `liveSource`, so this commit cannot show red by replay. |
 | `a539ea9` | Refactor with no test changes; the existing suite (126 tests) stays green. |
+| `fba5d57` | Test-only hygiene change (cleanup of scratch dirs); its tests pass on the parent, as expected. Not a red/green pair. |
+| `ddc7f7d` | The `ci.yml` change (run generated tests in CI) has no unit test; only the Pages deploy guard is covered by `workflow.test.ts`. |
+| `d562b49` | The red run shows 1 failing test; the nested-run flag change that de-flakes template tests has no test that fails on the parent. |
 | W5 `main.ts`, `index.html` | DOM glue without unit tests; only `tsc` + `vite build` check them. Logic was kept in tested modules (`charts.ts`, `load.ts`). |
 | `8fb35e8` | Committed with one failing test (needed `out/`); repaired by `770baa3`, so that single commit is not green on a clean checkout. |
 | Phase 1 plan | The implementation plan contained the code for both tests and implementation, so Phase 1 tasks mostly executed a pre-designed test/code pair. Review fixes (`96dff60` onward) were test-driven from the bug report. |
