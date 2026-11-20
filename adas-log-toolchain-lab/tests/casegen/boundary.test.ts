@@ -13,7 +13,15 @@ describe('casegen boundary', () => {
   it('produces at least 3 cases per rule with unique ids', () => {
     for (const r of RULES) expect(cases.filter((c) => c.ruleId === r.id).length).toBeGreaterThanOrEqual(3);
     expect(new Set(cases.map((c) => c.caseId)).size).toBe(cases.length);
-    expect(cases).toHaveLength(26);
+    expect(cases).toHaveLength(38);
+  });
+
+  it('covers the LKA groups: torque, confidence, persistence, display window', () => {
+    const groups = (id: string) => [...new Set(cases.filter((c) => c.ruleId === id).map((c) => c.caseId.replace(/-(minus|eq|plus)$/, '')))];
+    expect(groups('LKA-01')).toEqual(['LKA-01-torque']);
+    expect(groups('LKA-02')).toEqual(['LKA-02-conf', 'LKA-02-persist', 'LKA-02-window']);
+    const triggered = cases.filter((c) => c.ruleId.startsWith('LKA') && c.expectTriggered).map((c) => c.caseId);
+    expect(triggered).toEqual(['LKA-01-torque-plus', 'LKA-02-conf-minus', 'LKA-02-persist-plus', 'LKA-02-window-plus']);
   });
 
   it('every case is a complete scenario ending with SCENARIO_END', () => {
@@ -25,7 +33,7 @@ describe('casegen boundary', () => {
 
   it('all generated cases pass through the parser and fire only their target rule', async () => {
     const results = await verifyBoundaryCases(cases);
-    expect(results).toHaveLength(26);
+    expect(results).toHaveLength(38);
     expect(results.filter((r) => !r.pass)).toEqual([]);
     for (const r of results) expect(r.firedRules).toEqual(r.expectTriggered ? [r.ruleId] : []);
   });
@@ -61,7 +69,7 @@ describe('casegen boundary', () => {
     expect(readdirSync(dir)).toHaveLength(cases.length + 1);
     const expected = JSON.parse(readFileSync(join(dir, 'expected.json'), 'utf8')) as typeof entries;
     expect(expected).toEqual(entries);
-    expect(expected).toHaveLength(26);
+    expect(expected).toHaveLength(38);
     for (const entry of expected) {
       const lines = readFileSync(join(dir, entry.file), 'utf8').trimEnd().split('\n');
       expect(lines.every((x) => parseLine(x).ok)).toBe(true);

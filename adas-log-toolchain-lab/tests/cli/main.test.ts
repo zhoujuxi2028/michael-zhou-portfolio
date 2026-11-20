@@ -45,7 +45,7 @@ describe('adas-lab CLI', () => {
     const dir = tmp(), c = capture();
     expect(await main(['cases', 'boundary', '--out', dir], c.io)).toBe(0);
     expect(existsSync(join(dir, 'boundary', 'expected.json'))).toBe(true);
-    expect(c.out.join('\n')).toContain('26 passed, 0 failed');
+    expect(c.out.join('\n')).toContain('38 passed, 0 failed');
   });
 
   it.each([

@@ -11,4 +11,8 @@ describe('version', () => {
   it('RULESET_VERSION is semver', () => {
     expect(RULESET_VERSION).toMatch(/^\d+\.\d+\.\d+$/);
   });
+
+  it('RULESET_VERSION is 1.1.0 after adding the LKA rules (minor bump)', () => {
+    expect(RULESET_VERSION).toBe('1.1.0');
+  });
 });

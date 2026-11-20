@@ -7,4 +7,4 @@ export const TOOL_VERSION = '0.1.0';
  * - minor: rule added
  * - patch: message / description fixes
  */
-export const RULESET_VERSION = '1.0.0';
+export const RULESET_VERSION = '1.1.0';
