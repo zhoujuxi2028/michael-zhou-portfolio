@@ -92,6 +92,12 @@ export function createRecorder(opts: RecorderOptions, onClip: (c: Clip) => void)
       const sc = open(e.scenarioId);
       sc.now = Math.max(sc.now, e.ts);
       sc.buffer.push(e);
+      if (e.module === 'SYS' && e.type === 'MANUAL_TRIGGER') {
+        trigger(e.scenarioId, {
+          start: e.ts - options.preMs, end: e.ts + options.postMs,
+          trigger: 'manual', label: 'MANUAL', labelTs: e.ts, ruleIds: [],
+        });
+      }
       engine.push(e).forEach(onAnomaly);
       if (sc.window && sc.now > sc.window.end) close(e.scenarioId, sc);
     },

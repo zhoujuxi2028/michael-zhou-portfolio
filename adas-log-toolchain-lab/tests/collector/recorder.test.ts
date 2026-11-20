@@ -80,3 +80,22 @@ describe('recorder: merging', () => {
     ]);
   });
 });
+
+describe('recorder: manual trigger', () => {
+  const manual = (ts: number, s = 'S1') => ev('SYS/MANUAL_TRIGGER', ts, s, { note: 'driver button' });
+
+  it('records a window around SYS/MANUAL_TRIGGER', () => {
+    const clips = record(byTs(ticks(0, 20000), [manual(8050)]));
+    expect(clips).toHaveLength(1);
+    expect(clips[0]).toMatchObject({
+      file: 'S1_8050_MANUAL.jsonl', trigger: 'manual', ruleIds: [], startTs: 6050, endTs: 11050, truncated: false,
+    });
+    expect(range(clips[0] as Clip)).toEqual([6100, 11000]);
+  });
+
+  it('merges with an overlapping rule trigger and keeps the first trigger', () => {
+    const clips = record(byTs(ticks(0, 20000), [manual(8000), hit(9000, 0)]));
+    expect(clips).toHaveLength(1);
+    expect(clips[0]).toMatchObject({ file: 'S1_8000_MANUAL.jsonl', trigger: 'manual', ruleIds: ['T-1'], endTs: 12000 });
+  });
+});
