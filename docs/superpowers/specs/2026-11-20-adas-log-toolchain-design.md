@@ -2,7 +2,7 @@
 
 **Date:** 2026-11-20
 **Author:** michael_zhou
-**Status:** Spec review approved (round 2) — Pending user review
+**Status:** Spec review approved (round 2) — User approved (2026-11-20)
 **Requirement:** [`REQ-ADAS-01`](https://github.com/zhoujuxi2028/michael-zhou-portfolio/issues/69)（Stage 1 评审通过：可行性评估见 issue 评论）
 
 ---
