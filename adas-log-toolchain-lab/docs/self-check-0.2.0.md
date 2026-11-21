@@ -2,7 +2,7 @@
 
 Checklist from the [Phase 2–4 plan §5](../../docs/superpowers/plans/2026-11-20-adas-log-toolchain-phase2-4.md#5-自检清单). Run on 2026-11-20 on branch `feature/adas-phase2-4`, starting from clean `out/` and `coverage/` directories. Every result below is copied from a command run on that day.
 
-**Result:** items 1–10 pass. Two acceptance items stay open on purpose: GitHub Pages publishing and the root README row (see item 1).
+**Result:** items 1–10 pass. Follow-up closed on 2026-11-21: GitHub Pages is enabled and deployed, and the root README row (PR #77) is updated (see item 1).
 
 | # | Check | Result |
 |---|-------|--------|
@@ -27,10 +27,10 @@ Checklist from the [Phase 2–4 plan §5](../../docs/superpowers/plans/2026-11-2
 | FR-ADAS-006 | `casegen regression`: manifest and runnable Vitest regression tests | `tests/casegen/regression*.test.ts` (the generated file is type-checked and run both green and red); demo writes 16 cases; `npm run test:generated -- out/cases`: 16 passed | ✅ |
 | FR-ADAS-007 | `replay` runs the manifest and summarizes the results | `tests/replay/*.test.ts`; demo: `Replayed 16 cases: 16 passed, 0 failed (pass rate 100.0%)`; `--filter module=APA` is covered in `replay-cli.test.ts` | ✅ |
 | FR-ADAS-008 | LKA-01 / LKA-02 rules and their boundary cases | `tests/rules/lka-01.test.ts`, `lka-02.test.ts`; boundary cases grew from 26 to 38, and all pass through the parser | ✅ |
-| Phase 2 | Root README quick-reference row points to this project | Done after merge (release wrap-up) | ⏳ open |
+| Phase 2 | Root README quick-reference row points to this project | Done in PR #77 | ✅ |
 | FR-ADAS-009 | `analysis`: Python 3.13 + Pandas → `summary.json`, pytest | `analysis/tests/*` (69 passed), including a contract test against C4 | ✅ |
 | FR-ADAS-010 | `dashboard`: static page builds | `dashboard/tests/*` (30 passed), `npm run build`; rendered with real data in headless Chrome: 6 KPI cards and 3 charts, values match `summary.json` | ✅ |
-| FR-ADAS-010 | Published on GitHub Pages | `adas-pages.yml` is ready. The deploy job runs only after the owner enables Pages and sets `ADAS_PAGES_ENABLED=true` | ⏳ open (owner action) |
+| FR-ADAS-010 | Published on GitHub Pages | Pages enabled (source: GitHub Actions), `ADAS_PAGES_ENABLED=true`; deploy run 44838261278 succeeded; https://zhoujuxi2028.github.io/michael-zhou-portfolio/ returns 200 | ✅ |
 | FR-ADAS-011 | `ticket`: Jira export → script tasks + check scripts | `tests/ticket/*.test.ts`; fixture: `6 tickets: 3 mapped, 3 unmapped`; generated checks: 5 passed | ✅ |
 | FR-ADAS-012 | User guide and development guide | `docs/user-guide*.md`, `docs/dev-guide*.md` (EN + ZH); every documented command was run while writing them | ✅ |
 | NFR | Coverage gates still met | see item 3 | ✅ |
