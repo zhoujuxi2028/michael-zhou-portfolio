@@ -98,7 +98,7 @@ gen ──> events.jsonl + labels.json
 - 回归回放：demo 生成的用例回放通过率 100%
 - 覆盖率：行 ≥ 90%，`src/rules/` 100%
 - 性能冒烟：10 万事件 < 5 s（`npm run test:perf`）
-- CI（GitHub Actions）：`adas`（lint、typecheck、覆盖率、demo、生成的回归测试）、`adas-analysis`（flake8、pytest）、`adas-dashboard`（lint、typecheck、test、build）；GitLab CI 示例与之对应（未在 GitLab 运行）
+- CI（GitHub Actions）：`adas`（lint、typecheck、覆盖率、demo、生成的回归测试）、`adas-analysis`（flake8、pytest）、`adas-analysis-spark`（Java 17、PySpark 测试）、`adas-dashboard`（lint、typecheck、test、build）；GitLab CI 示例与之对应，不含 Spark job（未在 GitLab 运行）
 
 ## 与生产环境的差距
 

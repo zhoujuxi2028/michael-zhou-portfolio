@@ -185,6 +185,7 @@ cd dashboard && npm test && npm run lint && npm run typecheck && npm run build
 |--------------|------|------|
 | `.github/workflows/ci.yml` job `adas` | PR 到 `main` | Node 22、`npm ci`、`lint`、`typecheck`、`test:coverage`、`npm run demo`、`npm run test:generated -- out/cases`（工作目录 `adas-log-toolchain-lab`） |
 | `ci.yml` job `adas-analysis` | PR 到 `main` | Python 3.13、`pip install -r requirements.txt flake8==7.5.0`、`flake8 --max-line-length 100 .`、`pytest -v` |
+| `ci.yml` job `adas-analysis-spark` | PR 到 `main` | Java 17、Python 3.13、`pip install -r requirements-spark.txt`、检查 pyspark 可导入（缺失时失败而不是跳过）、`pytest -v tests/test_spark_aggregate.py`；由 `dashboard/tests/workflow.test.ts` 断言 |
 | `ci.yml` job `adas-dashboard` | PR 到 `main` | Node 22、`npm ci`、lint、typecheck、`npm test`、`npm run build` |
 | `.github/workflows/adas-pages.yml` | `main` 上涉及 `adas-log-toolchain-lab/**` 的 push，或手动 | gen、parse、`cases regression`、`replay`、analysis -> `dashboard/public/summary.json`、看板构建、上传并部署到 GitHub Pages；部署 job 仅在仓库变量 `ADAS_PAGES_ENABLED == 'true'` 时运行；`cancel-in-progress: false` |
 | `.gitlab-ci.yml` | 无（示例，未执行） | `lint` 和 `test` 两个 stage，对应 `adas` job；由 `tests/gitlab-ci.test.ts` 断言 |

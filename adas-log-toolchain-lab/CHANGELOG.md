@@ -6,7 +6,7 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 
 ### Added
 
-- `analysis/`: optional PySpark aggregation (`python -m adas_analysis.spark_aggregate`), byRule / byModule written as Parquet, parity with the Pandas summary checked by tests; `requirements-spark.txt`, needs Java 17 / 21. CI installs only `requirements.txt`, so the Spark tests are skipped there
+- `analysis/`: optional PySpark aggregation (`python -m adas_analysis.spark_aggregate`), byRule / byModule written as Parquet, parity with the Pandas summary checked by tests; `requirements-spark.txt`, needs Java 17 / 21. GitHub Actions job `adas-analysis-spark` (Java 17) runs the Spark tests and fails if pyspark is not importable
 
 ## [0.2.0] - 2026-11-20
 

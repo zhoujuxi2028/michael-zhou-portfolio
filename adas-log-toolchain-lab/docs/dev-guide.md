@@ -185,6 +185,7 @@ Notes:
 |----------------|---------|-------|
 | `.github/workflows/ci.yml` job `adas` | PR to `main` | Node 22, `npm ci`, `lint`, `typecheck`, `test:coverage`, `npm run demo`, `npm run test:generated -- out/cases` (working dir `adas-log-toolchain-lab`) |
 | `ci.yml` job `adas-analysis` | PR to `main` | Python 3.13, `pip install -r requirements.txt flake8==7.5.0`, `flake8 --max-line-length 100 .`, `pytest -v` |
+| `ci.yml` job `adas-analysis-spark` | PR to `main` | Java 17, Python 3.13, `pip install -r requirements-spark.txt`, import check for pyspark (fails instead of skipping), `pytest -v tests/test_spark_aggregate.py`; asserted by `dashboard/tests/workflow.test.ts` |
 | `ci.yml` job `adas-dashboard` | PR to `main` | Node 22, `npm ci`, lint, typecheck, `npm test`, `npm run build` |
 | `.github/workflows/adas-pages.yml` | push to `main` touching `adas-log-toolchain-lab/**`, or manual | gen, parse, `cases regression`, `replay`, analysis -> `dashboard/public/summary.json`, dashboard build, upload and deploy to GitHub Pages; the deploy job runs only when the repository variable `ADAS_PAGES_ENABLED == 'true'`; `cancel-in-progress: false` |
 | `.gitlab-ci.yml` | none (example, not executed) | stages `lint` and `test` mirroring the `adas` job; asserted by `tests/gitlab-ci.test.ts` |
