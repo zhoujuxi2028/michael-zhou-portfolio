@@ -37,7 +37,7 @@
 | REQ-DVP-008 | Elastic 集成 / Loki vs Elastic 对比 | devops-platform-demo | DEMO | P3 | 2026-11-12 | Open |
 | REQ-DVP-009 | 数据管道 / DB 备份自动化 | devops-platform-demo | FR | P3 | 2026-11-12 | Open |
 | REQ-DVP-010 | OPA/Kyverno 策略即代码 | devops-platform-demo | FR | P3 | 2026-11-12 | Open |
-| REQ-ADAS-01 | ADAS 日志工具链：TS 解析 + 用例生成 + 数据采集 + 场景回放 + 分析看板（#69） | adas-log-toolchain-lab | DEMO | P1 | 2026-11-20 | In Progress |
+| REQ-ADAS-01 | ADAS 日志工具链：TS 解析 + 用例生成 + 数据采集 + 场景回放 + 分析看板（#69） | adas-log-toolchain-lab | DEMO | P1 | 2026-11-20 | Done |
 
 ---
 
