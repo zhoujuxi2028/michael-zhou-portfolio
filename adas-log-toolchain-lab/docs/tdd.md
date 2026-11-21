@@ -171,6 +171,16 @@ Second-round review fixes (`9d53455..HEAD`), replayed the same way (`ccf8e70` by
 
 Cumulative (66 code commits with tests or CI changes): 38 TDD, 18 Fix, 7 Characterization, 1 Refactor, 2 CI config, 1 Test hygiene; plus 1 comment-only commit.
 
+### PySpark aggregation
+
+Observed live before the commit, pytest from `analysis/` with pyspark 4.0.1 installed:
+
+| Commit | Change | Class | Red | Green |
+|--------|--------|-------|-----|-------|
+| `c49d0f5` | `spark_aggregate.py`: byRule / byModule with PySpark, Parquet output, parity with Pandas | TDD | collection error: no module `adas_analysis.spark_aggregate` | 2 passed (JDK 17); full suite 70 passed, 1 skipped |
+
+On Java 25 the green run fails with `UnsupportedOperationException: getSubject is not supported`; Spark 4.0 needs Java 17 / 21.
+
 ## Exceptions (recorded as they happened)
 
 | Where | What happened |

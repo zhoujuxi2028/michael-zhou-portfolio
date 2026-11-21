@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [SemVer](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- `analysis/`: optional PySpark aggregation (`python -m adas_analysis.spark_aggregate`), byRule / byModule written as Parquet, parity with the Pandas summary checked by tests; `requirements-spark.txt`, needs Java 17 / 21. CI installs only `requirements.txt`, so the Spark tests are skipped there
+
 ## [0.2.0] - 2026-11-20
 
 Ruleset version: 1.1.0. Covers Phases 2-4 in a single release (deviation from one tag per phase: the phases were merged together).
