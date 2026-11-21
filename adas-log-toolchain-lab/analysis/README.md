@@ -23,6 +23,23 @@ Exit codes: `0` success, `2` missing or invalid input (message on stderr). Field
 Output is deterministic (fixed key order, 2-space indent, trailing newline).
 `tests/data/summary.sample.json` is a sample of the output contract.
 
+## PySpark aggregation (optional)
+
+`adas_analysis.spark_aggregate` computes the same `byRule` / `byModule` counts with
+PySpark and writes them as Parquet (`by_rule/`, `by_module/`). It is a small-scale
+example of the Spark path for logs too large for one Pandas process; results match
+the Pandas summary (checked by `tests/test_spark_aggregate.py`).
+
+Requires Java 17 or 21 (Spark 4.0 does not run on Java 25).
+
+```bash
+pip install -r requirements-spark.txt
+export JAVA_HOME=$(/usr/libexec/java_home -v 17)   # macOS
+python -m adas_analysis.spark_aggregate ../out/anomalies.json ../out/spark
+```
+
+CI installs only `requirements.txt`, so the Spark tests are skipped there.
+
 ## Test
 
 ```bash
