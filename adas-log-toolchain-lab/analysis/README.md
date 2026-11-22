@@ -38,7 +38,7 @@ export JAVA_HOME=$(/usr/libexec/java_home -v 17)   # macOS
 python -m adas_analysis.spark_aggregate ../out/anomalies.json ../out/spark
 ```
 
-CI installs only `requirements.txt`, so the Spark tests are skipped there.
+The `adas-analysis` CI job installs only `requirements.txt`, so the Spark tests skip there; the separate `adas-analysis-spark` job (Java 17, `requirements-spark.txt`) runs them.
 
 ## Test
 

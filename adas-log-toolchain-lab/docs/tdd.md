@@ -178,6 +178,7 @@ Observed live before the commit, pytest from `analysis/` with pyspark 4.0.1 inst
 | Commit | Change | Class | Red | Green |
 |--------|--------|-------|-----|-------|
 | `c49d0f5` | `spark_aggregate.py`: byRule / byModule with PySpark, Parquet output, parity with Pandas | TDD | collection error: no module `adas_analysis.spark_aggregate` | 2 passed (JDK 17); full suite 70 passed, 1 skipped |
+| `137c95e` | `ci.yml` job `adas-analysis-spark` (Java 17, import check, Spark tests) | CI config (TDD) | `dashboard/tests/workflow.test.ts`: 2 failed, 10 passed | 12 passed |
 
 On Java 25 the green run fails with `UnsupportedOperationException: getSubject is not supported`; Spark 4.0 needs Java 17 / 21.
 

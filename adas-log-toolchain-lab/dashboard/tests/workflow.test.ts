@@ -116,3 +116,21 @@ describe('ci.yml adas-dashboard job', () => {
     expect(node?.with?.['cache-dependency-path']).toBe('adas-log-toolchain-lab/dashboard/package-lock.json');
   });
 });
+
+describe('ci.yml adas-analysis-spark job', () => {
+  const job = load('ci.yml').jobs['adas-analysis-spark'];
+  const runs = (job?.steps ?? []).flatMap((s) => (s.run ? [s.run] : []));
+
+  it('sets up Java 17 (Spark 4.0 does not run on Java 25)', () => {
+    const java = job?.steps.find((s) => s.uses?.startsWith('actions/setup-java'));
+    expect(java?.with?.['java-version']).toBe('17');
+  });
+
+  it('installs Spark deps, fails if pyspark is missing, then runs the Spark tests', () => {
+    expect(runs).toEqual([
+      'pip install -r requirements-spark.txt',
+      'python -c "import pyspark; print(pyspark.__version__)"',
+      'pytest -v tests/test_spark_aggregate.py',
+    ]);
+  });
+});

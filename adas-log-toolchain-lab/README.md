@@ -98,7 +98,7 @@ Built test-first: each behavior starts as a failing test, then the minimum code 
 - Regression replay: the demo cases must replay with a 100% pass rate
 - Coverage: lines >= 90%, `src/rules/` 100%
 - Performance smoke: 100k events < 5 s (`npm run test:perf`)
-- CI (GitHub Actions): `adas` (lint, typecheck, coverage, demo, generated regression tests), `adas-analysis` (flake8, pytest), `adas-dashboard` (lint, typecheck, test, build); a GitLab CI example mirrors them (not executed on GitLab)
+- CI (GitHub Actions): `adas` (lint, typecheck, coverage, demo, generated regression tests), `adas-analysis` (flake8, pytest), `adas-analysis-spark` (Java 17, PySpark tests), `adas-dashboard` (lint, typecheck, test, build); a GitLab CI example mirrors them except the Spark job (not executed on GitLab)
 
 ## Gap to production
 
