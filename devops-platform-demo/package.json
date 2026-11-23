@@ -59,5 +59,8 @@
     "*.{json,md,yml,yaml}": [
       "echo 'Formatting not available without prettier'"
     ]
+  },
+  "allowScripts": {
+    "cypress": true
   }
 }

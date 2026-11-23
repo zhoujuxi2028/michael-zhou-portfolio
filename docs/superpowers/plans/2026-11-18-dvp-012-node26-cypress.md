@@ -362,7 +362,7 @@ git commit -m "docs(dvp): register REQ-DVP-012 and REQ-DVP-013"
 - [x] `validate-environment.sh` 退出码 0
 - [ ] CI：`dvp-pr.yml` 全绿，`e2e` job 实际执行 Cypress（本 PR 改了 `cypress/` 与 `.nvmrc`，应触发）
 - [ ] CI：`dvp-devcontainer.yml` 全绿（Node 26 feature 构建），日志中 `verify-tools.sh` 报 `node 26.13.1` 无 drift（只看 `scripts` job 不算）
-- [ ] Dev Container 构建日志（本机 `npm ci` 已观察到：npm 11.20 报 `cypress@16.3.0` postinstall 未被 `allowScripts` 覆盖，当前仅警告，postinstall 仍执行）：`postCreateCommand` 的 `npm ci` 是否出现 npm 11 `allowScripts` 警告 / cypress postinstall 被跳过，结果写入 PR
+- [ ] Dev Container 构建日志（本机 `npm ci` 已观察到：npm 11.20 报 `cypress@16.3.0` postinstall 未被 `allowScripts` 覆盖，当前仅警告，postinstall 仍执行——对照实验确认；已在 `package.json` 加 `allowScripts: {"cypress": true}`，不固定版本以免 Dependabot 升级后失效）：`postCreateCommand` 的 `npm ci` 是否出现 npm 11 `allowScripts` 警告 / cypress postinstall 被跳过，结果写入 PR
 - [x] 本地 `npm run lint` 在 Cypress 运行后仍可用：复现失败（shell 把 glob 展开到 `cypress/screenshots/02-ui-tests.cy.js/` 目录），改为 `eslint cypress` 修复
 
 ## 风险
