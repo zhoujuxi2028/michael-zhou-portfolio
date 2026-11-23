@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-> 日期：2026-11-18 | 分支：`feature/dvp-012-node26-cypress` | 状态：Stage 4 测试完成（本地 + CI，PR #87）
+> 日期：2026-11-18 | 分支：`feature/dvp-012-node26-cypress` | 状态：✅ Done（PR #87 已合并，2026-11-23）
 
 **Goal:** 工具链从已 EOL 的 Node 20.20.0 升级到 Node 26.13.1 LTS，修复 Cypress 16 下失败的 E2E，并在 PR 门禁中真实运行 Cypress。
 
