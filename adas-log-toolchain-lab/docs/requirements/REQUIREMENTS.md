@@ -144,4 +144,4 @@
 | 2026-11-20 | Phase 2–4 开发（并行子代理 + TDD）| ✅ 完成 |
 | 2026-11-21 | Phase 2–4 发布（PR #76，tag `adas-lab-v0.2.0`） | ✅ 通过；Pages 已开启并部署；根 README 速查表（PR #77）已更新 |
 | 2026-11-21 | `REQ-ADAS-02` PySpark 聚合（PR #80）+ CI job（PR #81） | ✅ 合并；TDD 证据见 `docs/tdd.md` |
-| 2026-11-23 | `REQ-ADAS-02` 登记 + 发布 0.3.0 | 待评审 |
+| 2026-11-23 | `REQ-ADAS-02` 登记 + 发布 0.3.0（PR #85，tag `adas-lab-v0.3.0`） | ✅ CI 7/7 通过，已合并 |

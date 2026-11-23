@@ -40,6 +40,7 @@
 | REQ-DVP-012 | Node 26 LTS 升级 + Cypress 16 修复 + PR 门禁 E2E | devops-platform-demo | NFR | P1 | 2026-11-18 | In Progress |
 | REQ-DVP-013 | `qa-newman` 基础镜像升级（alpine 3.18 EOL，10 CRITICAL） | devops-platform-demo | NFR | P2 | 2026-11-18 | Open |
 | REQ-ADAS-01 | ADAS 日志工具链：TS 解析 + 用例生成 + 数据采集 + 场景回放 + 分析看板（#69） | adas-log-toolchain-lab | DEMO | P1 | 2026-11-20 | Done |
+| REQ-ADAS-02 | PySpark 聚合示例：byRule / byModule → Parquet + CI（Java 17），0.3.0（#80、#81、#85） | adas-log-toolchain-lab | DEMO | P3 | 2026-11-21 | Done |
 
 ---
 
@@ -104,7 +105,7 @@
 | `AND` | `android-app/` | 1 | 2026-11-05 |
 | `ANDT` | `android-testing-demo-*/` | 0 | — |
 | `DVP` | `devops-platform-demo/` | 6 | 2026-11-23 |
-| `ADAS` | `adas-log-toolchain-lab/` | 1 | 2026-11-20 |
+| `ADAS` | `adas-log-toolchain-lab/` | 2 | 2026-11-23 |
 | `DRV` | `linux-driver/`（规划中） | 0 | — |
 
 ---
@@ -113,6 +114,7 @@
 
 | 日期 | 操作 | 内容 | 操作人 |
 |------|------|------|--------|
+| 2026-11-23 | 新增 | 补登 REQ-ADAS-02 Done：PySpark 聚合，0.3.0（#85） | Michael Zhou |
 | 2026-11-23 | 新增 | 登记 REQ-DVP-012（In Progress）、REQ-DVP-013（Open，拆自 012） | Michael Zhou |
 | 2026-11-20 | 新增 | 登记 REQ-ADAS-01（#69）；新增项目前缀 `ADAS`；§7 补 ADAS 行 | Michael Zhou |
 | 2026-11-18 | 关闭 | REQ-DVP-003 Done：本地 DevSecOps 闭环（#65） | Michael Zhou |
