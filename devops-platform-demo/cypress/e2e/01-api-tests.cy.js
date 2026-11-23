@@ -9,7 +9,7 @@
  */
 
 describe('API Tests - JSONPlaceholder', () => {
-  const baseUrl = Cypress.env('apiUrl') || 'https://jsonplaceholder.typicode.com'
+  const baseUrl = Cypress.expose('apiUrl') || 'https://jsonplaceholder.typicode.com'
 
   // Interview Point: "We use beforeEach to ensure test isolation"
   beforeEach(() => {

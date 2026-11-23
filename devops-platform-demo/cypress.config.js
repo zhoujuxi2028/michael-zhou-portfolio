@@ -37,8 +37,8 @@ module.exports = defineConfig({
       return config
     },
 
-    // Environment-specific settings
-    env: {
+    // Non-sensitive config exposed to specs via Cypress.expose() (Cypress 16+)
+    expose: {
       apiUrl: 'https://jsonplaceholder.typicode.com',
       environment: 'staging'
     },

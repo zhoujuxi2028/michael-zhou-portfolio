@@ -16,7 +16,7 @@ services:
   # the official Cypress Docker image which includes Chrome, Firefox, and Edge pre-installed.
   # This eliminates 'works on my machine' issues by providing identical test environments."
   cypress:
-    image: cypress/included:13.6.0
+    image: cypress/included:16.3.0
     container_name: qa-cypress-demo
     working_dir: /e2e
 
@@ -121,6 +121,7 @@ networks:
 volumes:
   cypress-cache:
     name: qa-cypress-demo-cache
+    # After bumping cypress/included: docker compose down && docker volume rm qa-cypress-demo-cache
 
 # =============================================================================
 # Usage Instructions

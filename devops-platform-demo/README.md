@@ -59,7 +59,7 @@ See [WBS.md](docs/project-management/WBS.md) for detailed task breakdown.
 | 项目 | 说明 |
 |------|------|
 | 打开方式 | 在 VS Code 中打开 `devops-platform-demo/`，执行 “Dev Containers: Reopen in Container” |
-| 工具链 | Node 20.20.0、Terraform 1.7.5、Helm 3.14.0、kubectl 1.33.6、k3d 5.8.3、Trivy 0.70.0、Kyverno 1.20.0、Azure CLI 2.84.0 |
+| 工具链 | Node 26.13.1、Terraform 1.7.5、Helm 3.14.0、kubectl 1.33.6、k3d 5.8.3、Trivy 0.70.0、Kyverno 1.20.0、Azure CLI 2.84.0 |
 | 资源限制 | `--memory=2g --cpus=2` |
 | 集群访问 | 通过 `host.docker.internal` 访问宿主 k3d，并使用 `tls-server-name: localhost` 校验 TLS |
 | Cypress | 不在容器内运行；使用 `npm run docker:test` |

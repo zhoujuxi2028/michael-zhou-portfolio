@@ -15,6 +15,11 @@ module.exports = [
       'no-unused-vars': 'warn',
       'no-console': 'off',
       'cypress/no-unnecessary-waiting': 'warn',
+      'no-restricted-properties': ['error', {
+        object: 'Cypress',
+        property: 'env',
+        message: 'Cypress.env() was removed in Cypress 16. Use Cypress.expose() for non-sensitive values or cy.env() for secrets.',
+      }],
     },
   },
   {

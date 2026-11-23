@@ -12,7 +12,7 @@
  * Usage: cy.apiRequest('GET', '/users/1')
  */
 Cypress.Commands.add('apiRequest', (method, endpoint, body = null, options = {}) => {
-  const baseUrl = Cypress.env('apiUrl') || 'https://jsonplaceholder.typicode.com'
+  const baseUrl = Cypress.expose('apiUrl') || 'https://jsonplaceholder.typicode.com'
 
   const requestOptions = {
     method,
@@ -46,7 +46,7 @@ Cypress.Commands.add('validateApiResponse', (response, requiredFields) => {
  * Usage: cy.waitForApi('/health')
  */
 Cypress.Commands.add('waitForApi', (endpoint, maxRetries = 5) => {
-  const baseUrl = Cypress.env('apiUrl') || 'https://jsonplaceholder.typicode.com'
+  const baseUrl = Cypress.expose('apiUrl') || 'https://jsonplaceholder.typicode.com'
 
   const checkApi = (retriesLeft) => {
     cy.request({
@@ -73,7 +73,7 @@ Cypress.Commands.add('waitForApi', (endpoint, maxRetries = 5) => {
  */
 Cypress.Commands.add('logTestInfo', (message) => {
   cy.log(`[TEST INFO] ${message}`)
-  cy.log(`Environment: ${Cypress.env('environment') || 'default'}`)
+  cy.log(`Environment: ${Cypress.expose('environment') || 'default'}`)
   cy.log(`Browser: ${Cypress.browser.name}`)
   cy.log(`Viewport: ${Cypress.config('viewportWidth')}x${Cypress.config('viewportHeight')}`)
 })
