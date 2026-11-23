@@ -1,8 +1,8 @@
 # adas-log-toolchain-lab — Requirements
 
-> 需求编号：`REQ-ADAS-01` ｜ Issue：[#69](https://github.com/zhoujuxi2028/michael-zhou-portfolio/issues/69) ｜ 设计：[design spec](../../../docs/superpowers/specs/2026-11-20-adas-log-toolchain-design.md)
+> 需求编号：`REQ-ADAS-01`、`REQ-ADAS-02` ｜ Issue：[#69](https://github.com/zhoujuxi2028/michael-zhou-portfolio/issues/69) ｜ 设计：[design spec](../../../docs/superpowers/specs/2026-11-20-adas-log-toolchain-design.md)
 >
-> 细项编号 `FR-ADAS-*` / `NFR-ADAS-*`，均归属 `REQ-ADAS-01`。
+> 细项编号 `FR-ADAS-*` / `NFR-ADAS-*`：FR-ADAS-001~012、NFR-ADAS-001~006 归属 `REQ-ADAS-01`；FR-ADAS-013 归属 `REQ-ADAS-02`。
 >
 > **声明**：simulation lab，全部使用合成数据，不代表实车、测试车或量产项目经验。
 
@@ -15,6 +15,7 @@
 | REQ ID | 标题 | 类型 | 优先级 | 可行性 | 依赖 | 状态 |
 |--------|------|------|--------|--------|------|------|
 | `REQ-ADAS-01` | ADAS 日志工具链：TS 解析 + 用例生成 + 数据采集 + 场景回放 + 分析看板 | DEMO | P1 | ✅ 可行（2026-11-20） | — | ✅ 完成（0.2.0，2026-11-21） |
+| `REQ-ADAS-02` | PySpark 聚合示例：byRule / byModule → Parquet，与 Pandas 结果一致 + CI（Java 17） | DEMO | P3 | ✅ 可行（Java 17 / 21；Java 25 不可用） | `REQ-ADAS-01` | ✅ 完成（0.3.0，2026-11-23） |
 
 ## 3. 功能需求
 
@@ -32,6 +33,7 @@
 | FR-ADAS-010 | TypeScript + ECharts 静态看板，发布 GitHub Pages | `dashboard` | P2 | 3 |
 | FR-ADAS-011 | 合成的 Jira 导出工单 JSON → 脚本任务 + 检查脚本 | `ticket` | P3 | 4 |
 | FR-ADAS-012 | 使用手册与开发规范 | docs | P3 | 4 |
+| FR-ADAS-013 | PySpark 聚合 byRule / byModule，输出 Parquet，与 Pandas summary 一致；CI job `adas-analysis-spark`（`REQ-ADAS-02`） | `analysis` | P3 | 5 |
 
 ## 4. 非功能需求
 
@@ -52,10 +54,10 @@
 | 2 | `collector` + `casegen regression` + `replay` + LKA |
 | 3 | `analysis` + `dashboard` |
 | 4 | `ticket`（Jira 工单 → 脚本）+ 使用手册 + 开发规范 |
+| 5 | PySpark 聚合示例（`REQ-ADAS-02`，0.3.0） |
 
 **不做：** 真实车辆总线采集与云端上传、原始传感器数据（点云 / 图像）、连接真实 Jira 服务、AUTOSAR Adaptive、底层 C/C++。
 
-**后续可能：** PySpark 大规模日志处理示例（Phase 3 完成后评估）。
 
 ## 6. 验收标准
 
@@ -90,6 +92,13 @@
 
 - [x] `ticket`：解析合成的 Jira 导出 JSON（component → 模块，label → 规则），生成脚本任务与检查脚本
 - [x] 使用手册与开发规范（`docs/user-guide*.md`、`docs/dev-guide*.md`，中英双语）
+
+### Phase 5（`REQ-ADAS-02`）
+
+- [x] `spark_aggregate`：PySpark 计算 byRule / byModule，写 Parquet（PR #80）
+- [x] 与 Pandas summary 一致，由 `tests/test_spark_aggregate.py` 校验
+- [x] CI job `adas-analysis-spark`（Java 17），pyspark 不可导入时失败（PR #81）
+- [x] 发布 0.3.0，tag `adas-lab-v0.3.0`
 
 ## 7. 需求确认记录（2026-11-20）
 
@@ -134,3 +143,5 @@
 | 2026-11-20 | Stage 4 测试（Phase 1） | ✅ PR #75 CI 4 个 job 全绿 + 用户评审通过；合并后打 tag `adas-lab-v0.1.0` |
 | 2026-11-20 | Phase 2–4 开发（并行子代理 + TDD）| ✅ 完成 |
 | 2026-11-21 | Phase 2–4 发布（PR #76，tag `adas-lab-v0.2.0`） | ✅ 通过；Pages 已开启并部署；根 README 速查表（PR #77）已更新 |
+| 2026-11-21 | `REQ-ADAS-02` PySpark 聚合（PR #80）+ CI job（PR #81） | ✅ 合并；TDD 证据见 `docs/tdd.md` |
+| 2026-11-23 | `REQ-ADAS-02` 登记 + 发布 0.3.0 | 待评审 |

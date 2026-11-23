@@ -34,7 +34,7 @@
 ```bash
 cd adas-log-toolchain-lab
 npm ci
-node src/cli.ts --version     # 0.2.0
+node src/cli.ts --version     # 0.3.0
 npm run adas -- --help        # 等价于 node src/cli.ts --help
 ```
 

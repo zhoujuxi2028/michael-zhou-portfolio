@@ -19,9 +19,9 @@
 | `AND` | android-app | 1 |
 | `ANDT` | android-testing-demo | 2 |
 | `DVP` | devops-platform-demo | 11 |
-| `ADAS` | adas-log-toolchain-lab | 1 |
+| `ADAS` | adas-log-toolchain-lab | 2 |
 | `DRV` | （规划中） | 0 |
-| **合计** | | **30** |
+| **合计** | | **31** |
 
 ---
 
@@ -113,6 +113,7 @@
 | 编号 | 描述 | 状态 |
 |------|------|------|
 | `REQ-ADAS-01` | ADAS 日志工具链：TS 解析 + 用例生成 + 数据采集 + 场景回放 + 分析看板（#69） | ✅ |
+| `REQ-ADAS-02` | PySpark 聚合示例：byRule / byModule → Parquet + CI（Java 17），0.3.0 | ✅ |
 
 ---
 
