@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-> 日期：2026-11-18 | 分支：`feature/dvp-012-node26-cypress` | 状态：Stage 4 测试（本地验证完成，待 CI）
+> 日期：2026-11-18 | 分支：`feature/dvp-012-node26-cypress` | 状态：✅ Done（PR #87 已合并，2026-11-23）
 
 **Goal:** 工具链从已 EOL 的 Node 20.20.0 升级到 Node 26.13.1 LTS，修复 Cypress 16 下失败的 E2E，并在 PR 门禁中真实运行 Cypress。
 
@@ -360,9 +360,9 @@ git commit -m "docs(dvp): register REQ-DVP-012 and REQ-DVP-013"
 - [x] `npm run test:newman` 0 failed（7 requests，18 assertions）
 - [x] `verify-tools.sh --drift` 与 `test-verify-tools.sh` 通过（另 `test-install-tools.sh` 8、`test-setup-kubeconfig.sh` 5 passed）
 - [x] `validate-environment.sh` 退出码 0
-- [ ] CI：`dvp-pr.yml` 全绿，`e2e` job 实际执行 Cypress（本 PR 改了 `cypress/` 与 `.nvmrc`，应触发）
-- [ ] CI：`dvp-devcontainer.yml` 全绿（Node 26 feature 构建），日志中 `verify-tools.sh` 报 `node 26.13.1` 无 drift（只看 `scripts` job 不算）
-- [ ] Dev Container 构建日志（本机 `npm ci` 已观察到：npm 11.20 报 `cypress@16.3.0` postinstall 未被 `allowScripts` 覆盖，当前仅警告，postinstall 仍执行——对照实验确认；已在 `package.json` 加 `allowScripts: {"cypress": true}`，不固定版本以免 Dependabot 升级后失效）：`postCreateCommand` 的 `npm ci` 是否出现 npm 11 `allowScripts` 警告 / cypress postinstall 被跳过，结果写入 PR
+- [x] CI：`dvp-pr.yml` 全绿，`e2e` job 实际执行 Cypress（本 PR 改了 `cypress/` 与 `.nvmrc`，应触发）：PR #87 全绿，`e2e` 执行 17/17（Node 26.13.1）
+- [x] CI：`dvp-devcontainer.yml` 全绿（Node 26 feature 构建），日志中 `verify-tools.sh` 报 `node 26.13.1` 无 drift（只看 `scripts` job 不算）：`✅ node expected=26.13.1 actual=26.13.1`
+- [x] Dev Container 构建日志（本机 `npm ci` 已观察到：npm 11.20 报 `cypress@16.3.0` postinstall 未被 `allowScripts` 覆盖，当前仅警告，postinstall 仍执行——对照实验确认；已在 `package.json` 加 `allowScripts: {"cypress": true}`，不固定版本以免 Dependabot 升级后失效）：`postCreateCommand` 的 `npm ci` 是否出现 npm 11 `allowScripts` 警告 / cypress postinstall 被跳过，结果写入 PR CI 结果：postCreate `npm ci` 无 cypress install-scripts 警告（仅 node feature 全局安装的 `yarn` 有，非本项目依赖）
 - [x] 本地 `npm run lint` 在 Cypress 运行后仍可用：复现失败（shell 把 glob 展开到 `cypress/screenshots/02-ui-tests.cy.js/` 目录），改为 `eslint cypress` 修复
 
 ## 风险

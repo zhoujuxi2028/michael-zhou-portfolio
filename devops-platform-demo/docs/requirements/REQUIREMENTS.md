@@ -47,7 +47,7 @@
 | `REQ-DVP-009` | 数据管道 / DB 备份自动化 | FR | P3 | 85% | — | 🔲 Planned |
 | `REQ-DVP-010` | OPA/Kyverno 策略即代码 | FR | P3 | 90% | — | 🔲 Planned |
 | `REQ-DVP-011` | Dev Container 标准化开发环境 | NFR | P1 | 95% | — | ✅ Done |
-| `REQ-DVP-012` | Node 26 LTS 升级 + Cypress 16 修复 + PR 门禁 E2E | NFR | P1 | 100% | 011 | 🟡 In Progress |
+| `REQ-DVP-012` | Node 26 LTS 升级 + Cypress 16 修复 + PR 门禁 E2E | NFR | P1 | 100% | 011 | ✅ Done（PR #87） |
 | `REQ-DVP-013` | `qa-newman` 基础镜像升级（alpine 3.18 EOL） | NFR | P2 | 95% | — | 🔲 Planned |
 
 **整体风险：** k3d 同时运行 Prometheus 栈 + Loki + ArgoCD + Kyverno + Postgres（+ Elastic）约 8–12 GB，超出 OrbStack 8 GB 上限 → 按 REQ 分开演示、不用的组件缩到 0；必要时调高 `memory_mib`（宿主机仅剩 ~4 GB）或改用 Azure VM。
@@ -221,7 +221,9 @@
 
 **可行性 95%：** Dev Container 是开放规范（containers.dev），作为容器运行在 OrbStack 现有 VM 内，无额外 VM 开销，并解决 Intel macOS Homebrew Tier 3 的工具链问题。风险：容器内访问 k3d API 需处理网络（`host.docker.internal` / kubeconfig 改写）。
 
-### REQ-DVP-012 — Node 26 LTS 升级 + Cypress 16 修复
+### REQ-DVP-012 — Node 26 LTS 升级 + Cypress 16 修复 ✅
+
+已完成（PR #87，2026-11-23 合并）：Node 26.13.1、`Cypress.expose()` + ESLint 防回退、`cypress/included` 16.3.0、PR 门禁 `e2e` job；另修复 lint glob 问题、加 npm 11 `allowScripts`。
 
 **User Story:** As a maintainer, I want the toolchain on a supported Node LTS and E2E tests running in the PR gate, so that dependency bumps cannot silently break Cypress.
 
@@ -235,10 +237,10 @@
 | FR-DVP-012-04 | `dvp-pr.yml` 新增 `e2e` job（按路径触发），纳入 `pr-gate` |
 
 **验收标准：**
-- [ ] `npm run lint` 0 errors；ESLint 禁用 `Cypress.env`
-- [ ] `npx cypress run` 全部通过（Node 26）；`docker compose run --rm cypress` 退出码 0
-- [ ] `verify-tools.sh --drift` 无 drift
-- [ ] CI：`dvp-pr.yml`（含 `e2e`）与 `dvp-devcontainer.yml` 全绿
+- [x] `npm run lint` 0 errors；ESLint 禁用 `Cypress.env`
+- [x] `npx cypress run` 全部通过（Node 26，17/17）；`docker compose run --rm cypress` 退出码 0
+- [x] `verify-tools.sh --drift` 无 drift
+- [x] CI：`dvp-pr.yml`（含 `e2e`）与 `dvp-devcontainer.yml` 全绿（PR #87）
 
 ### REQ-DVP-013 — `qa-newman` 基础镜像升级
 
