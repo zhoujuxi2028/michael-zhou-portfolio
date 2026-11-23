@@ -4,6 +4,10 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 
 ## [Unreleased]
 
+### Fixed
+
+- Tests: default `testTimeout` raised from 5 s to 30 s; full-pipeline tests (~3 s) timed out under coverage plus machine load
+
 ## [0.3.0] - 2026-11-23
 
 Ruleset version: 1.1.0 (unchanged). Requirement: REQ-ADAS-02.
