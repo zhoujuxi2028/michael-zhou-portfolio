@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-java@v5
+      - uses: actions/setup-java@v6
         with:
           java-version: '17'
           distribution: 'temurin'
@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-java@v5
+      - uses: actions/setup-java@v6
         with:
           java-version: '17'
           distribution: 'temurin'
@@ -93,7 +93,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       # Spark 4.0 supports Java 17 / 21 only.
-      - uses: actions/setup-java@v5
+      - uses: actions/setup-java@v6
         with:
           java-version: '17'
           distribution: 'temurin'
