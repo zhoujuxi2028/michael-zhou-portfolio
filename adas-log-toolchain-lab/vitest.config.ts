@@ -4,6 +4,8 @@ export default defineConfig({
   test: {
     include: ['tests/**/*.test.ts'],
     exclude: ['tests/perf/**', 'node_modules/**'],
+    // Full-pipeline tests take ~3 s and exceed the 5 s default under coverage + load.
+    testTimeout: 30_000,
     coverage: {
       provider: 'v8',
       include: ['src/**/*.ts'],
