@@ -18,10 +18,10 @@
 | `CA` | claude-api-journey | 0 |
 | `AND` | android-app | 1 |
 | `ANDT` | android-testing-demo | 2 |
-| `DVP` | devops-platform-demo | 11 |
+| `DVP` | devops-platform-demo | 13 |
 | `ADAS` | adas-log-toolchain-lab | 2 |
 | `DRV` | （规划中） | 0 |
-| **合计** | | **31** |
+| **合计** | | **33** |
 
 ---
 
@@ -103,6 +103,8 @@
 | `REQ-DVP-009` | 数据管道 / DB 备份自动化 | 🔲 |
 | `REQ-DVP-010` | OPA/Kyverno 策略即代码 | 🔲 |
 | `REQ-DVP-011` | Dev Container 标准化开发环境（#50） | ✅ |
+| `REQ-DVP-012` | Node 26 LTS 升级 + Cypress 16 修复 + PR 门禁 E2E | 🟡 |
+| `REQ-DVP-013` | `qa-newman` 基础镜像升级（alpine 3.18 EOL） | 🔲 |
 
 ---
 
