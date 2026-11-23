@@ -2,7 +2,7 @@
 
 Run on 2026-11-23 on branch `docs/adas-02-closeout`, starting from clean `out/` and `coverage/` directories. Every result below is copied from a command run on that day. Scope: the PySpark aggregation (PR #80), its CI job (PR #81) and the version bump; the Phase 1–4 checks of [0.2.0](self-check-0.2.0.md) are re-run as regression.
 
-**Result:** items 1–8 pass; item 9 is not re-run (see below); item 10 is filled in from the PR checks.
+**Result:** items 1–8 pass; item 9 is not re-run (see below); item 10 passes on PR #85.
 
 | # | Check | Result |
 |---|-------|--------|
@@ -15,7 +15,7 @@ Run on 2026-11-23 on branch `docs/adas-02-closeout`, starting from clean `out/` 
 | 7 | Tool 0.3.0 / ruleset 1.1.0 in every output | ✅ |
 | 8 | English code and output; bilingual README; CHANGELOG | ✅ |
 | 9 | Public repository hygiene | ⚠️ not re-run (private term list kept outside the repo) |
-| 10 | CI green on the pull request | see PR checks |
+| 10 | CI green on the pull request | ✅ PR #85: all 7 checks pass (run 45124473588), incl. `adas-analysis-spark` |
 
 ## 1. Acceptance criteria (REQUIREMENTS §6, Phase 5)
 
