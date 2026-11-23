@@ -4,9 +4,17 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-23
+
+Ruleset version: 1.1.0 (unchanged). Requirement: REQ-ADAS-02.
+
 ### Added
 
 - `analysis/`: optional PySpark aggregation (`python -m adas_analysis.spark_aggregate`), byRule / byModule written as Parquet, parity with the Pandas summary checked by tests; `requirements-spark.txt`, needs Java 17 / 21. GitHub Actions job `adas-analysis-spark` (Java 17) runs the Spark tests and fails if pyspark is not importable
+
+### Changed
+
+- Tool version 0.2.0 -> 0.3.0 (`--version`, `meta.toolVersion` in all outputs)
 
 ## [0.2.0] - 2026-11-20
 

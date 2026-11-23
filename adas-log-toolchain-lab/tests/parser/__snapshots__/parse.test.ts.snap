@@ -74,7 +74,7 @@ exports[`parseFile > matches the report snapshot 1`] = `
     "input": "fixtures/golden/mixed.jsonl",
     "rulesetVersion": "1.1.0",
     "scenarios": 2,
-    "toolVersion": "0.2.0",
+    "toolVersion": "0.3.0",
   },
   "summary": {
     "byRule": {

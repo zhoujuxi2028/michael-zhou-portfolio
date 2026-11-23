@@ -65,6 +65,6 @@ describe('adas-lab CLI', () => {
   it('prints the version', async () => {
     const c = capture();
     expect(await main(['--version'], c.io)).toBe(0);
-    expect(c.out.join('\n')).toContain('0.2.0');
+    expect(c.out.join('\n')).toContain('0.3.0');
   });
 });
