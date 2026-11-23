@@ -10,7 +10,7 @@
 
 第 1-4 期已在 0.2.0 实现（[REQ-ADAS-01](https://github.com/zhoujuxi2028/michael-zhou-portfolio/issues/69)）；0.3.0 新增可选的 PySpark 聚合（REQ-ADAS-02）。规则集 1.1.0。设计见 [spec](../docs/superpowers/specs/2026-11-20-adas-log-toolchain-design.md)。看板已通过 `.github/workflows/adas-pages.yml` 发布到 [GitHub Pages](https://zhoujuxi2028.github.io/michael-zhou-portfolio/)。
 
-文档：[使用手册](docs/user-guide.zh.md) | [开发规范](docs/dev-guide.zh.md) | [TDD 证据](docs/tdd.md) | [自检 0.2.0](docs/self-check-0.2.0.md)
+文档：[使用手册](docs/user-guide.zh.md) | [开发规范](docs/dev-guide.zh.md) | [TDD 证据](docs/tdd.md) | [自检 0.2.0](docs/self-check-0.2.0.md) | [自检 0.3.0](docs/self-check-0.3.0.md)
 
 ## 快速开始
 

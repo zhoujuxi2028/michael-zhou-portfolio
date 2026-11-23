@@ -10,7 +10,7 @@ TypeScript toolchain for ADAS-style logs: generate synthetic data, record clips,
 
 Phases 1-4 implemented in release 0.2.0 ([REQ-ADAS-01](https://github.com/zhoujuxi2028/michael-zhou-portfolio/issues/69)); optional PySpark aggregation added in 0.3.0 (REQ-ADAS-02). Ruleset 1.1.0. Design: [spec](../docs/superpowers/specs/2026-11-20-adas-log-toolchain-design.md). The dashboard is published on [GitHub Pages](https://zhoujuxi2028.github.io/michael-zhou-portfolio/) via `.github/workflows/adas-pages.yml`.
 
-Docs: [User guide](docs/user-guide.md) | [Development guide](docs/dev-guide.md) | [TDD evidence](docs/tdd.md) | [Self-check 0.2.0](docs/self-check-0.2.0.md)
+Docs: [User guide](docs/user-guide.md) | [Development guide](docs/dev-guide.md) | [TDD evidence](docs/tdd.md) | [Self-check 0.2.0](docs/self-check-0.2.0.md) | [Self-check 0.3.0](docs/self-check-0.3.0.md)
 
 ## Quick start
 
