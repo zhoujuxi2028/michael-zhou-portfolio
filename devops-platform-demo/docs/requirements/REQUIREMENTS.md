@@ -41,7 +41,7 @@
 | `REQ-DVP-003` | Phase 3：本地 DevSecOps 闭环（本地 registry + Trivy→Prometheus，替代 Azure） | FR | P1 | — | 002 | ✅ Done（PR #65） |
 | `REQ-DVP-004` | README / CLAUDE.md 过期内容修正 | NFR | P1 | 100% | — | ✅ Done |
 | `REQ-DVP-005` | Incident / RCA postmortem 模板 + 案例 | DEMO | P2 | 95% | — | ✅ Done |
-| `REQ-DVP-006` | Azure Key Vault + External Secrets + K8s RBAC | FR | P2 | 75% | 003 | 🔲 Planned |
+| `REQ-DVP-006` | Secrets Manager（LocalStack）+ External Secrets + K8s RBAC（替代 Azure Key Vault） | FR | P2 | 90% | 003 | 🔲 Planned（设计中） |
 | `REQ-DVP-007` | Dependabot 依赖与补丁自动化 | NFR | P2 | 95% | — | ✅ Done（PR #56） |
 | `REQ-DVP-008` | Elastic 集成 / Loki vs Elastic 对比 | DEMO | P3 | 60%（部署）/ 100%（文档） | — | 🔲 Planned |
 | `REQ-DVP-009` | 数据管道 / DB 备份自动化 | FR | P3 | 85% | — | 🔲 Planned |
@@ -115,23 +115,25 @@
 
 **可行性 95%：** 已有真实 bug 素材。风险仅在于案例的深度。
 
-### REQ-DVP-006 — Key Vault + External Secrets + RBAC
+### REQ-DVP-006 — Secrets Manager + External Secrets + RBAC
 
-**User Story:** As a security owner, I want secrets sourced from Azure Key Vault and cluster access scoped by RBAC, so that no credentials live in Git and access follows least privilege.
+原 Azure Key Vault 方案因订阅到期改为 LocalStack Secrets Manager（同 003）。设计：[2026-11-24-dvp-006-secrets-rbac-design.md](../../../docs/superpowers/specs/2026-11-24-dvp-006-secrets-rbac-design.md)。
+
+**User Story:** As a security owner, I want secrets sourced from a secrets manager and cluster access scoped by RBAC, so that no credentials live in Git and access follows least privilege.
 
 | ID | 描述 |
 |----|------|
-| FR-DVP-006-01 | Terraform 创建 Key Vault + 访问策略，存放 Slack webhook、ACR 凭据 |
-| FR-DVP-006-02 | k3d 安装 External Secrets Operator，`ExternalSecret` 同步到 K8s Secret |
-| FR-DVP-006-03 | Helm chart 增加 ServiceAccount + Role/RoleBinding（最小权限） |
-| FR-DVP-006-04 | CI 使用 OIDC（GitHub → Azure federated credential）替代长期 secret |
+| FR-DVP-006-01 | Terraform 在 LocalStack Secrets Manager 创建 registry 凭据、Slack webhook（值来自 `sensitive` 变量） |
+| FR-DVP-006-02 | k3d 安装 External Secrets Operator（自定义 endpoint），`ExternalSecret` 同步到 K8s Secret；registry 凭据接入 `imagePullSecrets` |
+| FR-DVP-006-03 | Helm chart 增加 ServiceAccount + Role/RoleBinding（最小权限，无通配符） |
+| ~~FR-DVP-006-04~~ | ~~CI 使用 OIDC 替代长期 secret~~ — 移出范围（需真实云账号），仅文档给出 GitHub → AWS IAM OIDC 示例 |
 
 **验收标准：**
-- [ ] 仓库与 values 文件中无明文凭据
-- [ ] 轮换 Key Vault secret 后 K8s Secret 自动更新
-- [ ] 越权 `kubectl` 操作被拒绝
+- [ ] 仓库与 values 文件中无明文凭据（Trivy secret scan 0 findings）
+- [ ] 轮换 Secrets Manager secret 后 60s 内 K8s Secret 自动更新
+- [ ] `scripts/verify-rbac.sh` 越权操作断言均为 `no`
 
-**可行性 75%：** 依赖 003。本地 k3d 无法使用 Workload Identity，ESO 需用 SP secret 引导（需说明这只是演示时的折中）；OIDC federated credential 可能受租户权限限制。
+**可行性 90%：** ESO 官方支持 `AWS_SECRETSMANAGER_ENDPOINT`。本地 ESO 用静态凭据引导（演示折中，真实 AWS 用 IRSA）；风险：OrbStack 下 `host.k3d.internal` 解析。
 
 ### REQ-DVP-007 — Dependabot 补丁自动化
 
