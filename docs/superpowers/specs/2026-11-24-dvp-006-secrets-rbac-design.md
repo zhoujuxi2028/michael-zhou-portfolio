@@ -42,8 +42,8 @@ TF_VAR_* (env, sensitive)
    │ terraform apply
    ▼
 LocalStack Secrets Manager (:4566)
-   │  qa-portfolio/<env>/registry       {username,password,server}
-   │  qa-portfolio/<env>/slack-webhook  {url}
+   │  portfolio-<env>/registry       {username,password,server}
+   │  portfolio-<env>/slack-webhook  {url}
    │
    │ http://host.k3d.internal:4566  (AWS_SECRETSMANAGER_ENDPOINT)
    ▼
@@ -60,7 +60,7 @@ ExternalSecret ──► Secret alertmanager-slack (monitoring ns)          ─�
 |------|------|------|
 | LocalStack | `docker-compose.localstack.yml` | `SERVICES=s3,dynamodb,secretsmanager` |
 | Terraform provider | `terraform/provider.tf` | endpoints 增加 `secretsmanager` |
-| Terraform secrets | `terraform/secrets.tf` | `aws_secretsmanager_secret` + `_version` ×2；值来自 `sensitive` 变量，默认空则跳过 version |
+| Terraform secrets | `terraform/secrets.tf` | `aws_secretsmanager_secret` + `_version` ×2；值来自 `sensitive` 变量；`ignore_changes = [secret_string]`（轮换在 Terraform 之外）；非 LocalStack 时用 CMK |
 | Terraform 变量 | `terraform/variables.tf` | `registry_username` / `registry_password` / `registry_server` / `slack_webhook_url`（`sensitive = true`，tfvars 不写） |
 | ESO 安装 | `scripts/install-eso.sh` | Helm 安装 ESO（锁定版本），`extraEnv` 注入 endpoint；创建 `aws-localstack-creds` |
 | Helm 开关 | `helm/qa-portfolio/values.yaml` | `externalSecrets.enabled: false`、`refreshInterval`、`secretStore.*`；`serviceAccount.*`、`rbac.create` |
@@ -68,7 +68,7 @@ ExternalSecret ──► Secret alertmanager-slack (monitoring ns)          ─�
 | Helm RBAC | `templates/serviceaccount.yaml`、`role.yaml`、`rolebinding.yaml` | 见 §5 |
 | Helm values | `values-registry.yaml` | 启用 `externalSecrets`，`imagePullSecrets` 指向同步出的 Secret |
 | 监控 ESO | `monitoring/eso/secretstore.yaml`、`externalsecret-slack.yaml` | `monitoring` ns 独立 SecretStore（app chart 不跨 namespace 建资源）；`install-eso.sh` 在该 ns 也创建引导凭据 |
-| 监控 | `monitoring/prometheus-values.yaml` | `slack_api_url` → `slack_api_url_file`，挂载 `alertmanager-slack` |
+| 监控 | `monitoring/prometheus-values.yaml` | `slack_api_url` → `slack_api_url_file`，挂载 `alertmanager-slack`；顺带删除重复的顶层 `alertmanager:` 键（第一个块被第二个覆盖，属死配置） |
 
 ## 5. RBAC 矩阵
 
@@ -87,7 +87,7 @@ ServiceAccount `qa-portfolio`（deployment + newman/cypress jobs 共用），`au
 
 ## 6. 数据流：轮换
 
-1. `awslocal secretsmanager put-secret-value --secret-id qa-portfolio/dev/registry ...`
+1. `awslocal secretsmanager put-secret-value --secret-id portfolio-dev/registry ...`
 2. ESO 按 `refreshInterval`（演示 15s）拉取
 3. K8s Secret `resourceVersion` / 数据变化
 4. 新拉取的 Pod 使用新凭据（已运行 Pod 不受影响 — 文档说明）
@@ -105,9 +105,10 @@ ServiceAccount `qa-portfolio`（deployment + newman/cypress jobs 共用），`au
 
 | 类型 | 方式 | 位置 |
 |------|------|------|
-| Terraform | `terraform validate` + LocalStack `plan/apply` | `dvp-terraform.yml`（已有 LocalStack） |
+| Terraform | fmt / validate / Trivy IaC（production.tfvars） | `dvp-terraform.yml`（现有 job，无需改动） |
+| Terraform apply | `terraform apply -var-file=environments/dev.tfvars` 对 LocalStack | 本地（CI 无 LocalStack） |
 | Helm 渲染 | `helm template` 开/关两种 values，断言 CR 存在/不存在 | `dvp-pr.yml` |
-| 明文扫描 | Trivy `--scanners secret` 覆盖 `terraform/`、`helm/` | `dvp-pr.yml` |
+| 明文扫描 | Trivy fs（默认含 secret scanner）覆盖 `devops-platform-demo/` | `dvp-pr.yml` 现有 `security-scan` job |
 | RBAC | `scripts/verify-rbac.sh`：按 §5 矩阵断言 `can-i` | 本地 k3d |
 | 轮换 | `scripts/verify-secret-rotation.sh`：更新 → 60s 内断言 Secret 变化 | 本地 k3d |
 
