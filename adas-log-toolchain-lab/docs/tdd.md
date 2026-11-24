@@ -188,6 +188,16 @@ Release 0.3.0:
 
 On Java 25 the green run fails with `UnsupportedOperationException: getSubject is not supported`; Spark 4.0 needs Java 17 / 21.
 
+### Test timeout
+
+Red / green by load, not by `scripts/tdd-redgreen.sh`: two `npx vitest run --coverage` runs started at the same time.
+
+| Commit | Change | Class | Red | Green |
+|--------|--------|-------|-----|-------|
+| `01377da` | `vitest.config.ts`: default `testTimeout` 5 s → 30 s | Test hygiene | each run 3 failed, 339 passed (`TestTimeoutError`: `cli/main.test.ts`, `collector/session.test.ts` ×2) | each run 342 passed |
+
+Which tests time out changes from run to run, so the fix is global, not per test.
+
 ## Exceptions (recorded as they happened)
 
 | Where | What happened |
