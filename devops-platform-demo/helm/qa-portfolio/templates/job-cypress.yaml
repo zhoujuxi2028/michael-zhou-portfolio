@@ -15,6 +15,7 @@ spec:
         {{- include "qa-portfolio.cypress.labels" . | nindent 8 }}
     spec:
       restartPolicy: Never
+      serviceAccountName: {{ include "qa-portfolio.serviceAccountName" . }}
       initContainers:
         - name: prepare-results-dir
           image: busybox:1.36

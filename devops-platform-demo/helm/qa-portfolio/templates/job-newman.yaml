@@ -15,6 +15,7 @@ spec:
         {{- include "qa-portfolio.newman.labels" . | nindent 8 }}
     spec:
       restartPolicy: Never
+      serviceAccountName: {{ include "qa-portfolio.serviceAccountName" . }}
       {{- with .Values.newman.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}

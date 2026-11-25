@@ -1,0 +1,15 @@
+{{- if .Values.rbac.create }}
+# 最小权限：只读 configmaps / pods，不使用通配符（REQ-DVP-006 §5）
+# 注意：注释中勿出现 secret 字样，测试按文本断言
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "qa-portfolio.fullname" . }}-reader
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "qa-portfolio.labels" . | nindent 4 }}
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps", "pods"]
+    verbs: ["get", "list"]
+{{- end }}
