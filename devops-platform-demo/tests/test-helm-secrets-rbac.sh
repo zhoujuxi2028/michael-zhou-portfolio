@@ -75,8 +75,11 @@ assert_match    "ExternalSecret remote key"           "$registry" 'key: portfoli
 assert_match    "Demo refresh interval"               "$registry" 'refreshInterval: 15s'
 assert_match    "Target is dockerconfigjson"          "$registry" 'type: kubernetes.io/dockerconfigjson'
 assert_match    "ESO template kept literal"           "$registry" '\{\{ \.password \}\}'
-assert_match    "Newman pulls with synced secret"     "$registry" '- name: qa-registry-pull-secret'
-assert_no_match "No endpoint hard-coded in chart"     "$registry" '4566|AWS_SECRETSMANAGER_ENDPOINT'
+assert_match    "ESO auth field kept literal"         "$registry" 'printf "%s:%s" \.username \.password \| b64enc'
+newman_pull=$(render -f "$CHART/values-registry.yaml" --show-only templates/job-newman.yaml)
+newman_pull=$(grep -A1 '^ *imagePullSecrets:' <<<"$newman_pull" || [ $? -eq 1 ])
+assert_match    "Newman pulls with synced secret"     "$newman_pull" '- name: qa-registry-pull-secret'
+assert_no_match "No endpoint hard-coded in chart"     "$registry" '(^|[^0-9])4566([^0-9]|$)|AWS_SECRETSMANAGER_ENDPOINT'
 
 echo "---"
 echo "passed=$passed failed=$failed"
