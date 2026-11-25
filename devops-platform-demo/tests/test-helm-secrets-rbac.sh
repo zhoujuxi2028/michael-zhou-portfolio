@@ -41,6 +41,7 @@ assert_count() {
 # --- RBAC (default values) ---
 default=$(render)
 role=$(render --show-only templates/role.yaml)
+role_rules=$(sed -n '/^rules:/,$p' <<<"$role")
 sa=$(render --show-only templates/serviceaccount.yaml)
 
 assert_match    "ServiceAccount rendered"             "$sa"      '^kind: ServiceAccount$'
@@ -48,11 +49,17 @@ assert_match    "SA token not automounted"            "$sa"      '^automountServ
 assert_match    "Role rendered"                       "$role"    '^kind: Role$'
 assert_match    "Role grants configmaps/pods"         "$role"    'resources: \["configmaps", "pods"\]'
 assert_match    "Role verbs are read-only"            "$role"    'verbs: \["get", "list"\]'
-assert_no_match "Role has no wildcard"                "$role"    '\*'
-assert_no_match "Role does not grant secrets"         "$role"    'secrets'
+assert_no_match "Role has no wildcard"                "$role_rules" '\*'
+assert_no_match "Role does not grant secrets"         "$role_rules" 'secrets'
 assert_no_match "No ClusterRole"                      "$default" '^kind: ClusterRole'
 assert_match    "RoleBinding rendered"                "$default" '^kind: RoleBinding$'
 assert_count    "3 workloads use the SA"              "$default" '^ *serviceAccountName: qa-portfolio$' 3
+
+# --- RBAC toggles off ---
+off=$(render --set serviceAccount.create=false --set rbac.create=false)
+assert_no_match "No SA when serviceAccount.create=false"       "$off" '^kind: ServiceAccount$'
+assert_no_match "No Role/RoleBinding when rbac.create=false"   "$off" '^kind: Role(Binding)?$'
+assert_count    "Workloads fall back to default SA"            "$off" '^ *serviceAccountName: default$' 3
 
 echo "---"
 echo "passed=$passed failed=$failed"

@@ -156,9 +156,9 @@ podDisruptionBudget:
   minAvailable: 1
   # 或者：maxUnavailable: 1
 
-
 # --- ServiceAccount & RBAC（REQ-DVP-006）---
 # 工作负载不调用 K8s API：token 不挂载，Role 仅保留只读演示权限
+# 注意：rbac.create=true 且 serviceAccount.create=false、name 为空时，Role 绑定到 namespace 的 default SA
 serviceAccount:
   create: true
   name: ""  # 空则使用 fullname
