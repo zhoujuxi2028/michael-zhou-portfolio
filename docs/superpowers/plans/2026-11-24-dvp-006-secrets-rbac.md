@@ -1137,6 +1137,7 @@ git commit -m "ci(dvp): run RBAC and External Secrets render tests in PR gate"
 | 本地折中 | 静态引导凭据 vs IRSA；`host.k3d.internal`（或 Task 2 备选地址）；已运行 Pod 不会自动换凭据 |
 | 排查 | `kubectl describe externalsecret`、`SecretSyncedError` 常见原因表 |
 | 真实云迁移 / OIDC（FR-04，未实施） | GitHub → AWS IAM OIDC 示例（下方），说明需真实 AWS 账号 |
+| 迁移到 Azure Key Vault（未实施） | 映射表 + `SecretStore` 示例（下方）；ESO / RBAC / Helm 开关复用，仅替换 provider 与 Terraform 资源 |
 
 步骤命令块：
 
@@ -1188,6 +1189,32 @@ resource "aws_iam_role" "github_deploy" {
 ```
 
 配套 workflow 片段：`permissions: id-token: write` + `aws-actions/configure-aws-credentials` 的 `role-to-assume`。
+
+迁移到 Azure Key Vault（仅文档，标注「未在本仓库 apply」）：
+
+| 层 | 本地（本 REQ） | Azure |
+|----|----------------|-------|
+| secret 源 | LocalStack Secrets Manager | Azure Key Vault |
+| Terraform | `aws_secretsmanager_secret` | `azurerm_key_vault` + `azurerm_key_vault_secret` |
+| ESO 认证 | 静态引导凭据 `aws-localstack-creds` | AKS Workload Identity（`authType: WorkloadIdentity`） |
+| ESO provider | `provider.aws` | `provider.azurekv` |
+| 不变 | — | `ExternalSecret`、RBAC、Helm `externalSecrets.enabled` 开关 |
+
+```yaml
+apiVersion: external-secrets.io/v1
+kind: SecretStore
+metadata:
+  name: qa-portfolio-azure
+spec:
+  provider:
+    azurekv:
+      vaultUrl: https://<vault-name>.vault.azure.net
+      authType: WorkloadIdentity
+      serviceAccountRef:
+        name: qa-portfolio-eso   # 带 azure.workload.identity/client-id 注解
+```
+
+注意：Key Vault secret 名不允许 `/`，`portfolio-dev/registry` 需改为 `portfolio-dev-registry`。
 
 - [ ] **Step 2: README / CLAUDE.md**
 
