@@ -13,6 +13,15 @@ npm test
 npm run docker:test
 ```
 
+## Secrets & RBAC（REQ-DVP-006）
+```bash
+bash tests/test-helm-secrets-rbac.sh
+bash tests/test-alertmanager-values.sh
+./scripts/install-eso.sh operator
+./scripts/verify-rbac.sh
+./scripts/verify-secret-rotation.sh
+```
+
 ## Dev Container
 ```bash
 npx -y @devcontainers/cli@0.90.0 up --workspace-folder .
