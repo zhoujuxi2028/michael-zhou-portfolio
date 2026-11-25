@@ -81,6 +81,11 @@ newman_pull=$(grep -A1 '^ *imagePullSecrets:' <<<"$newman_pull" || [ $? -eq 1 ])
 assert_match    "Newman pulls with synced secret"     "$newman_pull" '- name: qa-registry-pull-secret'
 assert_no_match "No endpoint hard-coded in chart"     "$registry" '(^|[^0-9])4566([^0-9]|$)|AWS_SECRETSMANAGER_ENDPOINT'
 
+# --- Release namespace: not rendered by default (compatible with --create-namespace) ---
+assert_no_match "No Namespace by default"             "$default" '^kind: Namespace$'
+ns_on=$(render --set createNamespace=true)
+assert_match    "Namespace when createNamespace=true" "$ns_on"   '^kind: Namespace$'
+
 echo "---"
 echo "passed=$passed failed=$failed"
 [ "$failed" -eq 0 ]

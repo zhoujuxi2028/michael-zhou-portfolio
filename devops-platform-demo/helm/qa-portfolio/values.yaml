@@ -4,6 +4,9 @@
 nameOverride: ""
 fullnameOverride: ""
 
+# 是否由 chart 渲染 Release namespace（默认 false：由 helm --create-namespace 或 ArgoCD CreateNamespace=true 创建）
+createNamespace: false
+
 # --- Results Server (nginx) ---
 image:
   repository: nginx

@@ -1,3 +1,5 @@
+{{- if .Values.createNamespace }}
+{{- /* 默认关闭：helm --create-namespace / ArgoCD CreateNamespace=true 负责创建，避免 invalid ownership metadata 冲突 */}}
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -5,3 +7,4 @@ metadata:
   labels:
     {{- include "qa-portfolio.labels" . | nindent 4 }}
     purpose: cicd-testing
+{{- end }}
