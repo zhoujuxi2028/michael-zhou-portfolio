@@ -34,6 +34,29 @@ preflight() {
   fi
 }
 
+# charts.external-secrets.io 偶发 EOF：最多重试 3 次，全部失败则退出非 0
+install_chart() {
+  local attempt
+  for attempt in 1 2 3; do
+    # 2.15.0 默认即 true；显式声明，避免依赖 chart 默认值
+    if helm upgrade --install external-secrets external-secrets \
+         --repo https://charts.external-secrets.io \
+         --kube-context "$KUBE_CONTEXT" \
+         --namespace external-secrets --create-namespace \
+         --version "$ESO_VERSION" \
+         --set installCRDs=true \
+         --set 'extraEnv[0].name=AWS_SECRETSMANAGER_ENDPOINT' \
+         --set "extraEnv[0].value=$ENDPOINT" \
+         --wait --timeout 5m; then
+      return 0
+    fi
+    echo "[eso] ⚠️ helm install attempt $attempt/3 failed" >&2
+    if [ "$attempt" -lt 3 ]; then sleep 5; fi
+  done
+  echo "[eso] ❌ helm install failed after 3 attempts" >&2
+  exit 1
+}
+
 install_operator() {
   preflight
   local health hosts
@@ -59,16 +82,7 @@ install_operator() {
     fi
   fi
 
-  # 2.15.0 默认即 true；显式声明，避免依赖 chart 默认值
-  helm upgrade --install external-secrets external-secrets \
-    --repo https://charts.external-secrets.io \
-    --kube-context "$KUBE_CONTEXT" \
-    --namespace external-secrets --create-namespace \
-    --version "$ESO_VERSION" \
-    --set installCRDs=true \
-    --set 'extraEnv[0].name=AWS_SECRETSMANAGER_ENDPOINT' \
-    --set "extraEnv[0].value=$ENDPOINT" \
-    --wait --timeout 5m
+  install_chart
   echo "[eso] ✅ External Secrets Operator $ESO_VERSION ready (endpoint: $ENDPOINT)"
 }
 
