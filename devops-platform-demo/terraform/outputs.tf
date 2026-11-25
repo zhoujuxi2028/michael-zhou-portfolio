@@ -147,3 +147,13 @@ output "usage_instructions" {
 
   EOT
 }
+
+output "registry_secret_name" {
+  description = "Secrets Manager name for registry credentials (ESO remote key)"
+  value       = aws_secretsmanager_secret.registry.name
+}
+
+output "slack_webhook_secret_name" {
+  description = "Secrets Manager name for the Slack webhook (ESO remote key)"
+  value       = aws_secretsmanager_secret.slack_webhook.name
+}
