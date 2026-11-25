@@ -30,11 +30,12 @@ provider "aws" {
   dynamic "endpoints" {
     for_each = var.use_localstack ? [1] : []
     content {
-      s3       = var.localstack_endpoint
-      dynamodb = var.localstack_endpoint
-      ecr      = var.localstack_endpoint
-      iam      = var.localstack_endpoint
-      sts      = var.localstack_endpoint
+      s3             = var.localstack_endpoint
+      dynamodb       = var.localstack_endpoint
+      ecr            = var.localstack_endpoint
+      iam            = var.localstack_endpoint
+      sts            = var.localstack_endpoint
+      secretsmanager = var.localstack_endpoint
     }
   }
 

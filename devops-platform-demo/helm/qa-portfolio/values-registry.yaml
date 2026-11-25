@@ -13,12 +13,17 @@
 #        仓库地址填 host.k3d.internal:5000       ← 需 k3s 允许 HTTP insecure registry
 #   宿主机本地推拉仍可用 localhost:5000（用于 docker push / trivy scan）
 #
-# 本地 registry 为 HTTP 明文、无认证时 imagePullSecrets 留空；
-# 若启用 auth，则先创建 k8s docker-registry secret 并在此引用。
+# imagePullSecrets 由 External Secrets 从 Secrets Manager 同步（REQ-DVP-006）：
+#   前置：scripts/install-eso.sh operator && scripts/install-eso.sh creds qa-portfolio
+#   本地 registry 无认证时凭据被忽略，拉取不受影响
+externalSecrets:
+  enabled: true
+  refreshInterval: 15s  # 演示轮换；默认 1h
 
 newman:
   image:
     repository: k3d-qa-registry:5000/qa-newman
     tag: "latest"
     pullPolicy: IfNotPresent
-  imagePullSecrets: []
+  imagePullSecrets:
+    - name: qa-registry-pull-secret

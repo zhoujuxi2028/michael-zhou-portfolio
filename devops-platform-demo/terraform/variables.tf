@@ -109,3 +109,34 @@ variable "additional_tags" {
   type        = map(string)
   default     = {}
 }
+
+# ==============================================================================
+# Secrets Manager 输入（REQ-DVP-006）— 通过 TF_VAR_* 传入，tfvars 中不写明文
+# ==============================================================================
+
+variable "registry_server" {
+  description = "Container registry host stored in the registry secret"
+  type        = string
+  default     = "k3d-qa-registry:5000"
+}
+
+variable "registry_username" {
+  description = "Container registry username (TF_VAR_registry_username)"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "registry_password" {
+  description = "Container registry password (TF_VAR_registry_password)"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "slack_webhook_url" {
+  description = "Alertmanager Slack webhook URL (TF_VAR_slack_webhook_url)"
+  type        = string
+  default     = ""
+  sensitive   = true
+}

@@ -4,6 +4,9 @@
 nameOverride: ""
 fullnameOverride: ""
 
+# 是否由 chart 渲染 Release namespace（默认 false：由 helm --create-namespace 或 ArgoCD CreateNamespace=true 创建）
+createNamespace: false
+
 # --- Results Server (nginx) ---
 image:
   repository: nginx
@@ -156,3 +159,23 @@ podDisruptionBudget:
   minAvailable: 1
   # 或者：maxUnavailable: 1
 
+# --- ServiceAccount & RBAC（REQ-DVP-006）---
+# 工作负载不调用 K8s API：token 不挂载，Role 仅保留只读演示权限
+# 注意：rbac.create=true 且 serviceAccount.create=false、name 为空时，Role 绑定到 namespace 的 default SA
+serviceAccount:
+  create: true
+  name: ""  # 空则使用 fullname
+
+rbac:
+  create: true
+
+# --- External Secrets（REQ-DVP-006）---
+# 需先运行 scripts/install-eso.sh operator；endpoint 由 ESO controller 环境变量提供
+externalSecrets:
+  enabled: false
+  refreshInterval: 1h
+  region: us-east-1
+  credentialsSecret: aws-localstack-creds  # install-eso.sh creds 创建；真实 AWS 改用 IRSA
+  registry:
+    remoteKey: portfolio-dev/registry
+    targetName: qa-registry-pull-secret

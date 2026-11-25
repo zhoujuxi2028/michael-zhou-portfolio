@@ -79,3 +79,14 @@ Newman job labels
 app.kubernetes.io/component: newman
 test-type: api
 {{- end }}
+
+{{/*
+ServiceAccount name
+*/}}
+{{- define "qa-portfolio.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create }}
+{{- default (include "qa-portfolio.fullname" .) .Values.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.serviceAccount.name }}
+{{- end }}
+{{- end }}

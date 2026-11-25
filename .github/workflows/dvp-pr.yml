@@ -105,8 +105,19 @@ jobs:
       - name: Helm lint
         run: helm lint helm/qa-portfolio
 
+      - name: Helm render tests (RBAC + External Secrets)
+        run: bash tests/test-helm-secrets-rbac.sh
+
+      - name: Alertmanager values tests
+        run: bash tests/test-alertmanager-values.sh
+
       - name: Helm template render (dev values)
         run: helm template qa-portfolio helm/qa-portfolio > /tmp/helm-rendered.yaml
+
+      - name: Helm template render (registry values)
+        run: |
+          helm template qa-portfolio helm/qa-portfolio \
+            -f helm/qa-portfolio/values-registry.yaml > /tmp/helm-rendered-registry.yaml
 
       - name: Validate K8s manifests (kubeconform)
         shell: bash
@@ -118,7 +129,9 @@ jobs:
           /tmp/kubeconform -summary -ignore-missing-schemas -skip Ingress k8s/
 
       - name: Validate rendered Helm output
-        run: /tmp/kubeconform -summary -ignore-missing-schemas -skip Ingress /tmp/helm-rendered.yaml
+        run: |
+          /tmp/kubeconform -summary -ignore-missing-schemas -skip Ingress \
+            /tmp/helm-rendered.yaml /tmp/helm-rendered-registry.yaml monitoring/eso/
 
   # ---------------------------------------------------------------------------
   # Job 3: Build —— Docker image 构建（不 push）

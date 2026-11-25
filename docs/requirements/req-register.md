@@ -33,7 +33,7 @@
 
 | REQ ID | 标题摘要 | 项目 / 范围 | 类型 | 优先级 | 提出日期 | 状态 |
 |--------|----------|-------------|------|--------|----------|------|
-| REQ-DVP-006 | Azure Key Vault + External Secrets + K8s RBAC | devops-platform-demo | FR | P2 | 2026-11-12 | Open |
+| REQ-DVP-006 | Secrets Manager（LocalStack）+ External Secrets + K8s RBAC | devops-platform-demo | FR | P2 | 2026-11-12 | Open |
 | REQ-DVP-008 | Elastic 集成 / Loki vs Elastic 对比 | devops-platform-demo | DEMO | P3 | 2026-11-12 | Open |
 | REQ-DVP-009 | 数据管道 / DB 备份自动化 | devops-platform-demo | FR | P3 | 2026-11-12 | Open |
 | REQ-DVP-010 | OPA/Kyverno 策略即代码 | devops-platform-demo | FR | P3 | 2026-11-12 | Open |
