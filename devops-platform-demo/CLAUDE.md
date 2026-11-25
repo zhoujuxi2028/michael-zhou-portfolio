@@ -15,11 +15,11 @@ npm run docker:test
 
 ## Secrets & RBAC（REQ-DVP-006）
 ```bash
-bash tests/test-helm-secrets-rbac.sh
-bash tests/test-alertmanager-values.sh
-./scripts/install-eso.sh operator
-./scripts/verify-rbac.sh
-./scripts/verify-secret-rotation.sh
+bash tests/test-helm-secrets-rbac.sh     # 无需集群
+bash tests/test-alertmanager-values.sh   # 无需集群
+./scripts/install-eso.sh operator        # 需 k3d + LocalStack
+./scripts/verify-rbac.sh                 # 需已部署 chart
+./scripts/verify-secret-rotation.sh      # 需 ExternalSecret Ready
 ```
 
 ## Dev Container

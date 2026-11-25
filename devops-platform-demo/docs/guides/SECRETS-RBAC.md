@@ -26,7 +26,7 @@ ExternalSecret ──► Secret alertmanager-slack (monitoring ns)          ─�
 | 原 Azure 方案 | 本地方案 | 说明 |
 |--------------|---------|------|
 | Azure Key Vault | LocalStack Secrets Manager | `terraform/secrets.tf` |
-| Key Vault CSI / ESO azurekv | ESO `provider.aws` + `AWS_SECRETSMANAGER_ENDPOINT` | 迁移真实 AWS 仅删 endpoint |
+| Key Vault CSI / ESO azurekv | ESO `provider.aws` + `AWS_SECRETSMANAGER_ENDPOINT` | ESO 侧仅移除 endpoint 环境变量；真实 AWS 另需 IRSA + KMS |
 | Workload Identity / IRSA | 静态引导凭据 `aws-localstack-creds` | k3d 不支持 IRSA |
 | GitHub OIDC → Azure | 仅文档（见 [真实云迁移](#真实云迁移--oidcfr-04未实施)） | 需真实云账号 |
 | AKS RBAC | Helm `Role` / `RoleBinding`（namespace 级） | 无 `ClusterRole`、无 `*` |
@@ -42,7 +42,9 @@ ServiceAccount `qa-portfolio`（deployment + newman/cypress jobs 共用），`au
 | `secrets` | get, list | ❌ no |
 | `pods` | delete, create | ❌ no |
 | `deployments` | update | ❌ no |
-| `*` 任意资源（其他 namespace） | get | ❌ no |
+| 其他 namespace（`default` 的 configmaps、`kube-system` 的 secrets） | get | ❌ no |
+
+> `verify-rbac.sh` 按此矩阵抽样 9 项：yes 侧为 `get configmaps`、`list pods`。
 
 ## 前置
 
@@ -52,22 +54,33 @@ ServiceAccount `qa-portfolio`（deployment + newman/cypress jobs 共用），`au
 | 集群 | `k3d cluster start portfolio-dev` |
 | LocalStack | `npm run localstack:up`（`SERVICES` 含 `secretsmanager`） |
 | kube context | 本机有多个 context，所有命令显式指定 `k3d-portfolio-dev` |
+| 工具 | `docker`、`kubectl`、`helm`、`terraform`、`jq`、`curl` |
 
 > **⚠️ 集群必须经 `k3d cluster start` 启动**：只有该命令会向 CoreDNS 注入 `host.k3d.internal`。OrbStack 自动拉起的集群缺此记录，且 k3s 可能循环重启，需执行 `k3d cluster stop portfolio-dev && k3d cluster start portfolio-dev`。
 
 ## 步骤
 
 ```bash
+# 1. Secrets Manager（state 存于 LocalStack S3 backend）
 export AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1  # LocalStack 假凭据
+terraform -chdir=terraform init -input=false
 TF_VAR_registry_username=demo TF_VAR_registry_password=demo-pass \
 TF_VAR_slack_webhook_url=https://hooks.slack.com/services/T000/B000/DEMO \
-  terraform -chdir=terraform apply -var-file=environments/dev.tfvars
+  terraform -chdir=terraform apply -var-file=environments/dev.tfvars -auto-approve
+
+# 2. ESO + 引导凭据（先于 chart，ExternalSecret 首次即可同步）
 ./scripts/install-eso.sh operator
-helm --kube-context k3d-portfolio-dev upgrade --install qa-portfolio helm/qa-portfolio \
-  -n qa-portfolio --create-namespace -f helm/qa-portfolio/values-registry.yaml
+kubectl --context k3d-portfolio-dev create namespace qa-portfolio --dry-run=client -o yaml \
+  | kubectl --context k3d-portfolio-dev apply -f -
 ./scripts/install-eso.sh creds qa-portfolio
+
+# 3. chart（默认 createNamespace=false，不与已有 namespace 冲突）
+helm --kube-context k3d-portfolio-dev upgrade --install qa-portfolio helm/qa-portfolio \
+  -n qa-portfolio -f helm/qa-portfolio/values-registry.yaml
 kubectl --context k3d-portfolio-dev -n qa-portfolio wait externalsecret/qa-portfolio-registry \
   --for=condition=Ready --timeout=60s
+
+# 4. 验证
 ./scripts/verify-rbac.sh
 ./scripts/verify-secret-rotation.sh
 ```
@@ -86,7 +99,7 @@ kubectl --context k3d-portfolio-dev -n qa-portfolio wait externalsecret/qa-portf
 | `NAMESPACE` | `qa-portfolio` |
 | `SERVICE_ACCOUNT` | `qa-portfolio` |
 
-期望输出形态：
+期望输出形态（模板，实测输出见下方）：
 
 ```text
 Context: k3d-portfolio-dev  Subject: system:serviceaccount:qa-portfolio:qa-portfolio
@@ -111,7 +124,7 @@ passed=9 failed=0
 | `TIMEOUT_SECONDS` | `60` |
 | `LOCALSTACK_CONTAINER` | `qa-portfolio-localstack` |
 
-期望输出形态（refresh 15s，spike 实测约 12s 生效）：
+期望输出形态（模板；refresh 15s，Task 8 实测约 10s 生效）：
 
 ```text
 Rotated portfolio-dev/registry password → <new-password>; waiting up to 60s
@@ -124,7 +137,7 @@ PASS qa-portfolio/qa-registry-pull-secret synced in <N>s
 
 | 脚本 | 断言数 | CI |
 |------|--------|----|
-| `tests/test-helm-secrets-rbac.sh` | 26 | `dvp-pr.yml` `unit-tests` job：Helm render tests (RBAC + External Secrets) |
+| `tests/test-helm-secrets-rbac.sh` | 28 | `dvp-pr.yml` `unit-tests` job：Helm render tests (RBAC + External Secrets) |
 | `tests/test-alertmanager-values.sh` | 10 | `dvp-pr.yml` `unit-tests` job：Alertmanager values tests |
 
 ## Terraform 注意事项
@@ -141,7 +154,7 @@ PASS qa-portfolio/qa-registry-pull-secret synced in <N>s
 | 折中 | 说明 |
 |------|------|
 | 密码特殊字符 | registry 密码含 `"` 或 `\` 时，dockerconfigjson 模板生成的 JSON 无效（演示凭据可控）；生产可改用 `dict … \| toJson` |
-| 同步前拉取 | ESO 同步完成前，newman 拉取缺 pull secret 仅告警，匿名拉取 |
+| 同步前拉取 | 步骤中 `creds` 先于 chart，ExternalSecret 首次即可同步；若 pull secret 仍缺失，kubelet 仅记录告警事件并继续拉取（本地 registry 无认证） |
 | 引导凭据 | 静态 `aws-localstack-creds`（`test`/`test`，由脚本创建，不进 Git）；真实 AWS 用 IRSA |
 | endpoint | `http://host.k3d.internal:4566`（spike 实测可用），经 ESO controller 环境变量注入 |
 | 已运行 Pod | 不会自动换凭据；仅新拉取的 Pod 使用轮换后的值 |
@@ -180,11 +193,13 @@ kubectl --context k3d-portfolio-dev -n external-secrets logs deploy/external-sec
 Slack webhook 经 ESO 同步到 `monitoring` ns；`Secret alertmanager-slack` 缺失时 Alertmanager 会 `FailedMount`，因此顺序固定：
 
 ```bash
+kubectl --context k3d-portfolio-dev create namespace monitoring --dry-run=client -o yaml \
+  | kubectl --context k3d-portfolio-dev apply -f -
 ./scripts/install-eso.sh creds monitoring
 kubectl --context k3d-portfolio-dev apply -f monitoring/eso/
 kubectl --context k3d-portfolio-dev -n monitoring wait externalsecret/alertmanager-slack \
   --for=condition=Ready --timeout=60s
-# 然后 helm install kube-prometheus-stack（-f monitoring/prometheus-values.yaml）
+# 然后 helm install kube-prometheus-stack（-n monitoring -f monitoring/prometheus-values.yaml）
 ```
 
 > 内存上限 8 GB，本 REQ 未部署完整监控栈做 Slack 端到端验证。
@@ -197,7 +212,7 @@ kubectl --context k3d-portfolio-dev -n monitoring wait externalsecret/alertmanag
 
 ## 真实云迁移 / OIDC（FR-04，未实施）
 
-> **⚠️ 仅文档，未在本仓库 apply**：需真实 AWS 账号，无法本地验证。
+> **⚠️ 仅文档，未在本仓库 apply**：需真实 AWS 账号，无法本地验证。AWS provider < 5.81 时 `aws_iam_openid_connect_provider` 还需 `thumbprint_list`。
 
 ```hcl
 resource "aws_iam_openid_connect_provider" "github" {
@@ -218,7 +233,7 @@ data "aws_iam_policy_document" "github_assume" {
       values   = ["sts.amazonaws.com"]
     }
     condition {
-      test     = "StringLike"
+      test     = "StringEquals"
       variable = "token.actions.githubusercontent.com:sub"
       values   = ["repo:<owner>/<repo>:ref:refs/heads/main"]
     }
@@ -239,7 +254,7 @@ permissions:
   contents: read
 
 steps:
-  - uses: aws-actions/configure-aws-credentials@v4
+  - uses: aws-actions/configure-aws-credentials@v6
     with:
       role-to-assume: arn:aws:iam::<account-id>:role/github-deploy
       aws-region: us-east-1
