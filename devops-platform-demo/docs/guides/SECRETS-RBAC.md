@@ -109,7 +109,22 @@ PASS get configmaps -n qa-portfolio → yes
 passed=9 failed=0
 ```
 
-<!-- Task 11 实测输出粘贴于此 -->
+实测（2026-11-25，k3d `portfolio-dev`）：
+
+```text
+Context: k3d-portfolio-dev  Subject: system:serviceaccount:qa-portfolio:qa-portfolio
+PASS get configmaps -n qa-portfolio → yes
+PASS list pods -n qa-portfolio → yes
+PASS get secrets -n qa-portfolio → no
+PASS list secrets -n qa-portfolio → no
+PASS create pods -n qa-portfolio → no
+PASS delete pods -n qa-portfolio → no
+PASS update deployments.apps -n qa-portfolio → no
+PASS get configmaps -n default → no
+PASS get secrets -n kube-system → no
+---
+passed=9 failed=0
+```
 
 ### verify-secret-rotation.sh
 
@@ -131,7 +146,12 @@ Rotated portfolio-dev/registry password → <new-password>; waiting up to 60s
 PASS qa-portfolio/qa-registry-pull-secret synced in <N>s
 ```
 
-<!-- Task 11 实测输出粘贴于此 -->
+实测（2026-11-25）：
+
+```text
+Rotated portfolio-dev/registry password → rotated-1795609401-56980; waiting up to 60s
+PASS qa-portfolio/qa-registry-pull-secret synced in 10s
+```
 
 ### 测试（无需集群）
 
@@ -176,6 +196,15 @@ kubectl --context k3d-portfolio-dev -n external-secrets logs deploy/external-sec
 | remote key 不存在（LocalStack 不持久化，重启后丢失） | 重新 `terraform apply` |
 | namespace 缺 `aws-localstack-creds` | `./scripts/install-eso.sh creds <ns>` |
 | context 错误（连到其他集群） | 确认 `KUBE_CONTEXT` / `--context k3d-portfolio-dev` |
+
+chart 安装常见冲突：
+
+| 现象 | 处理 |
+|------|------|
+| `IngressClass "nginx" ... cannot be imported into the current release` | 集群已有其他 release 持有该集群级资源 → 加 `--set ingressClass.enabled=false` |
+| `Namespace ... invalid ownership metadata` | chart 默认 `createNamespace=false`；仅在无 `--create-namespace` / ArgoCD 时设为 `true` |
+| newman `ErrImagePull`（`k3d-qa-registry:5000`） | 本地 registry 未运行，见 [LOCAL-DEVSECOPS.md](LOCAL-DEVSECOPS.md)；与 pull secret 同步无关 |
+| 内存紧张（OrbStack 8 GB） | 演示时 `--set cypress.enabled=false` |
 
 > 已同步的 K8s Secret 在 secret 缺失时保留（ESO 默认 `deletionPolicy: Retain`）。
 
