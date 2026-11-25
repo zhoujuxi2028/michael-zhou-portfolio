@@ -687,7 +687,7 @@ externalSecrets:
 bash tests/test-helm-secrets-rbac.sh
 helm lint helm/qa-portfolio -f helm/qa-portfolio/values-registry.yaml
 ```
-Expected: `passed=25 failed=0`（Task 4 审查后为 13 条 + 本 task 12 条）
+Expected: `passed=25 failed=0`（Task 4 审查后为 13 条 + 本 task 12 条；审查收紧后为 26）
 
 - [ ] **Step 8: Commit**
 
@@ -1135,7 +1135,7 @@ git commit -m "ci(dvp): run RBAC and External Secrets render tests in PR gate"
 | 步骤 | 下方命令块 |
 | 验证 | `verify-rbac.sh` 期望矩阵（同 spec §5）、`verify-secret-rotation.sh` 示例输出（Task 11 实测粘贴） |
 | Terraform 注意事项 | 本机直接跑 terraform 需 `AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1`；`secret_string` 仅首次 apply 写入（之后用 `put-secret-value` 或 `-replace`）；production 每次 plan/apply 都必须导出 TF_VAR_*（precondition 防空值）；真实 AWS 下 ESO 角色需 `kms:Decrypt`（CMK） |
-| 本地折中 | 静态引导凭据 vs IRSA；`host.k3d.internal`（或 Task 2 备选地址）；已运行 Pod 不会自动换凭据 |
+| 本地折中 | registry 密码含 `"` 或 `\` 时 dockerconfigjson 模板生成的 JSON 无效（演示凭据可控；生产可改用 `dict … | toJson`）；ESO 同步前 newman 拉取缺 pull secret 仅告警、匿名拉取；静态引导凭据 vs IRSA；`host.k3d.internal`（或 Task 2 备选地址）；已运行 Pod 不会自动换凭据 |
 | 排查 | `kubectl describe externalsecret`、`SecretSyncedError` 常见原因表 |
 | 真实云迁移 / OIDC（FR-04，未实施） | GitHub → AWS IAM OIDC 示例（下方），说明需真实 AWS 账号 |
 | 迁移到 Azure Key Vault（未实施） | 映射表 + `SecretStore` 示例（下方）；ESO / RBAC / Helm 开关复用，仅替换 provider 与 Terraform 资源 |
