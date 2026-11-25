@@ -61,6 +61,23 @@ assert_no_match "No SA when serviceAccount.create=false"       "$off" '^kind: Se
 assert_no_match "No Role/RoleBinding when rbac.create=false"   "$off" '^kind: Role(Binding)?$'
 assert_count    "Workloads fall back to default SA"            "$off" '^ *serviceAccountName: default$' 3
 
+# --- External Secrets: disabled by default ---
+assert_no_match "No SecretStore by default"           "$default" '^kind: SecretStore$'
+assert_no_match "No ExternalSecret by default"        "$default" '^kind: ExternalSecret$'
+
+# --- External Secrets: enabled via values-registry.yaml ---
+registry=$(render -f "$CHART/values-registry.yaml")
+assert_match    "SecretStore rendered"                "$registry" '^kind: SecretStore$'
+assert_match    "SecretStore uses Secrets Manager"    "$registry" 'service: SecretsManager'
+assert_match    "SecretStore uses bootstrap creds"    "$registry" 'name: aws-localstack-creds'
+assert_match    "ExternalSecret rendered"             "$registry" '^kind: ExternalSecret$'
+assert_match    "ExternalSecret remote key"           "$registry" 'key: portfolio-dev/registry'
+assert_match    "Demo refresh interval"               "$registry" 'refreshInterval: 15s'
+assert_match    "Target is dockerconfigjson"          "$registry" 'type: kubernetes.io/dockerconfigjson'
+assert_match    "ESO template kept literal"           "$registry" '\{\{ \.password \}\}'
+assert_match    "Newman pulls with synced secret"     "$registry" '- name: qa-registry-pull-secret'
+assert_no_match "No endpoint hard-coded in chart"     "$registry" '4566|AWS_SECRETSMANAGER_ENDPOINT'
+
 echo "---"
 echo "passed=$passed failed=$failed"
 [ "$failed" -eq 0 ]

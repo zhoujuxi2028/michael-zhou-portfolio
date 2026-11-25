@@ -165,3 +165,14 @@ serviceAccount:
 
 rbac:
   create: true
+
+# --- External Secrets（REQ-DVP-006）---
+# 需先运行 scripts/install-eso.sh operator；endpoint 由 ESO controller 环境变量提供
+externalSecrets:
+  enabled: false
+  refreshInterval: 1h
+  region: us-east-1
+  credentialsSecret: aws-localstack-creds  # install-eso.sh creds 创建；真实 AWS 改用 IRSA
+  registry:
+    remoteKey: portfolio-dev/registry
+    targetName: qa-registry-pull-secret
