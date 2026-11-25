@@ -25,6 +25,8 @@
 | LocalStack CLI | 本机无 `awslocal`，用 `docker exec qa-portfolio-localstack awslocal ...` |
 | 禁止 | `\|\| true`、`continue-on-error` 隐藏失败（项目 CLAUDE.md） |
 | 本机环境 | OrbStack 需先启动；代理 7890 见 memory `local-env-quirks` |
+| kube context | 本机有多个 context（kind / docker-desktop）。脚本用 `KUBE_CONTEXT`（默认 `k3d-portfolio-dev`）；手工命令一律加 `--context k3d-portfolio-dev` / `helm --kube-context k3d-portfolio-dev` |
+| 集群启动 | 必须用 `k3d cluster start portfolio-dev`：它向 CoreDNS 注入 `host.k3d.internal`；OrbStack 自动拉起的集群缺此记录，且 k3s 可能循环重启 |
 
 ## 文件结构
 
@@ -97,7 +99,20 @@ git commit -m "feat(dvp): enable secretsmanager in LocalStack"
 
 ---
 
-### Task 2: Spike — ESO 连通 LocalStack（不提交代码）
+### Task 2: Spike — ESO 连通 LocalStack（不提交代码）✅ 2026-11-25
+
+**结果：**
+
+| 项 | 值 |
+|----|----|
+| `ESO_VERSION` | `2.15.0`（app v2.15.0） |
+| API 版本 | `external-secrets.io/v1` |
+| chart 参数 | `installCRDs`、`extraEnv` 有效 |
+| `LOCALSTACK_ENDPOINT` | `http://host.k3d.internal:4566`（CoreDNS → `192.168.117.1`），前提是 `k3d cluster start` |
+| 同步 / 轮换 | `v1` 同步成功；refresh 15s 下轮换 12s 生效 |
+| 内存 | 3 个 pod 共 ~117 Mi |
+| 踩坑 | OrbStack 重启后集群未经 `k3d cluster start` → `host.k3d.internal` 解析失败 + k3s 循环重启；`k3d cluster stop/start` 修复。下方 Step 4 备选命令有误：`--reuse-values` 只设 `value` 会丢失 `name`，需同时设置；接入 k3d 网络方案未采用 |
+
 
 目的：锁定 ESO 版本、确认 API 版本与 k3d → LocalStack 地址。结果写入 Task 7 的默认值。
 
@@ -836,7 +851,7 @@ git commit -m "feat(dvp): source Alertmanager Slack webhook from External Secret
 **Files:**
 - Create: `scripts/install-eso.sh`
 
-- [ ] **Step 1: 写脚本**（`ESO_VERSION` / `LOCALSTACK_ENDPOINT` 默认值用 Task 2 结果替换）
+- [ ] **Step 1: 写脚本**（默认值来自 Task 2 结果）
 
 ```bash
 #!/usr/bin/env bash
@@ -847,16 +862,19 @@ git commit -m "feat(dvp): source Alertmanager Slack webhook from External Secret
 #   ./scripts/install-eso.sh creds <ns>...      在已存在的 namespace 创建 aws-localstack-creds
 #
 # Env:
+#   KUBE_CONTEXT          kubectl/helm context（默认 k3d-portfolio-dev）
 #   ESO_VERSION           ESO Helm chart 版本
 #   LOCALSTACK_ENDPOINT   集群内可达的 LocalStack 地址
 #   LOCALSTACK_HEALTH_URL 宿主机健康检查地址
 set -euo pipefail
 
-ESO_VERSION="${ESO_VERSION:-<TASK2_VERSION>}"
+KUBE_CONTEXT="${KUBE_CONTEXT:-k3d-portfolio-dev}"
+ESO_VERSION="${ESO_VERSION:-2.15.0}"
 ENDPOINT="${LOCALSTACK_ENDPOINT:-http://host.k3d.internal:4566}"
 HEALTH_URL="${LOCALSTACK_HEALTH_URL:-http://localhost:4566/_localstack/health}"
 
 usage() { sed -n '4,6p' "$0" >&2; exit 2; }
+kc() { kubectl --context "$KUBE_CONTEXT" "$@"; }
 
 install_operator() {
   echo "[eso] Checking LocalStack secretsmanager: $HEALTH_URL"
@@ -865,9 +883,17 @@ install_operator() {
     exit 1
   fi
 
+  # k3d 仅在 `k3d cluster start` 时向 CoreDNS 注入 host.k3d.internal
+  if [[ "$ENDPOINT" == *host.k3d.internal* ]] && \
+     ! kc -n kube-system get configmap coredns -o jsonpath='{.data.NodeHosts}' | grep -q 'host.k3d.internal'; then
+    echo "[eso] ❌ host.k3d.internal missing from CoreDNS — run: k3d cluster stop portfolio-dev && k3d cluster start portfolio-dev" >&2
+    exit 1
+  fi
+
   helm repo add external-secrets https://charts.external-secrets.io --force-update >/dev/null
   helm repo update external-secrets >/dev/null
   helm upgrade --install external-secrets external-secrets/external-secrets \
+    --kube-context "$KUBE_CONTEXT" \
     --namespace external-secrets --create-namespace \
     --version "$ESO_VERSION" \
     --set installCRDs=true \
@@ -881,14 +907,14 @@ create_creds() {
   [ "$#" -ge 1 ] || usage
   local ns
   for ns in "$@"; do
-    if ! kubectl get namespace "$ns" >/dev/null 2>&1; then
+    if ! kc get namespace "$ns" >/dev/null 2>&1; then
       echo "[eso] ❌ namespace $ns not found — create it first (helm install / kubectl create ns)" >&2
       exit 1
     fi
     # LocalStack 接受任意凭据；真实 AWS 使用 IRSA，不创建此 Secret
-    kubectl -n "$ns" create secret generic aws-localstack-creds \
+    kc -n "$ns" create secret generic aws-localstack-creds \
       --from-literal=access-key=test --from-literal=secret-key=test \
-      --dry-run=client -o yaml | kubectl apply -f -
+      --dry-run=client -o yaml | kc apply -f -
   done
 }
 
@@ -936,8 +962,10 @@ git commit -m "feat(dvp): add install-eso.sh for External Secrets Operator"
 ```bash
 #!/usr/bin/env bash
 # verify-rbac.sh — 断言 qa-portfolio ServiceAccount 最小权限（REQ-DVP-006 spec §5）
-# Usage: ./scripts/verify-rbac.sh   (env: NAMESPACE, SERVICE_ACCOUNT)
+# Usage: ./scripts/verify-rbac.sh   (env: KUBE_CONTEXT, NAMESPACE, SERVICE_ACCOUNT)
 set -euo pipefail
+
+KUBE_CONTEXT="${KUBE_CONTEXT:-k3d-portfolio-dev}"
 
 NS="${NAMESPACE:-qa-portfolio}"
 SA="${SERVICE_ACCOUNT:-qa-portfolio}"
@@ -948,7 +976,7 @@ failed=0
 # check <yes|no> <verb> <resource> [namespace]
 check() {
   local want=$1 verb=$2 res=$3 ns=${4:-$NS} got code=0
-  got=$(kubectl auth can-i "$verb" "$res" --as="$AS" -n "$ns" 2>&1) || code=$?
+  got=$(kubectl --context "$KUBE_CONTEXT" auth can-i "$verb" "$res" --as="$AS" -n "$ns" 2>&1) || code=$?
   # can-i: exit 0 = yes, exit 1 = no；其他输出视为错误
   if [ "$got" != "yes" ] && [ "$got" != "no" ]; then
     echo "ERROR can-i $verb $res -n $ns (exit $code): $got" >&2
@@ -961,7 +989,7 @@ check() {
   fi
 }
 
-echo "Subject: $AS"
+echo "Context: $KUBE_CONTEXT  Subject: $AS"
 check yes get    configmaps
 check yes list   pods
 check no  get    secrets
@@ -983,8 +1011,10 @@ echo "passed=$passed failed=$failed"
 #!/usr/bin/env bash
 # verify-secret-rotation.sh — 轮换 Secrets Manager 中的 registry 密码，断言 K8s Secret 在超时内同步
 # Usage: ./scripts/verify-secret-rotation.sh
-#   env: NAMESPACE, TARGET_SECRET, REMOTE_KEY, TIMEOUT_SECONDS, LOCALSTACK_CONTAINER
+#   env: KUBE_CONTEXT, NAMESPACE, TARGET_SECRET, REMOTE_KEY, TIMEOUT_SECONDS, LOCALSTACK_CONTAINER
 set -euo pipefail
+
+KUBE_CONTEXT="${KUBE_CONTEXT:-k3d-portfolio-dev}"
 
 NS="${NAMESPACE:-qa-portfolio}"
 TARGET="${TARGET_SECRET:-qa-registry-pull-secret}"
@@ -993,7 +1023,8 @@ TIMEOUT="${TIMEOUT_SECONDS:-60}"
 CONTAINER="${LOCALSTACK_CONTAINER:-qa-portfolio-localstack}"
 
 awsl() { docker exec "$CONTAINER" awslocal "$@"; }
-k8s_value() { kubectl -n "$NS" get secret "$TARGET" -o jsonpath='{.data.\.dockerconfigjson}'; }
+kc() { kubectl --context "$KUBE_CONTEXT" "$@"; }
+k8s_value() { kc -n "$NS" get secret "$TARGET" -o jsonpath='{.data.\.dockerconfigjson}'; }
 
 before=$(k8s_value)
 [ -n "$before" ] || { echo "FAIL $NS/$TARGET missing — is the ExternalSecret Ready?" >&2; exit 1; }
@@ -1015,7 +1046,7 @@ while (( SECONDS - start < TIMEOUT )); do
   sleep 3
 done
 echo "FAIL $NS/$TARGET not updated within ${TIMEOUT}s" >&2
-kubectl -n "$NS" describe externalsecret >&2
+kc -n "$NS" describe externalsecret >&2
 exit 1
 ```
 
