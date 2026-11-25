@@ -108,49 +108,6 @@ grafana:
     enabled: false
 
 
-# AlertManager Configuration
-alertmanager:
-  enabled: true
-
-  config:
-    global:
-      resolve_timeout: 5m
-    route:
-      group_by: ['alertname', 'cluster', 'namespace']
-      group_wait: 30s
-      group_interval: 5m
-      repeat_interval: 4h
-      receiver: 'default'
-      routes:
-        # 测试任务失败 — 高优先级，立即通知
-        - match:
-            team: qa
-          receiver: 'qa-team'
-          group_wait: 10s
-          repeat_interval: 1h
-        # 基础设施告警 — 标准优先级
-        - match:
-            team: infra
-          receiver: 'infra-team'
-    receivers:
-      # 默认接收器（演示环境：记录到日志，不发送通知）
-      - name: 'default'
-      # QA 团队接收器（生产环境配置 Slack/PagerDuty）
-      - name: 'qa-team'
-        # 生产环境取消注释并配置 Slack webhook：
-        # slack_configs:
-        #   - api_url: '{{ .SlackWebhookURL }}'
-        #     channel: '#qa-alerts'
-        #     title: '{{ .GroupLabels.alertname }}'
-        #     text: '{{ range .Alerts }}{{ .Annotations.description }}{{ end }}'
-      # 基础设施团队接收器
-      - name: 'infra-team'
-        # 生产环境取消注释并配置 PagerDuty：
-        # pagerduty_configs:
-        #   - routing_key: '{{ .PagerDutyRoutingKey }}'
-        #     description: '{{ .GroupLabels.alertname }}'
-
-
 # Node Exporter - Per-node metrics
 nodeExporter:
   enabled: true
@@ -209,13 +166,17 @@ commonLabels:
 
 # =============================================================================
 # AlertManager — Slack 通知配置（2.3.1, 2.3.2）
-# 真实集群部署时替换 PLACEHOLDER 为实际 Slack Webhook URL
+# Webhook 由 External Secrets 同步到 Secret alertmanager-slack（REQ-DVP-006）
+#   kubectl apply -f monitoring/eso/
 # =============================================================================
 alertmanager:
   enabled: true
+  alertmanagerSpec:
+    secrets:
+      - alertmanager-slack  # 挂载到 /etc/alertmanager/secrets/alertmanager-slack/
   config:
     global:
-      slack_api_url: 'https://hooks.slack.com/services/PLACEHOLDER'
+      slack_api_url_file: /etc/alertmanager/secrets/alertmanager-slack/url
       resolve_timeout: 5m
 
     route:
