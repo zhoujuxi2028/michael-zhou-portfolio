@@ -1,6 +1,9 @@
 # Secrets Manager — 工作负载凭据（REQ-DVP-006）
 # External Secrets Operator 从这里同步到 K8s Secret；轮换在 Terraform 之外进行，
 # 因此 secret_string 设置 ignore_changes，避免下次 apply 回滚已轮换的值。
+# 注意：secret_string 仅在首次 apply 时写入（首次 apply 必须设置 TF_VAR_*）；
+# 之后更新值用 `aws secretsmanager put-secret-value`，或
+# `terraform apply -replace=aws_secretsmanager_secret_version.<name>`。
 
 # LocalStack Community 不支持 KMS，仅在真实 AWS 环境创建 CMK
 resource "aws_kms_key" "secrets" {
@@ -8,6 +11,11 @@ resource "aws_kms_key" "secrets" {
   description             = "${local.name_prefix} Secrets Manager encryption key"
   deletion_window_in_days = 7
   enable_key_rotation     = true
+
+  tags = {
+    Name        = "${local.name_prefix}-secrets-kms"
+    Environment = var.environment
+  }
 }
 
 resource "aws_secretsmanager_secret" "registry" {
@@ -27,6 +35,11 @@ resource "aws_secretsmanager_secret_version" "registry" {
 
   lifecycle {
     ignore_changes = [secret_string]
+
+    precondition {
+      condition     = var.environment != "production" || nonsensitive(var.registry_username != "" && var.registry_password != "")
+      error_message = "registry_username / registry_password must be set via TF_VAR_* in production."
+    }
   }
 }
 
@@ -43,5 +56,10 @@ resource "aws_secretsmanager_secret_version" "slack_webhook" {
 
   lifecycle {
     ignore_changes = [secret_string]
+
+    precondition {
+      condition     = var.environment != "production" || nonsensitive(var.slack_webhook_url != "")
+      error_message = "slack_webhook_url must be set via TF_VAR_* in production."
+    }
   }
 }
