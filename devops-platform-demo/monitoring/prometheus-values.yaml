@@ -167,7 +167,11 @@ commonLabels:
 # =============================================================================
 # AlertManager — Slack 通知配置（2.3.1, 2.3.2）
 # Webhook 由 External Secrets 同步到 Secret alertmanager-slack（REQ-DVP-006）
-#   kubectl apply -f monitoring/eso/
+# 部署顺序（Secret 不存在时 Alertmanager pod 卡在 ContainerCreating / FailedMount）：
+#   1) scripts/install-eso.sh creds monitoring
+#   2) kubectl apply -f monitoring/eso/
+#   3) kubectl -n monitoring wait externalsecret/alertmanager-slack --for=condition=Ready
+#   4) helm upgrade --install（kube-prometheus-stack）
 # =============================================================================
 alertmanager:
   enabled: true
