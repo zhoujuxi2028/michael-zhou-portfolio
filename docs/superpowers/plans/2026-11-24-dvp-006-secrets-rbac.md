@@ -687,7 +687,7 @@ externalSecrets:
 bash tests/test-helm-secrets-rbac.sh
 helm lint helm/qa-portfolio -f helm/qa-portfolio/values-registry.yaml
 ```
-Expected: `passed=22 failed=0`
+Expected: `passed=25 failed=0`（Task 4 审查后为 13 条 + 本 task 12 条）
 
 - [ ] **Step 8: Commit**
 
