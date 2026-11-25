@@ -1134,6 +1134,7 @@ git commit -m "ci(dvp): run RBAC and External Secrets render tests in PR gate"
 | 前置 | OrbStack、`k3d cluster start portfolio-dev`、`npm run localstack:up` |
 | 步骤 | 下方命令块 |
 | 验证 | `verify-rbac.sh` 期望矩阵（同 spec §5）、`verify-secret-rotation.sh` 示例输出（Task 11 实测粘贴） |
+| Terraform 注意事项 | 本机直接跑 terraform 需 `AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1`；`secret_string` 仅首次 apply 写入（之后用 `put-secret-value` 或 `-replace`）；production 每次 plan/apply 都必须导出 TF_VAR_*（precondition 防空值）；真实 AWS 下 ESO 角色需 `kms:Decrypt`（CMK） |
 | 本地折中 | 静态引导凭据 vs IRSA；`host.k3d.internal`（或 Task 2 备选地址）；已运行 Pod 不会自动换凭据 |
 | 排查 | `kubectl describe externalsecret`、`SecretSyncedError` 常见原因表 |
 | 真实云迁移 / OIDC（FR-04，未实施） | GitHub → AWS IAM OIDC 示例（下方），说明需真实 AWS 账号 |
@@ -1142,6 +1143,7 @@ git commit -m "ci(dvp): run RBAC and External Secrets render tests in PR gate"
 步骤命令块：
 
 ```bash
+export AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1  # LocalStack 假凭据
 TF_VAR_registry_username=demo TF_VAR_registry_password=demo-pass \
 TF_VAR_slack_webhook_url=https://hooks.slack.com/services/T000/B000/DEMO \
   terraform -chdir=terraform apply -var-file=environments/dev.tfvars
