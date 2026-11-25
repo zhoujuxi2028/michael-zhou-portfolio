@@ -28,7 +28,7 @@ check() {
 }
 
 if ! kubectl --context "$KUBE_CONTEXT" -n "$NS" get serviceaccount "$SA" >/dev/null 2>&1; then
-  echo "ERROR serviceaccount $NS/$SA not found — deploy the chart first" >&2
+  echo "ERROR serviceaccount $NS/$SA not found or cluster unreachable (context $KUBE_CONTEXT) — deploy the chart first" >&2
   exit 2
 fi
 
