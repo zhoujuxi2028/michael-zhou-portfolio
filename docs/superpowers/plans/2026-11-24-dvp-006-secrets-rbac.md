@@ -835,7 +835,7 @@ spec:
 ```bash
 bash tests/test-alertmanager-values.sh
 ```
-Expected: `passed=8 failed=0`
+Expected: `passed=8 failed=0`（审查收紧后为 10）
 
 - [ ] **Step 8: Commit**
 
@@ -1137,6 +1137,8 @@ git commit -m "ci(dvp): run RBAC and External Secrets render tests in PR gate"
 | Terraform 注意事项 | 本机直接跑 terraform 需 `AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1`；`secret_string` 仅首次 apply 写入（之后用 `put-secret-value` 或 `-replace`）；production 每次 plan/apply 都必须导出 TF_VAR_*（precondition 防空值）；真实 AWS 下 ESO 角色需 `kms:Decrypt`（CMK） |
 | 本地折中 | registry 密码含 `"` 或 `\` 时 dockerconfigjson 模板生成的 JSON 无效（演示凭据可控；生产可改用 `dict … | toJson`）；ESO 同步前 newman 拉取缺 pull secret 仅告警、匿名拉取；静态引导凭据 vs IRSA；`host.k3d.internal`（或 Task 2 备选地址）；已运行 Pod 不会自动换凭据 |
 | 排查 | `kubectl describe externalsecret`、`SecretSyncedError` 常见原因表 |
+| 监控部署顺序 | `install-eso.sh creds monitoring` → `kubectl apply -f monitoring/eso/` → 等 ExternalSecret Ready → `helm install` kube-prometheus-stack（Secret 缺失时 Alertmanager FailedMount） |
+| 后续待办 | 删除死配置块丢失的 `team: qa/infra` 路由意图（`qa-team` / `infra-team` receiver 从未生效；`monitoring/alertrules/test-alerts.yaml` 仍带 `team:` 标签）→ 另开需求恢复按 team 路由 |
 | 真实云迁移 / OIDC（FR-04，未实施） | GitHub → AWS IAM OIDC 示例（下方），说明需真实 AWS 账号 |
 | 迁移到 Azure Key Vault（未实施） | 映射表 + `SecretStore` 示例（下方）；ESO / RBAC / Helm 开关复用，仅替换 provider 与 Terraform 资源 |
 
