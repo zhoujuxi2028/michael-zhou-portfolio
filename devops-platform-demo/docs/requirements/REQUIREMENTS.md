@@ -48,7 +48,7 @@
 | `REQ-DVP-010` | OPA/Kyverno 策略即代码 | FR | P3 | 90% | — | 🔲 Planned |
 | `REQ-DVP-011` | Dev Container 标准化开发环境 | NFR | P1 | 95% | — | ✅ Done |
 | `REQ-DVP-012` | Node 26 LTS 升级 + Cypress 16 修复 + PR 门禁 E2E | NFR | P1 | 100% | 011 | ✅ Done（PR #87） |
-| `REQ-DVP-013` | `qa-newman` 基础镜像升级（alpine 3.18 EOL） | NFR | P2 | 95% | — | 🔲 Planned |
+| `REQ-DVP-013` | `qa-newman` 镜像自维护（上游停更 + alpine 3.18 / Node 16 EOL） | NFR | P2 | 95% | — | 🔄 In Progress |
 
 **整体风险：** k3d 同时运行 Prometheus 栈 + Loki + ArgoCD + Kyverno + Postgres（+ Elastic）约 8–12 GB，超出 OrbStack 8 GB 上限 → 按 REQ 分开演示、不用的组件缩到 0；必要时调高 `memory_mib`（宿主机仅剩 ~4 GB）或改用 Azure VM。
 
@@ -246,17 +246,22 @@
 - [x] `verify-tools.sh --drift` 无 drift
 - [x] CI：`dvp-pr.yml`（含 `e2e`）与 `dvp-devcontainer.yml` 全绿（PR #87）
 
-### REQ-DVP-013 — `qa-newman` 基础镜像升级
+### REQ-DVP-013 — `qa-newman` 镜像自维护
 
-**User Story:** As a maintainer, I want the Newman image on a supported base, so that Trivy no longer reports CRITICAL findings from an EOL OS.
+**User Story:** As a maintainer, I want the Newman image built on a supported base with a pinned dependency tree, so that Trivy reports no CRITICAL findings and the image no longer depends on an abandoned upstream.
+
+**背景：** 上游 `postman/newman` 所有 tag 最后更新于 2024-06-10（停在 6.1.3，alpine 3.18.3 / Node 16）；仅换 base 仍剩 6 个 CRITICAL（`handlebars` 传递依赖）。
 
 | ID | 描述 |
 |----|------|
-| FR-DVP-013-01 | `Dockerfile.newman` 基础镜像 `postman/newman:6-alpine`（内含 alpine 3.18.3，EOL）→ 受支持的 base（如 `node:*-alpine` + 固定版本 newman） |
-| FR-DVP-013-02 | Trivy 扫描 CRITICAL = 0（2026-11-18 基线：10 CRITICAL） |
+| FR-DVP-013-01 | base 改为 `node:26.13.1-alpine3.24`（与 `.nvmrc` 一致）；newman 6.2.3 / htmlextra 1.23.1 固定版本 + lockfile（`docker/newman/`） |
+| FR-DVP-013-02 | `overrides` 修补传递依赖（handlebars、lodash、flatted、node-forge、underscore）；运行时删除 npm/npx |
+| FR-DVP-013-03 | PR CI Build job：镜像断言脚本 + Trivy image CRITICAL 门禁（`ignore-unfixed`） |
 
 **验收标准：**
-- [ ] 镜像构建成功，`npm run test:newman` 0 failed
-- [ ] Trivy 报告无 CRITICAL
+- [ ] 镜像构建成功，collection 运行 0 failed
+- [ ] Trivy CRITICAL = 0（基线 10）
+- [ ] docker-compose 与 Helm job 可运行
+- [ ] 已知风险记录在案：`@faker-js/faker` 5.5.3（HIGH，修复版 10.x 跨大版本，不 override）
 
-**可行性 95%：** 仅换基础镜像；风险是 Newman / Node 版本与新 alpine 的兼容性。
+**可行性 95%：** spike 已验证（CRITICAL 10 → 0，HIGH 91 → 1，7 请求 / 18 断言 0 失败）；不在范围：非 root 运行。
