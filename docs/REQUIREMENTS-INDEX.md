@@ -97,7 +97,7 @@
 | `REQ-DVP-003` | Phase 3：本地 DevSecOps 闭环（本地 registry + Trivy→Prometheus + ArgoCD/Helm，替代 Azure）（#65） | ✅ |
 | `REQ-DVP-004` | devops-platform-demo/CLAUDE.md 等过期内容修正（#52） | ✅ |
 | `REQ-DVP-005` | Incident / RCA postmortem 模板 + 案例（#54） | ✅ |
-| `REQ-DVP-006` | Secrets Manager（LocalStack）+ External Secrets + K8s RBAC | 🔲 |
+| `REQ-DVP-006` | Secrets Manager（LocalStack）+ External Secrets + K8s RBAC（#90） | ✅ |
 | `REQ-DVP-007` | Dependabot 依赖与补丁自动化 | ✅ |
 | `REQ-DVP-008` | Elastic 集成 / Loki vs Elastic 对比 | 🔲 |
 | `REQ-DVP-009` | 数据管道 / DB 备份自动化 | 🔲 |

@@ -2,7 +2,7 @@
 
 **Date:** 2026-11-24
 **Author:** michael_zhou
-**Status:** Draft — Pending spec review
+**Status:** ✅ Implemented（PR #90，2026-11-26）
 **Requirement:** [`REQ-DVP-006`](../../../devops-platform-demo/docs/requirements/REQUIREMENTS.md#req-dvp-006--secrets-manager--external-secrets--rbac)
 
 ---
