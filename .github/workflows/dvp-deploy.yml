@@ -182,7 +182,8 @@ jobs:
         run: |
           set -euo pipefail
           echo "🔍 [staging] Running Newman smoke test against external API..."
-          newman run postman/api-collection.json \
+          # npm ci 只安装到 node_modules/.bin（不在 PATH）→ 必须经 npx 调用（Bug #4）
+          npx --no-install newman run postman/api-collection.json \
             -e postman/environment.json \
             --iteration-count 1 \
             --timeout-request 10000 \
