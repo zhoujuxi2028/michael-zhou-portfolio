@@ -2,7 +2,7 @@
 
 **Date:** 2026-11-26
 **Author:** michael_zhou
-**Status:** 📝 Draft — 待评审
+**Status:** ✅ Approved（2026-11-26）
 **Requirement:** [`REQ-DVP-010`](../../../devops-platform-demo/docs/requirements/REQUIREMENTS.md#req-dvp-010--opakyverno-策略即代码)
 
 ---
