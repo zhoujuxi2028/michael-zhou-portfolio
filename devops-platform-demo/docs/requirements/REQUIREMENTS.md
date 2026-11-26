@@ -43,12 +43,12 @@
 | `REQ-DVP-005` | Incident / RCA postmortem 模板 + 案例 | DEMO | P2 | 95% | — | ✅ Done |
 | `REQ-DVP-006` | Secrets Manager（LocalStack）+ External Secrets + K8s RBAC（替代 Azure Key Vault） | FR | P2 | 100% | 003 | ✅ Done（PR #90） |
 | `REQ-DVP-007` | Dependabot 依赖与补丁自动化 | NFR | P2 | 95% | — | ✅ Done（PR #56） |
-| `REQ-DVP-008` | Elastic 集成 / Loki vs Elastic 对比 | DEMO | P3 | 60%（部署）/ 100%（文档） | — | 🔲 Planned |
-| `REQ-DVP-009` | 数据管道 / DB 备份自动化 | FR | P3 | 85% | — | 🔲 Planned |
-| `REQ-DVP-010` | OPA/Kyverno 策略即代码 | FR | P3 | 90% | — | 🔲 Planned |
+| `REQ-DVP-008` | Elastic 集成 / Loki vs Elastic 对比 | DEMO | P3 | 50%（部署）/ 100%（文档） | — | 🔲 Planned（设计待评审） |
+| `REQ-DVP-009` | 数据管道 / DB 备份自动化 | FR | P3 | 85% | 006 | 🔲 Planned（设计待评审） |
+| `REQ-DVP-010` | OPA/Kyverno 策略即代码 | FR | P3 | 90% | 013 | 🔲 Planned（设计待评审） |
 | `REQ-DVP-011` | Dev Container 标准化开发环境 | NFR | P1 | 95% | — | ✅ Done |
 | `REQ-DVP-012` | Node 26 LTS 升级 + Cypress 16 修复 + PR 门禁 E2E | NFR | P1 | 100% | 011 | ✅ Done（PR #87） |
-| `REQ-DVP-013` | `qa-newman` 基础镜像升级（alpine 3.18 EOL） | NFR | P2 | 95% | — | 🔲 Planned |
+| `REQ-DVP-013` | `qa-newman` 镜像自维护（上游停更 + alpine 3.18 / Node 16 EOL） | NFR | P2 | 95% | — | 🔄 In Progress |
 
 **整体风险：** k3d 同时运行 Prometheus 栈 + Loki + ArgoCD + Kyverno + Postgres（+ Elastic）约 8–12 GB，超出 OrbStack 8 GB 上限 → 按 REQ 分开演示、不用的组件缩到 0；必要时调高 `memory_mib`（宿主机仅剩 ~4 GB）或改用 Azure VM。
 
@@ -160,13 +160,15 @@
 | ID | 描述 |
 |----|------|
 | FR-DVP-008-01 | 对比文档：架构、索引模型、资源占用、成本、查询语言（LogQL vs KQL） |
-| FR-DVP-008-02 | 可选：ECK 单节点 Elasticsearch + Filebeat + Kibana，采集同一批 Pod 日志 |
+| FR-DVP-008-02 | 可选：`docker-compose.elastic.yml` 单节点 Elasticsearch + Filebeat + Kibana，按需启动，采集与 Promtail 同源的日志（不进 k3d、不与监控栈并行） |
 
 **验收标准：**
 - [ ] 对比文档完成
 - [ ] （可选）Kibana 可检索与 Loki 相同的日志
 
-**可行性：** 文档 100%；部署 60%，因为 Elasticsearch 需要 2–4 GB 内存，与现有栈并行运行时超出 OrbStack 8 GB 上限。可替代方案：Elastic Cloud 14 天试用。
+**可行性：** 文档 100%；部署 50%（2026-11-26 复评）：Elasticsearch + Kibana 约 2–2.5 GiB，与现有栈并行超出 OrbStack 8 GB；镜像约 1.7 GB，本机拉取慢。部署降为可选，实测值待 Stage 1 补充。
+
+**设计：** [2026-11-26-dvp-008-loki-vs-elastic-design.md](../../../docs/superpowers/specs/2026-11-26-dvp-008-loki-vs-elastic-design.md)（待评审）
 
 ### REQ-DVP-009 — 数据管道 / DB 备份自动化
 
@@ -174,17 +176,19 @@
 
 | ID | 描述 |
 |----|------|
-| FR-DVP-009-01 | K8s CronJob 定时 `pg_dump` PostgreSQL 至对象存储（LocalStack S3 或 Azure Blob） |
-| FR-DVP-009-02 | 备份保留策略（按天数清理），由 Terraform lifecycle rule 管理 |
-| FR-DVP-009-03 | 恢复演练 Job：restore 至临时实例 + 数据校验 |
-| FR-DVP-009-04 | 备份成功/失败、耗时指标推送 Pushgateway，失败触发 AlertManager 告警 |
+| FR-DVP-009-01 | K8s CronJob 定时 `pg_dump` PostgreSQL 16 至 LocalStack S3；凭据经 ESO 同步（复用 REQ-DVP-006） |
+| FR-DVP-009-02 | 备份保留策略（按天数清理）：由备份脚本执行（LocalStack 不执行 lifecycle 过期）；Terraform lifecycle rule 仅用于真实 AWS |
+| FR-DVP-009-03 | 恢复演练 Job：restore 至临时实例 + 按 manifest（行数 + sha256）校验 |
+| FR-DVP-009-04 | 备份成功/失败、耗时指标推送 Pushgateway；`BackupFailed` / `BackupStale` 告警 |
 
 **验收标准：**
 - [ ] CronJob 按计划生成备份文件，存储桶中可见
 - [ ] 恢复演练 Job 成功，校验通过
 - [ ] Grafana 可见备份指标；人为制造失败可触发告警
 
-**可行性 85%：** 全部本地零成本，可复用现有 Pushgateway/AlertManager。风险：LocalStack 社区版不支持 DynamoDB export，因此改用 Postgres。
+**可行性 85%（2026-11-26 spike）：** `pg_dump -Fc` / `pg_restore` 10 万行验证通过；Postgres ~50 MiB、LocalStack ~300 MiB；LocalStack 3.8 S3 lifecycle API 可写读但不执行过期删除。风险：Terraform lifecycle 资源在 LocalStack 上未复测（#47 已跳过）。Azure Blob 选项移除（订阅到期）。
+
+**设计：** [2026-11-26-dvp-009-db-backup-design.md](../../../docs/superpowers/specs/2026-11-26-dvp-009-db-backup-design.md)（待评审）
 
 ### REQ-DVP-010 — OPA/Kyverno 策略即代码
 
@@ -192,9 +196,9 @@
 
 | ID | 描述 |
 |----|------|
-| FR-DVP-010-01 | k3d 集群安装 Kyverno（或 OPA Gatekeeper），Helm 管理 |
-| FR-DVP-010-02 | 策略集：禁止 `latest` tag、必须设 resource limits、禁止 privileged、镜像仓库白名单 |
-| FR-DVP-010-03 | CI 中 `kyverno apply`（或 `conftest`）校验 Helm 渲染结果，违规阻断 PR |
+| FR-DVP-010-01 | k3d 集群安装 Kyverno（Helm，1 副本 + 资源上限） |
+| FR-DVP-010-02 | 策略集（Enforce）：禁止 `latest` tag、必须设 resource limits、禁止 privileged、镜像仓库白名单；runAsNonRoot 为 Audit |
+| FR-DVP-010-03 | CI 中 `kyverno test`（策略正/反例）+ `kyverno apply` 校验 4 份 values 渲染结果，违规阻断 PR |
 | FR-DVP-010-04 | 策略违规报告（PolicyReport）接入 Prometheus/Grafana |
 
 **验收标准：**
@@ -202,7 +206,9 @@
 - [ ] PR 中违规 Helm 变更导致 CI 失败
 - [ ] Grafana 可见策略违规计数
 
-**可行性 90%：** Helm 一键安装，CI 校验无需集群。风险：现有 chart 可能违反策略，需要先修复。需要 `brew install kyverno`。
+**可行性 90%（2026-11-26 静态检查）：** 4 份 values 渲染结果仅 3 处 Enforce 违规（newman `:latest` tag；2 个 busybox init 容器无 limits），修复成本低；runAsNonRoot 5 处违规 → Audit。CI 用 `kyverno/action-install-cli`；本机安装 CLI 需用户授权。依赖 013 提供固定版本的 newman 镜像 tag。
+
+**设计：** [2026-11-26-dvp-010-kyverno-policy-design.md](../../../docs/superpowers/specs/2026-11-26-dvp-010-kyverno-policy-design.md)（待评审）
 
 ### REQ-DVP-011 — Dev Container 标准化开发环境 ✅
 
@@ -246,17 +252,24 @@
 - [x] `verify-tools.sh --drift` 无 drift
 - [x] CI：`dvp-pr.yml`（含 `e2e`）与 `dvp-devcontainer.yml` 全绿（PR #87）
 
-### REQ-DVP-013 — `qa-newman` 基础镜像升级
+### REQ-DVP-013 — `qa-newman` 镜像自维护
 
-**User Story:** As a maintainer, I want the Newman image on a supported base, so that Trivy no longer reports CRITICAL findings from an EOL OS.
+**User Story:** As a maintainer, I want the Newman image built on a supported base with a pinned dependency tree, so that Trivy reports no CRITICAL findings and the image no longer depends on an abandoned upstream.
+
+**背景：** 上游 `postman/newman` 所有 tag 最后更新于 2024-06-10（停在 6.1.3，alpine 3.18.3 / Node 16）；仅换 base 仍剩 6 个 CRITICAL（`handlebars` 传递依赖）。
 
 | ID | 描述 |
 |----|------|
-| FR-DVP-013-01 | `Dockerfile.newman` 基础镜像 `postman/newman:6-alpine`（内含 alpine 3.18.3，EOL）→ 受支持的 base（如 `node:*-alpine` + 固定版本 newman） |
-| FR-DVP-013-02 | Trivy 扫描 CRITICAL = 0（2026-11-18 基线：10 CRITICAL） |
+| FR-DVP-013-01 | base 改为 `node:26.13.1-alpine3.24`（与 `.nvmrc` 一致）；newman 6.2.3 / htmlextra 1.23.1 固定版本 + lockfile（`docker/newman/`） |
+| FR-DVP-013-02 | `overrides` 修补传递依赖（handlebars、lodash、flatted、node-forge、underscore）；运行时删除 npm/npx |
+| FR-DVP-013-03 | PR CI Build job：镜像断言脚本 + Trivy image CRITICAL 门禁（`ignore-unfixed`） |
 
 **验收标准：**
-- [ ] 镜像构建成功，`npm run test:newman` 0 failed
-- [ ] Trivy 报告无 CRITICAL
+- [ ] 镜像构建成功，collection 运行 0 failed
+- [ ] Trivy CRITICAL = 0（基线 10）
+- [ ] docker-compose 与 Helm job 可运行
+- [ ] 已知风险记录在案：`@faker-js/faker` 5.5.3（HIGH，修复版 10.x 跨大版本，不 override）
 
-**可行性 95%：** 仅换基础镜像；风险是 Newman / Node 版本与新 alpine 的兼容性。
+**可行性 95%：** spike 已验证（CRITICAL 10 → 0，HIGH 91 → 1，7 请求 / 18 断言 0 失败）；不在范围：非 root 运行。
+
+**设计：** [2026-11-26-dvp-013-newman-image-design.md](../../../docs/superpowers/specs/2026-11-26-dvp-013-newman-image-design.md) · **计划：** [2026-11-26-dvp-013-newman-image.md](../../../docs/superpowers/plans/2026-11-26-dvp-013-newman-image.md)
