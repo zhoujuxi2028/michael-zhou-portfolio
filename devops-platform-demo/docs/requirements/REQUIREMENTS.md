@@ -41,7 +41,7 @@
 | `REQ-DVP-003` | Phase 3：本地 DevSecOps 闭环（本地 registry + Trivy→Prometheus，替代 Azure） | FR | P1 | — | 002 | ✅ Done（PR #65） |
 | `REQ-DVP-004` | README / CLAUDE.md 过期内容修正 | NFR | P1 | 100% | — | ✅ Done |
 | `REQ-DVP-005` | Incident / RCA postmortem 模板 + 案例 | DEMO | P2 | 95% | — | ✅ Done |
-| `REQ-DVP-006` | Secrets Manager（LocalStack）+ External Secrets + K8s RBAC（替代 Azure Key Vault） | FR | P2 | 90% | 003 | 🔲 Planned（设计中） |
+| `REQ-DVP-006` | Secrets Manager（LocalStack）+ External Secrets + K8s RBAC（替代 Azure Key Vault） | FR | P2 | 100% | 003 | ✅ Done（PR #90） |
 | `REQ-DVP-007` | Dependabot 依赖与补丁自动化 | NFR | P2 | 95% | — | ✅ Done（PR #56） |
 | `REQ-DVP-008` | Elastic 集成 / Loki vs Elastic 对比 | DEMO | P3 | 60%（部署）/ 100%（文档） | — | 🔲 Planned |
 | `REQ-DVP-009` | 数据管道 / DB 备份自动化 | FR | P3 | 85% | — | 🔲 Planned |
@@ -115,7 +115,9 @@
 
 **可行性 95%：** 已有真实 bug 素材。风险仅在于案例的深度。
 
-### REQ-DVP-006 — Secrets Manager + External Secrets + RBAC
+### REQ-DVP-006 — Secrets Manager + External Secrets + RBAC ✅
+
+已完成（PR #90，2026-11-26 合并）：LocalStack Secrets Manager（Terraform）、ESO 2.15.0 同步 registry pull secret 与 Slack webhook、Helm 最小权限 SA/Role/RoleBinding、`install-eso.sh` / `verify-rbac.sh` / `verify-secret-rotation.sh`、PR 门禁渲染测试。指南：[SECRETS-RBAC.md](../guides/SECRETS-RBAC.md)。
 
 原 Azure Key Vault 方案因订阅到期改为 LocalStack Secrets Manager（同 003）。设计：[2026-11-24-dvp-006-secrets-rbac-design.md](../../../docs/superpowers/specs/2026-11-24-dvp-006-secrets-rbac-design.md)。
 
@@ -129,9 +131,9 @@
 | ~~FR-DVP-006-04~~ | ~~CI 使用 OIDC 替代长期 secret~~ — 移出范围（需真实云账号），仅文档给出 GitHub → AWS IAM OIDC 示例 |
 
 **验收标准：**
-- [ ] 仓库与 values 文件中无明文凭据（Trivy secret scan 0 findings）
-- [ ] 轮换 Secrets Manager secret 后 60s 内 K8s Secret 自动更新
-- [ ] `scripts/verify-rbac.sh` 越权操作断言均为 `no`
+- [x] 仓库与 values 文件中无明文凭据（Trivy secret scan 0 findings）
+- [x] 轮换 Secrets Manager secret 后 60s 内 K8s Secret 自动更新（实测 10s）
+- [x] `scripts/verify-rbac.sh` 越权操作断言均为 `no`（9/9）
 
 **可行性 90%：** ESO 官方支持 `AWS_SECRETSMANAGER_ENDPOINT`。本地 ESO 用静态凭据引导（演示折中，真实 AWS 用 IRSA）；风险：OrbStack 下 `host.k3d.internal` 解析。
 
