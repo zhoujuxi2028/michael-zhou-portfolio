@@ -43,9 +43,9 @@
 | `REQ-DVP-005` | Incident / RCA postmortem 模板 + 案例 | DEMO | P2 | 95% | — | ✅ Done |
 | `REQ-DVP-006` | Secrets Manager（LocalStack）+ External Secrets + K8s RBAC（替代 Azure Key Vault） | FR | P2 | 100% | 003 | ✅ Done（PR #90） |
 | `REQ-DVP-007` | Dependabot 依赖与补丁自动化 | NFR | P2 | 95% | — | ✅ Done（PR #56） |
-| `REQ-DVP-008` | Elastic 集成 / Loki vs Elastic 对比 | DEMO | P3 | 50%（部署）/ 100%（文档） | — | 🔲 Planned（设计待评审） |
-| `REQ-DVP-009` | 数据管道 / DB 备份自动化 | FR | P3 | 85% | 006 | 🔲 Planned（设计待评审） |
-| `REQ-DVP-010` | OPA/Kyverno 策略即代码 | FR | P3 | 90% | 013 | 🔲 Planned（设计待评审） |
+| `REQ-DVP-008` | Elastic 集成 / Loki vs Elastic 对比 | DEMO | P3 | 50%（部署）/ 100%（文档） | — | 🔲 Planned（设计已评审） |
+| `REQ-DVP-009` | 数据管道 / DB 备份自动化 | FR | P3 | 85% | 006 | 🔲 Planned（设计已评审） |
+| `REQ-DVP-010` | OPA/Kyverno 策略即代码 | FR | P3 | 90% | 013 | 🔲 Planned（设计已评审） |
 | `REQ-DVP-011` | Dev Container 标准化开发环境 | NFR | P1 | 95% | — | ✅ Done |
 | `REQ-DVP-012` | Node 26 LTS 升级 + Cypress 16 修复 + PR 门禁 E2E | NFR | P1 | 100% | 011 | ✅ Done（PR #87） |
 | `REQ-DVP-013` | `qa-newman` 镜像自维护（上游停更 + alpine 3.18 / Node 16 EOL） | NFR | P2 | 95% | — | 🔄 In Progress |
@@ -168,7 +168,7 @@
 
 **可行性：** 文档 100%；部署 50%（2026-11-26 复评）：Elasticsearch + Kibana 约 2–2.5 GiB，与现有栈并行超出 OrbStack 8 GB；镜像约 1.7 GB，本机拉取慢。部署降为可选，实测值待 Stage 1 补充。
 
-**设计：** [2026-11-26-dvp-008-loki-vs-elastic-design.md](../../../docs/superpowers/specs/2026-11-26-dvp-008-loki-vs-elastic-design.md)（待评审）
+**设计：** [2026-11-26-dvp-008-loki-vs-elastic-design.md](../../../docs/superpowers/specs/2026-11-26-dvp-008-loki-vs-elastic-design.md)
 
 ### REQ-DVP-009 — 数据管道 / DB 备份自动化
 
@@ -188,7 +188,7 @@
 
 **可行性 85%（2026-11-26 spike）：** `pg_dump -Fc` / `pg_restore` 10 万行验证通过；Postgres ~50 MiB、LocalStack ~300 MiB；LocalStack 3.8 S3 lifecycle API 可写读但不执行过期删除。风险：Terraform lifecycle 资源在 LocalStack 上未复测（#47 已跳过）。Azure Blob 选项移除（订阅到期）。
 
-**设计：** [2026-11-26-dvp-009-db-backup-design.md](../../../docs/superpowers/specs/2026-11-26-dvp-009-db-backup-design.md)（待评审）
+**设计：** [2026-11-26-dvp-009-db-backup-design.md](../../../docs/superpowers/specs/2026-11-26-dvp-009-db-backup-design.md)
 
 ### REQ-DVP-010 — OPA/Kyverno 策略即代码
 
@@ -208,7 +208,7 @@
 
 **可行性 90%（2026-11-26 静态检查）：** 4 份 values 渲染结果仅 3 处 Enforce 违规（newman `:latest` tag；2 个 busybox init 容器无 limits），修复成本低；runAsNonRoot 5 处违规 → Audit。CI 用 `kyverno/action-install-cli`；本机安装 CLI 需用户授权。依赖 013 提供固定版本的 newman 镜像 tag。
 
-**设计：** [2026-11-26-dvp-010-kyverno-policy-design.md](../../../docs/superpowers/specs/2026-11-26-dvp-010-kyverno-policy-design.md)（待评审）
+**设计：** [2026-11-26-dvp-010-kyverno-policy-design.md](../../../docs/superpowers/specs/2026-11-26-dvp-010-kyverno-policy-design.md)
 
 ### REQ-DVP-011 — Dev Container 标准化开发环境 ✅
 

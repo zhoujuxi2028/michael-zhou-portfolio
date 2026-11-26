@@ -2,7 +2,7 @@
 
 **Date:** 2026-11-26
 **Author:** michael_zhou
-**Status:** 📝 Draft — 待评审（Stage 1 方案 A 已确认）
+**Status:** ✅ Approved（2026-11-26）
 **Requirement:** [`REQ-DVP-013`](../../../devops-platform-demo/docs/requirements/REQUIREMENTS.md#req-dvp-013--qa-newman-镜像自维护)
 **Plan:** [2026-11-26-dvp-013-newman-image.md](../plans/2026-11-26-dvp-013-newman-image.md)
 

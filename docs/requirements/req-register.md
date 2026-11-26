@@ -114,7 +114,7 @@
 
 | 日期 | 操作 | 内容 | 操作人 |
 |------|------|------|--------|
-| 2026-11-26 | 变更 | REQ-DVP-013 改名「镜像自维护」→ In Progress；REQ-DVP-008/009/010 完成可行性复评并补设计 spec（待评审） | Michael Zhou |
+| 2026-11-26 | 变更 | REQ-DVP-013 改名「镜像自维护」→ In Progress；REQ-DVP-008/009/010 完成可行性复评并补设计 spec（已评审） | Michael Zhou |
 | 2026-11-26 | 关闭 | REQ-DVP-006 Done：LocalStack Secrets Manager + ESO + K8s RBAC，本地 e2e 验收 4/4（#90） | Michael Zhou |
 | 2026-11-23 | 关闭 | REQ-DVP-012 Done：Node 26 LTS + Cypress 16 + PR 门禁 E2E（#87） | Michael Zhou |
 | 2026-11-23 | 新增 | 补登 REQ-ADAS-02 Done：PySpark 聚合，0.3.0（#85） | Michael Zhou |
