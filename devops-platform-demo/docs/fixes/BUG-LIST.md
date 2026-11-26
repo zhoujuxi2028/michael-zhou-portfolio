@@ -218,6 +218,50 @@ cat test-logs/test-summary-*.txt | grep -E "Cypress:|Newman:"
 
 ---
 
+## 🐛 Bug #4: Deploy Pipeline 冒烟测试 `newman: command not found`
+
+### 问题
+```text
+DVP / Staging Smoke Test → Run Newman smoke test
+line 3: newman: command not found
+##[error]Process completed with exit code 127.
+```
+main 上每次 `DVP / Deploy Pipeline` 都失败在此步（2026-11-19 起最近 8 次全部失败），staging 冒烟测试从未真正执行。
+
+### 原因
+| 项 | 说明 |
+|----|------|
+| 引入 | `42938b6`（REQ-DVP-001 迁移，#44） |
+| 根因 | `Install Newman` 步骤为 `npm ci`，newman 只装到 `node_modules/.bin`（不在 `PATH`）；下一步直接调用 `newman` |
+| 为何未被发现 | `dvp-deploy.yml` 仅在 push 到 main / 手动触发时运行，PR 门禁不跑；本机有全局 newman，直接调用可用 |
+
+### 修复
+`.github/workflows/dvp-deploy.yml`：
+```diff
+-          newman run postman/api-collection.json \
++          npx --no-install newman run postman/api-collection.json \
+```
+
+### 回归测试
+```bash
+# 1. 本地复现（去掉全局 newman，仅保留 node/npm/npx）
+cd devops-platform-demo
+env -i HOME="$HOME" PATH="<node-only-dir>:/usr/bin:/bin" bash -c 'newman --version'   # 期望 exit 127
+env -i HOME="$HOME" PATH="<node-only-dir>:/usr/bin:/bin" bash -c \
+  'npx --no-install newman run postman/api-collection.json -e postman/environment.json -r cli'  # 期望 0 failures
+
+# 2. 合并前：修复分支手动触发（staging/production 均为 dry-run，不部署）
+gh workflow run dvp-deploy.yml --ref fix/dvp-deploy-newman-smoke -f skip_production=true
+gh run watch   # 期望 DVP / Staging Smoke Test ✅
+
+# 3. 合并后：main 上 push 触发的 DVP / Deploy Pipeline 全绿
+gh run list --workflow dvp-deploy.yml --branch main --limit 1
+```
+
+> **⚠️ 为何不能用文档 PR（如 #91）回归**：PR 的 CI 不运行 `dvp-deploy.yml`，PR 绿灯不能证明此 bug 已修复。
+
+---
+
 ## ✅ 完整回归测试（一键执行）
 
 ```bash
@@ -268,6 +312,7 @@ chmod +x run-regression-test.sh
 |-----|------|------|------|
 | #1 | Newman HTMLExtra 缺失 | ☐ 通过 ☐ 失败 | 报告大小: _____ KB |
 | #2 | Cypress 测试中断 | ☐ 通过 ☐ 失败 | 视频数量: _____ 个 |
+| #4 | Deploy 冒烟测试 newman 未找到 | ☑ 通过（合并前） | 本地 ✅；分支手动触发 run 45739365526 ✅（7 请求 / 18 断言 / 0 失败）；main：合并后补填 |
 
 **测试日期**: _______________
 **测试人**: _______________
