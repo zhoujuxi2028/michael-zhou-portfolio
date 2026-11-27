@@ -1,0 +1,66 @@
+# 轻量 Pushgateway（REQ-DVP-009 本地验证）：无 kube-prometheus-stack 时接收备份指标。
+# Service 名与 demo/local-devsecops-demo.sh、data-pipeline PUSHGATEWAY_URL 一致（svc/prometheus-pushgateway）。
+# 前置：kubectl --context k3d-portfolio-dev create namespace monitoring
+# 安装完整监控栈前删除：kubectl --context k3d-portfolio-dev delete -f monitoring/pushgateway/pushgateway-lite.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus-pushgateway
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/name: prometheus-pushgateway
+    app.kubernetes.io/part-of: qa-portfolio
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: prometheus-pushgateway
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: prometheus-pushgateway
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: pushgateway
+          image: prom/pushgateway:v1.11.5
+          ports:
+            - name: http
+              containerPort: 9091
+          readinessProbe:
+            httpGet:
+              path: /-/ready
+              port: http
+          resources:
+            requests:
+              cpu: 20m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus-pushgateway
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/name: prometheus-pushgateway
+    app.kubernetes.io/part-of: qa-portfolio
+spec:
+  selector:
+    app.kubernetes.io/name: prometheus-pushgateway
+  ports:
+    - name: http
+      port: 9091
+      targetPort: http
