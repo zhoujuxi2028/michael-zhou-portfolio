@@ -52,7 +52,7 @@ chart 目前没有任何准入控制，违规 manifest（`latest` tag、无 limi
 | D9 | 策略改用 `ValidatingPolicy`（`policies.kyverno.io/v1`，CEL） | ClusterPolicy（`kyverno.io/v1`） | Kyverno 1.20 不再执行 legacy 策略；锁定 ≤1.19 是死路 |
 | D10 | 策略按动作分 `enforce/`（4）与 `audit/`（1）目录 | 平铺 `policies/kyverno/*.yaml` | `--audit-warn` 对 VPOL 无效；Audit 策略进入 CI apply 会因 5 处 runAsNonRoot 违规阻断 |
 | D11 | 安装级排除：`config.webhooks.namespaceSelector` + `config.resourceFiltersIncludeNamespaces` + `features.backgroundScan.skipResourceFilters=false` | 在策略中排除 namespace | 策略保持 namespace 无关，CLI 行为确定；1.20 默认后台扫描跳过 resourceFilters |
-| D12 | 排除名单增加 `portfolio` | 仅 D5 四项 | legacy release `portfolio-demo` 不受本 chart values 管理，不排除会被拒绝 |
+| D12 | 排除名单增加 `portfolio` | 仅 D5 四项 | **已撤销（2026-11-27）**：`portfolio` 纳入策略范围；legacy Job 模板仍用 `:latest`，重跑会被拒绝 |
 | D13 | admission + reports controller 各 1 副本，禁用 background / cleanup controller | 沿用默认副本 | 无 generate / mutate-existing / cleanup 策略；内存上限 384Mi + 192Mi = 576Mi ≤ 600Mi |
 | D14 | 指标改用 `kyverno_validating_policy_results_total{result="fail"}` | `kyverno_policy_results_total` | VPOL 使用独立指标 |
 | D15 | 镜像白名单额外放行 `host.k3d.internal:5000/` | 仅现用 5 类 | `values-registry.yaml` 的方式 B（宿主 registry）避免被拦截 |

@@ -34,15 +34,14 @@ features:
 
 config:
   # admission 排除（kyverno 由 excludeKyvernoNamespace 默认追加；此处显式列出，便于断言）
-  # portfolio：legacy release portfolio-demo，迁移到合规 values 后移除
   webhooks:
     namespaceSelector:
       matchExpressions:
         - key: kubernetes.io/metadata.name
           operator: NotIn
-          values: [kube-system, kyverno, monitoring, external-secrets, portfolio]
+          values: [kube-system, kyverno, monitoring, external-secrets]
   # 后台扫描排除（kube-system 已在默认 resourceFilters 中）
-  resourceFiltersIncludeNamespaces: [monitoring, external-secrets, portfolio]
+  resourceFiltersIncludeNamespaces: [monitoring, external-secrets]
 
 # 新集群无 legacy ClusterPolicy；关闭 hook Job，少拉一个 kyverno-cli 镜像
 upgrade:

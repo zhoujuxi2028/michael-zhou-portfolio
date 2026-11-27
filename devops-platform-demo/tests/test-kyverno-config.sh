@@ -30,11 +30,11 @@ check "both controllers single replica"      "2" "$(count '^  replicas: 1$' "$ou
 check "admission memory limit 384Mi"         "1" "$(count '^ +memory: 384Mi$' "$out")"
 check "reports memory limit 192Mi"           "1" "$(count '^ +memory: 192Mi$' "$out")"
 check "failurePolicy forced to Ignore"       "1" "$(count 'forceFailurePolicyIgnore=true' "$out")"
-for ns in kube-system kyverno monitoring external-secrets portfolio; do
+for ns in kube-system kyverno monitoring external-secrets; do
   # webhooks 为转义 JSON 字符串（\"kube-system\"）：按非名称字符定界
   check "webhook excludes $ns"               "1" "$(count "^  webhooks: .*[^a-z-]${ns}[^a-z-]" "$cm")"
 done
-for ns in monitoring external-secrets portfolio; do
+for ns in monitoring external-secrets; do
   # resourceFilters 为折叠块（每行一个过滤器）
   check "resourceFilters exclude $ns"        "1" "$(count "^    \[\*/\*,$ns,\*\]$" "$cm")"
 done
