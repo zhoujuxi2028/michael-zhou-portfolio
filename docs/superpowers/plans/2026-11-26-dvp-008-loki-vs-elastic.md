@@ -55,7 +55,7 @@
 
 > 前置：`docker stats --no-stream` 确认没有 REQ-009 / REQ-010 的 e2e 在跑；Loki + Promtail 合计 limits ≈ 640Mi。所有命令显式 `--kube-context` / `--context k3d-portfolio-dev`，工作目录 `devops-platform-demo/`。不修改本机 helm repo 配置（与 `scripts/install-eso.sh` 相同，用 `--repo`）。
 
-- [ ] **Step 1: 集群就绪 + 基线**
+- [x] **Step 1: 集群就绪 + 基线**
 
 ```bash
 k3d cluster start portfolio-dev
@@ -65,7 +65,7 @@ kubectl --context k3d-portfolio-dev get ns -o name | sort | tee /tmp/dvp008-base
 ```
 Expected: 3 节点 `Ready`；`list -A` 中无 `loki` / `promtail` / `dvp008-logs`；`get ns` 中**没有** `monitoring` 和 `qa-portfolio`（Step 7 会删除这两个命名空间 —— 若任一已存在，停下询问用户）。
 
-- [ ] **Step 2: 安装 Loki + Promtail（关闭 ServiceMonitor —— 没有 Prometheus Operator CRD）**
+- [x] **Step 2: 安装 Loki + Promtail（关闭 ServiceMonitor —— 没有 Prometheus Operator CRD）**
 
 ```bash
 helm --kube-context k3d-portfolio-dev upgrade --install loki loki \
@@ -81,7 +81,7 @@ kubectl --context k3d-portfolio-dev get pods -n monitoring -o wide
 Expected: `loki-0` 1/1 Running；`promtail-*` 3 个 Running（每节点一个）。记录 `loki-0` 从创建到 Ready 的秒数：
 `kubectl --context k3d-portfolio-dev get pod loki-0 -n monitoring -o jsonpath='{.metadata.creationTimestamp} {.status.conditions[?(@.type=="Ready")].lastTransitionTime}{"\n"}'`
 
-- [ ] **Step 3: 跑 newman Job（独立 release，不影响其他 release）**
+- [x] **Step 3: 跑 newman Job（独立 release，不影响其他 release）**
 
 ```bash
 docker image inspect qa-newman-demo:latest >/dev/null || docker build -t qa-newman-demo:latest -f Dockerfile.newman .
@@ -94,7 +94,7 @@ kubectl --context k3d-portfolio-dev wait --for=condition=complete job/dvp008-log
 ```
 Expected: Job 名以 `get jobs` 输出为准（若不是 `dvp008-logs-qa-portfolio-newman`，后续命令替换）；`condition met`。若因集群无外网（jsonplaceholder）而 failed，日志仍可用于对比 —— 记录为 failed 并继续（失败日志让 Q2 有命中）。Job 默认 TTL 3600s，Step 4–6 须在 1 小时内完成。
 
-- [ ] **Step 4: 端口转发 + 标签实测（#96 证据）**
+- [x] **Step 4: 端口转发 + 标签实测（#96 证据）**
 
 ```bash
 kubectl --context k3d-portfolio-dev -n monitoring port-forward svc/loki 3100:3100 >/tmp/dvp008-pf.log 2>&1 &
@@ -112,7 +112,7 @@ kubectl --context k3d-portfolio-dev logs -n qa-portfolio job/dvp008-logs-qa-port
 ```
 Expected: 标签含 `namespace`、`pod`、`container`、`node_name`（记录完整列表）；`job_name` 值列表与仪表盘查询结果（预期为空 / `[]`）—— 原样贴到 [#96](https://github.com/zhoujuxi2028/michael-zhou-portfolio/issues/96) 评论；stream 总数（整数）；newman 输出中请求行形如 `GET https://... [200 OK, 7.94kB, 245ms]`（若格式不同，调整 Q5 正则并同步到文档）。
 
-- [ ] **Step 5: 5 个查询实测（命中数 + Loki 执行时间）**
+- [x] **Step 5: 5 个查询实测（命中数 + Loki 执行时间）**
 
 ```bash
 q() { # q <label> <logql-metric-query>
@@ -130,7 +130,7 @@ q ALL 'sum(count_over_time({namespace=~".+"}[24h]))'
 ```
 Expected: 每行 `<label> hits=<整数> execTime=<秒>s`，命令 exit 0（任一 LogQL 语法错误 → curl 400 → 失败，修正后重跑）。Q1 > 0。Q3 为瞬时查询，0 命中可接受（记录"窗口外"）。
 
-- [ ] **Step 6: 资源与保留策略实测**
+- [x] **Step 6: 资源与保留策略实测**
 
 ```bash
 {
@@ -143,7 +143,7 @@ kill "$PF_PID"
 ```
 Expected: `top` 输出 loki-0 与 3 个 promtail 的 MiB；`du` 为 KiB（若镜像无 `du`，改用 `docker exec k3d-portfolio-dev-<loki 所在节点> du -sk /var/lib/rancher/k3s/storage/<pvc 目录>`）；`retention_enabled: false` / `retention_period: 0s`（证明当前无限保留至 PVC 满，#97）；Loki / Promtail 镜像大小。
 
-- [ ] **Step 7: 清理 —— 卸载三个 release，删除两个命名空间**
+- [x] **Step 7: 清理 —— 卸载三个 release，删除两个命名空间**
 
 ```bash
 helm --kube-context k3d-portfolio-dev uninstall promtail loki -n monitoring --wait
@@ -156,13 +156,13 @@ diff /tmp/dvp008-baseline-ns.txt <(kubectl --context k3d-portfolio-dev get ns -o
 ```
 Expected: `list -A` 无 `loki` / `promtail` / `dvp008-logs`；`HELM_BASELINE_OK`（与 Step 1 完全一致，即 portfolio-demo、external-secrets、traefik 的 release 未被改动）；`get ns` 无 `monitoring` / `qa-portfolio`；`NS_BASELINE_OK`（`portfolio`、`external-secrets`、`kube-system` 等仍在）。任一 diff 有输出 → 停下报告用户。`k3d image import` 的镜像留在节点上（不影响其他 release）。
 
-- [ ] **Step 8:** 无提交（实测记录在 `/tmp/dvp008-loki.txt`，Task 2 写入文档）。
+- [x] **Step 8:** 无提交（实测记录在 `/tmp/dvp008-loki.txt`，Task 2 写入文档）。
 
 ### Task 2: 编写对比文档
 
 **Files:** Create `devops-platform-demo/docs/guides/LOGGING-LOKI-VS-ELASTIC.md`
 
-- [ ] **Step 1: 按下列结构写文档**（中文正文，表格优先；`<T1:...>` 表示填入 Task 1 记录值，提交时必须是实际数字）
+- [x] **Step 1: 按下列结构写文档**（中文正文，表格优先；`<T1:...>` 表示填入 Task 1 记录值，提交时必须是实际数字）
 
 **标题与引言：** `# Loki vs Elastic 日志栈对比（REQ-DVP-008）`；引言 2 行：本项目日志栈为 Loki + Promtail（REQ-DVP-002）；Elastic 未在本项目部署（FR-DVP-008-02 未执行，原因：内存 / 网络限制），Elastic 列引用官方来源。数据来源图例表：
 
@@ -278,8 +278,8 @@ Expected: `list -A` 无 `loki` / `promtail` / `dvp008-logs`；`HELM_BASELINE_OK`
 
 **附录 C：相关 issue**：#96（仪表盘 `job_name`）、#97（Loki retention）、#98（Promtail → Alloy）。
 
-- [ ] **Step 2: 核实官方来源**：对附录 B 每个链接用 WebFetch 打开，确认引用的句子 / 默认值存在；能核实的 `TODO-verify` 与"核实"标注改为事实 + 访问日期；不能核实的保留 `TODO-verify`。
-- [ ] **Step 3: 自检**
+- [x] **Step 2: 核实官方来源**：对附录 B 每个链接用 WebFetch 打开，确认引用的句子 / 默认值存在；能核实的 `TODO-verify` 与"核实"标注改为事实 + 访问日期；不能核实的保留 `TODO-verify`。
+- [x] **Step 3: 自检**
 
 ```bash
 cd devops-platform-demo
@@ -290,16 +290,16 @@ grep -c '未实测（可选部署未执行）' "$f"               # Expected: > 
 grep -n 'TODO-verify' "$f"                           # Expected: 仅 §2 / §6 许可证与订阅行
 grep -c '#96\|#97\|#98' "$f"                          # Expected: ≥ 3
 ```
-- [ ] **Step 4:** Commit `docs(dvp): add Loki vs Elastic logging comparison guide`
+- [x] **Step 4:** Commit `docs(dvp): add Loki vs Elastic logging comparison guide`
 
 ### Task 3: 登记文档
 
 **Files:** Modify `devops-platform-demo/README.md`（Documentation 表，约第 489 行 `SECRETS-RBAC.md` 行之后；第 292 行日志链路）
 
-- [ ] **Step 1:** 插入 `| [LOGGING-LOKI-VS-ELASTIC.md](docs/guides/LOGGING-LOKI-VS-ELASTIC.md) | Loki vs Elastic 日志栈对比（REQ-DVP-008） |`
-- [ ] **Step 2:** 在 `Pod logs ──→ Promtail ──→ Loki ──→ Grafana log explorer` 所在代码块之后加一行：`> 与 Elastic 的取舍见 [LOGGING-LOKI-VS-ELASTIC.md](docs/guides/LOGGING-LOKI-VS-ELASTIC.md)`
-- [ ] **Step 3:** 链接检查：`grep -o '](docs/guides/LOGGING-LOKI-VS-ELASTIC.md)' README.md | wc -l` → `2`；`test -f docs/guides/LOGGING-LOKI-VS-ELASTIC.md && echo OK`
-- [ ] **Step 4:** Commit `docs(dvp): link logging comparison guide from README`
+- [x] **Step 1:** 插入 `| [LOGGING-LOKI-VS-ELASTIC.md](docs/guides/LOGGING-LOKI-VS-ELASTIC.md) | Loki vs Elastic 日志栈对比（REQ-DVP-008） |`
+- [x] **Step 2:** 在 `Pod logs ──→ Promtail ──→ Loki ──→ Grafana log explorer` 所在代码块之后加一行：`> 与 Elastic 的取舍见 [LOGGING-LOKI-VS-ELASTIC.md](docs/guides/LOGGING-LOKI-VS-ELASTIC.md)`
+- [x] **Step 3:** 链接检查：`grep -o '](docs/guides/LOGGING-LOKI-VS-ELASTIC.md)' README.md | wc -l` → `2`；`test -f docs/guides/LOGGING-LOKI-VS-ELASTIC.md && echo OK`
+- [x] **Step 4:** Commit `docs(dvp): link logging comparison guide from README`
 
 ---
 
@@ -317,7 +317,9 @@ grep -c '#96\|#97\|#98' "$f"                          # Expected: ≥ 3
 
 ## Stage 4 / 5
 
-| 阶段 | 内容 |
-|------|------|
-| 4 | 文档自检（Task 2 Step 3）、README 链接检查；push `feature/dvp-008-logging-comparison`，开 PR，CI 全绿 |
-| 5 | REQUIREMENTS 章节：FR-DVP-008-02 标"不在本 REQ（2026-11-27 用户决定）"、勾文档验收、总表状态 Done；`docs/REQUIREMENTS-INDEX.md:102` 状态；更新 memory |
+| 阶段 | 内容 | 状态 |
+|------|------|------|
+| 4 | 文档自检（Task 2 Step 3）、README 链接检查；push `feature/dvp-008-logging-comparison`，开 PR，CI 全绿 | ✅ PR #105 |
+| 5 | REQUIREMENTS 章节：FR-DVP-008-02 标"不在本 REQ（2026-11-28 用户决定）"、勾文档验收、总表状态 Done；`docs/REQUIREMENTS-INDEX.md:102` 状态；更新 memory | ✅ |
+
+> 实施偏差：Promtail 已由 #98 迁移为 Grafana Alloy；Alloy 镜像拉取受限，查询实测使用 Loki Push API 注入日志（见文档附录 A）。

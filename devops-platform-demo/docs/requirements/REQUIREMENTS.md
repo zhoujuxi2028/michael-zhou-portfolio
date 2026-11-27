@@ -43,7 +43,7 @@
 | `REQ-DVP-005` | Incident / RCA postmortem 模板 + 案例 | DEMO | P2 | 95% | — | ✅ Done |
 | `REQ-DVP-006` | Secrets Manager（LocalStack）+ External Secrets + K8s RBAC（替代 Azure Key Vault） | FR | P2 | 100% | 003 | ✅ Done（PR #90） |
 | `REQ-DVP-007` | Dependabot 依赖与补丁自动化 | NFR | P2 | 95% | — | ✅ Done（PR #56） |
-| `REQ-DVP-008` | Elastic 集成 / Loki vs Elastic 对比 | DEMO | P3 | 50%（部署）/ 100%（文档） | — | 🔲 Planned（设计已评审） |
+| `REQ-DVP-008` | Elastic 集成 / Loki vs Elastic 对比 | DEMO | P3 | 100%（文档） | — | ✅ Done（PR #105） |
 | `REQ-DVP-009` | 数据管道 / DB 备份自动化 | FR | P3 | 85% | 006 | 🔲 Planned（设计已评审） |
 | `REQ-DVP-010` | OPA/Kyverno 策略即代码 | FR | P3 | 100% | 013 | ✅ Done（PR #101） |
 | `REQ-DVP-011` | Dev Container 标准化开发环境 | NFR | P1 | 95% | — | ✅ Done |
@@ -160,13 +160,13 @@
 | ID | 描述 |
 |----|------|
 | FR-DVP-008-01 | 对比文档：架构、索引模型、资源占用、成本、查询语言（LogQL vs KQL） |
-| FR-DVP-008-02 | 可选：`docker-compose.elastic.yml` 单节点 Elasticsearch + Filebeat + Kibana，按需启动，采集与 Promtail 同源的日志（不进 k3d、不与监控栈并行） |
+| FR-DVP-008-02 | 可选：`docker-compose.elastic.yml` 单节点 Elasticsearch + Filebeat + Kibana，按需启动（**不在本 REQ**；2026-11-28 用户决定，未执行） |
 
 **验收标准：**
-- [ ] 对比文档完成
-- [ ] （可选）Kibana 可检索与 Loki 相同的日志
+- [x] 对比文档完成（`docs/guides/LOGGING-LOKI-VS-ELASTIC.md`）
+- 可选 Kibana 检索：**不在本 REQ**（2026-11-28 用户决定，未执行）
 
-**可行性：** 文档 100%；部署 50%（2026-11-26 复评）：Elasticsearch + Kibana 约 2–2.5 GiB，与现有栈并行超出 OrbStack 8 GB；镜像约 1.7 GB，本机拉取慢。部署降为可选，实测值待 Stage 1 补充。
+**可行性 100%（2026-11-28 完成）：** 文档 100%；Loki 实测（116Mi、5 个 LogQL 查询、retention 1w）；Elastic 未部署，引用官方来源。原“部署 50%”降为可选，不在本 REQ。
 
 **设计：** [2026-11-26-dvp-008-loki-vs-elastic-design.md](../../../docs/superpowers/specs/2026-11-26-dvp-008-loki-vs-elastic-design.md)
 
