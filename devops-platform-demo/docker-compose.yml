@@ -60,7 +60,7 @@ services:
   # Newman API Tests
   # Interview Talking Point:
   # "The Newman service runs Postman collections via the Newman CLI. It's much lighter
-  # than Cypress (~150MB vs ~1GB) since API tests don't need browsers. We generate
+  # than Cypress (~230MB vs ~1GB) since API tests don't need browsers. We generate
   # multiple report formats for different audiences."
   newman:
     build:
@@ -183,9 +183,10 @@ volumes:
 #    complex vs simple architectures."
 #
 # 2. Container Images:
-#    "We use official images (cypress/included and postman/newman) rather than
-#    building custom Dockerfiles. Official images are maintained, tested, and
-#    regularly updated with security patches. This reduces maintenance burden."
+#    "We use the official cypress/included image plus a self-maintained qa-newman image
+#    built on node:26-alpine with a pinned dependency tree. The upstream postman/newman
+#    image stopped receiving updates, so owning the Dockerfile keeps newman and its
+#    transitive dependencies patched."
 #
 # 3. Volume Strategy:
 #    "We mount the project directory for test files and separate volumes for

@@ -86,6 +86,31 @@ docker run --rm \
 **Images scanned:**
 - `qa-newman-demo:latest` (Dockerfile.newman)
 
+**qa-newman 镜像自维护（REQ-DVP-013）**
+
+上游 `postman/newman` 镜像自 2024-06 停更（alpine 3.18 / Node 16 EOL），改为 `node:26.13.1-alpine3.24` + 锁定依赖树（`docker/newman/package.json` + lockfile，`npm ci` 安装，运行时删除 npm/npx）。PR CI 对镜像做内容断言 + Trivy CRITICAL 门禁。
+
+| 指标 | 旧（postman/newman:6-alpine） | 新 |
+|------|------|------|
+| Node / newman | 16.20.2 / 6.1.3 | 26.13.1 / 6.2.3 |
+| 镜像大小 | 251MB | 234MB |
+| CRITICAL | 10 | 0 |
+| HIGH | 91 | 1 |
+
+已知风险：`@faker-js/faker` 5.5.3（HIGH，CVE-2026-73231）。修复版 10.x 跨 5 个大版本，Newman `$random*` 动态变量依赖其 5.x API，暂不升级。
+
+验证（2026-11-27）：
+
+| 项 | 命令 | 结果 |
+|----|------|------|
+| 镜像断言 | `bash tests/test-newman-image.sh` | 8/8 PASS |
+| Trivy | `trivy image --severity CRITICAL --ignore-unfixed --exit-code 1` | CRITICAL 0，HIGH 1（faker） |
+| 容器功能 | `docker run ... newman run postman/api-collection.json` | 7 请求 / 18 断言 / 0 失败，HTML + JUnit 生成 |
+| docker compose | `docker compose build newman && docker compose run --rm newman` | 0 失败，`newman/api-report.html`、`junit.xml` 生成 |
+| Helm (k3d) | `helm install ... --set cypress.enabled=false` + `kubectl wait --for=condition=complete job` | Job Complete，18 断言 0 失败 |
+
+> 本地 Trivy DB 使用 2026-11-25 缓存（镜像源网络受限时 `--skip-db-update`）；CI 每次拉取最新 DB。
+
 ### 4. Trivy IaC Scan
 
 Scans Infrastructure as Code for security misconfigurations.

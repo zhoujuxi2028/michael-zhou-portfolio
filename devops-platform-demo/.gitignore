@@ -9,7 +9,7 @@ cypress/downloads/
 cypress/results/
 
 # Newman
-newman/
+/newman/
 
 # Test Reports
 *.html
