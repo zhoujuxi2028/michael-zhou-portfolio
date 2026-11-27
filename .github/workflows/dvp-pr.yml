@@ -97,6 +97,9 @@ jobs:
             console.log('Collection OK: ' + c.items.count() + ' item(s)');
           "
 
+      - name: Verify chart collection copy is in sync
+        run: diff -u postman/api-collection.json helm/qa-portfolio/files/api-collection.json
+
       - name: Setup Helm
         uses: azure/setup-helm@v5
         with:

@@ -76,7 +76,8 @@ spec:
               subPath: newman
       volumes:
         - name: postman-config
-          emptyDir: {}
+          configMap:
+            name: {{ include "qa-portfolio.fullname" . }}-newman-collection
         - name: newman-env
           configMap:
             name: {{ include "qa-portfolio.fullname" . }}-newman-env
