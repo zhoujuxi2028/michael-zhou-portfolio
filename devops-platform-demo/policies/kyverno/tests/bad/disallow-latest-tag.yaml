@@ -1,0 +1,43 @@
+# 仅违反 disallow-latest-tag
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bad-latest-tag
+  namespace: policy-test
+spec:
+  securityContext: {runAsNonRoot: true}
+  containers:
+    - name: app
+      image: nginx:latest
+      resources:
+        limits: {cpu: 100m, memory: 64Mi}
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bad-no-tag
+  namespace: policy-test
+spec:
+  securityContext: {runAsNonRoot: true}
+  containers:
+    - name: app
+      image: busybox
+      resources:
+        limits: {cpu: 50m, memory: 32Mi}
+---
+# 端口中的冒号不是 tag
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: bad-registry-port-no-tag
+  namespace: policy-test
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      securityContext: {runAsNonRoot: true}
+      containers:
+        - name: newman
+          image: k3d-qa-registry:5000/qa-newman
+          resources:
+            limits: {cpu: 500m, memory: 512Mi}

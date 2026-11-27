@@ -1,0 +1,92 @@
+# 合规样例：5 条策略全部 pass（REQ-DVP-010）
+apiVersion: v1
+kind: Pod
+metadata:
+  name: good-pod
+  namespace: policy-test
+spec:
+  securityContext:
+    runAsNonRoot: true
+  containers:
+    - name: app
+      image: nginx:1.25-alpine
+      resources:
+        limits: {cpu: 100m, memory: 64Mi}
+---
+# digest 引用 + docker.io 全名
+apiVersion: v1
+kind: Pod
+metadata:
+  name: good-digest
+  namespace: policy-test
+spec:
+  securityContext:
+    runAsNonRoot: true
+  containers:
+    - name: app
+      image: docker.io/library/nginx@sha256:0000000000000000000000000000000000000000000000000000000000000000
+      resources:
+        limits: {cpu: 100m, memory: 64Mi}
+---
+# 容器级 runAsNonRoot + init 容器 + docker.io/cypress 全名
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: good-deployment
+  namespace: policy-test
+spec:
+  selector:
+    matchLabels: {app: good}
+  template:
+    metadata:
+      labels: {app: good}
+    spec:
+      initContainers:
+        - name: init
+          image: busybox:1.36
+          securityContext: {runAsNonRoot: true}
+          resources:
+            limits: {cpu: 50m, memory: 32Mi}
+      containers:
+        - name: app
+          image: docker.io/cypress/included:16.3.0
+          securityContext: {runAsNonRoot: true, privileged: false}
+          resources:
+            limits: {cpu: 500m, memory: 1Gi}
+---
+# registry 带端口 + 固定 tag
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: good-job
+  namespace: policy-test
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      securityContext: {runAsNonRoot: true}
+      containers:
+        - name: newman
+          image: k3d-qa-registry:5000/qa-newman:6.2.3-node26
+          resources:
+            limits: {cpu: 500m, memory: 512Mi}
+---
+# CronJob：jobTemplate 路径
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: good-cronjob
+  namespace: policy-test
+spec:
+  schedule: "0 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          securityContext: {runAsNonRoot: true}
+          containers:
+            - name: newman
+              image: qa-newman-demo:6.2.3-node26
+              resources:
+                limits: {cpu: 500m, memory: 512Mi}

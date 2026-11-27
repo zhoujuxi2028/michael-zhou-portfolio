@@ -59,6 +59,11 @@ check_drift() {
     count=$((count + 1))
   done < <(pins_of 'azure\/setup-helm' 'version' "$wf"/dvp-*.yml)
   if [ "$count" -eq 0 ]; then echo "❌ no azure/setup-helm version pins found in $wf"; fail=1; fi
+
+  # kyverno: 'release:' within each 'uses: kyverno/action-install-cli' step（无该 action 时不报错）
+  while read -r v; do
+    report "kyverno release" "v$KYVERNO_VERSION" "$v"
+  done < <(pins_of 'kyverno\/action-install-cli' 'release' "$wf"/dvp-*.yml)
 }
 
 # First x.y.z found on stdin (awk exits 0 even without a match)

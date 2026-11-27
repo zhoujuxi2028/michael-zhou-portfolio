@@ -1,0 +1,53 @@
+# kyverno test policies/kyverno/tests（REQ-DVP-010）
+# 每条策略：5 个 good 全 pass + 对应 bad 全 fail → 共 37 条结果
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: qa-portfolio-policies
+policies:
+  - ../enforce/disallow-latest-tag.yaml
+  - ../enforce/require-resource-limits.yaml
+  - ../enforce/disallow-privileged.yaml
+  - ../enforce/restrict-image-registries.yaml
+  - ../audit/require-run-as-non-root.yaml
+resources:
+  - good/workloads.yaml
+  - bad/disallow-latest-tag.yaml
+  - bad/require-resource-limits.yaml
+  - bad/disallow-privileged.yaml
+  - bad/restrict-image-registries.yaml
+  - bad/require-run-as-non-root.yaml
+results:
+  # --- disallow-latest-tag ---
+  - {policy: disallow-latest-tag, isValidatingPolicy: true, kind: Pod, resources: [good-pod, good-digest], result: pass}
+  - {policy: disallow-latest-tag, isValidatingPolicy: true, kind: Deployment, resources: [good-deployment], result: pass}
+  - {policy: disallow-latest-tag, isValidatingPolicy: true, kind: Job, resources: [good-job], result: pass}
+  - {policy: disallow-latest-tag, isValidatingPolicy: true, kind: CronJob, resources: [good-cronjob], result: pass}
+  - {policy: disallow-latest-tag, isValidatingPolicy: true, kind: Pod, resources: [bad-latest-tag, bad-no-tag], result: fail}
+  - {policy: disallow-latest-tag, isValidatingPolicy: true, kind: Job, resources: [bad-registry-port-no-tag], result: fail}
+  # --- require-resource-limits ---
+  - {policy: require-resource-limits, isValidatingPolicy: true, kind: Pod, resources: [good-pod, good-digest], result: pass}
+  - {policy: require-resource-limits, isValidatingPolicy: true, kind: Deployment, resources: [good-deployment], result: pass}
+  - {policy: require-resource-limits, isValidatingPolicy: true, kind: Job, resources: [good-job], result: pass}
+  - {policy: require-resource-limits, isValidatingPolicy: true, kind: CronJob, resources: [good-cronjob], result: pass}
+  - {policy: require-resource-limits, isValidatingPolicy: true, kind: Job, resources: [bad-init-no-limits], result: fail}
+  - {policy: require-resource-limits, isValidatingPolicy: true, kind: Pod, resources: [bad-memory-only-limits], result: fail}
+  # --- disallow-privileged ---
+  - {policy: disallow-privileged, isValidatingPolicy: true, kind: Pod, resources: [good-pod, good-digest], result: pass}
+  - {policy: disallow-privileged, isValidatingPolicy: true, kind: Deployment, resources: [good-deployment], result: pass}
+  - {policy: disallow-privileged, isValidatingPolicy: true, kind: Job, resources: [good-job], result: pass}
+  - {policy: disallow-privileged, isValidatingPolicy: true, kind: CronJob, resources: [good-cronjob], result: pass}
+  - {policy: disallow-privileged, isValidatingPolicy: true, kind: Deployment, resources: [bad-privileged], result: fail}
+  - {policy: disallow-privileged, isValidatingPolicy: true, kind: Pod, resources: [bad-privileged-init], result: fail}
+  # --- restrict-image-registries ---
+  - {policy: restrict-image-registries, isValidatingPolicy: true, kind: Pod, resources: [good-pod, good-digest], result: pass}
+  - {policy: restrict-image-registries, isValidatingPolicy: true, kind: Deployment, resources: [good-deployment], result: pass}
+  - {policy: restrict-image-registries, isValidatingPolicy: true, kind: Job, resources: [good-job], result: pass}
+  - {policy: restrict-image-registries, isValidatingPolicy: true, kind: CronJob, resources: [good-cronjob], result: pass}
+  - {policy: restrict-image-registries, isValidatingPolicy: true, kind: Pod, resources: [bad-untrusted-registry, bad-registry-lookalike, bad-name-prefix], result: fail}
+  # --- require-run-as-non-root (Audit) ---
+  - {policy: require-run-as-non-root, isValidatingPolicy: true, kind: Pod, resources: [good-pod, good-digest], result: pass}
+  - {policy: require-run-as-non-root, isValidatingPolicy: true, kind: Deployment, resources: [good-deployment], result: pass}
+  - {policy: require-run-as-non-root, isValidatingPolicy: true, kind: Job, resources: [good-job], result: pass}
+  - {policy: require-run-as-non-root, isValidatingPolicy: true, kind: CronJob, resources: [good-cronjob], result: pass}
+  - {policy: require-run-as-non-root, isValidatingPolicy: true, kind: Pod, resources: [bad-run-as-root, bad-run-as-root-override], result: fail}

@@ -23,7 +23,8 @@ externalSecrets:
 newman:
   image:
     repository: k3d-qa-registry:5000/qa-newman
-    tag: "latest"
+    # 固定版本（REQ-DVP-010 禁止 latest）
+    tag: "6.2.3-node26"
     pullPolicy: IfNotPresent
   imagePullSecrets:
     - name: qa-registry-pull-secret

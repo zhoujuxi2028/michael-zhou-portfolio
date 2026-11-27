@@ -49,22 +49,27 @@ chart 目前没有任何准入控制，违规 manifest（`latest` tag、无 limi
 | D6 | Kyverno Helm 安装，各 controller 1 副本 + 资源上限 | 默认值 | OrbStack 8 GB 上限；目标增量 ≤ 600 MiB |
 | D7 | 违规指标用 Kyverno 自带 `kyverno_policy_results_total` + ServiceMonitor | Policy Reporter | 少一个组件；Grafana 面板直接查询 |
 | D8 | newman tag 固定为 013 产出的版本号 | 继续 `latest` | 依赖 REQ-DVP-013，避免重复改动 |
+| D9 | 策略改用 `ValidatingPolicy`（`policies.kyverno.io/v1`，CEL） | ClusterPolicy（`kyverno.io/v1`） | Kyverno 1.20 不再执行 legacy 策略；锁定 ≤1.19 是死路 |
+| D10 | 策略按动作分 `enforce/`（4）与 `audit/`（1）目录 | 平铺 `policies/kyverno/*.yaml` | `--audit-warn` 对 VPOL 无效；Audit 策略进入 CI apply 会因 5 处 runAsNonRoot 违规阻断 |
+| D11 | 安装级排除：`config.webhooks.namespaceSelector` + `config.resourceFiltersIncludeNamespaces` + `features.backgroundScan.skipResourceFilters=false` | 在策略中排除 namespace | 策略保持 namespace 无关，CLI 行为确定；1.20 默认后台扫描跳过 resourceFilters |
+| D12 | 排除名单增加 `portfolio` | 仅 D5 四项 | legacy release `portfolio-demo` 不受本 chart values 管理，不排除会被拒绝 |
+| D13 | admission + reports controller 各 1 副本，禁用 background / cleanup controller | 沿用默认副本 | 无 generate / mutate-existing / cleanup 策略；内存上限 384Mi + 192Mi = 576Mi ≤ 600Mi |
+| D14 | 指标改用 `kyverno_validating_policy_results_total{result="fail"}` | `kyverno_policy_results_total` | VPOL 使用独立指标 |
+| D15 | 镜像白名单额外放行 `host.k3d.internal:5000/` | 仅现用 5 类 | `values-registry.yaml` 的方式 B（宿主 registry）避免被拦截 |
 
 ## 4. 架构
 
 ```
 policies/kyverno/
-  disallow-latest-tag.yaml        (Enforce)
-  require-resource-limits.yaml    (Enforce)
-  disallow-privileged.yaml        (Enforce)
-  restrict-image-registries.yaml  (Enforce)
-  require-run-as-non-root.yaml    (Audit)
-  tests/  kyverno-test.yaml + good/ bad/ fixtures
+  enforce/  disallow-latest-tag / require-resource-limits / disallow-privileged / restrict-image-registries  (Deny)
+  audit/    require-run-as-non-root                                                                      (Audit)
+  tests/    kyverno-test.yaml + good/ + bad/
+policies/kyverno-values.yaml   (Kyverno Helm values)
 
 PR CI (dvp-pr.yml)                         k3d 集群
   kyverno test policies/kyverno/tests        helm install kyverno (1 副本)
-  helm template × 4 values                   kubectl apply policies/kyverno/
-  kyverno apply policies/ --resource ...     违规 apply → admission 拒绝
+  helm template × 4 values                   kubectl apply policies/kyverno/enforce + audit
+  kyverno apply enforce/ × values            违规 apply → admission 拒绝
   违规 → job 失败                             PolicyReport → metrics → Grafana
 ```
 
@@ -72,13 +77,13 @@ PR CI (dvp-pr.yml)                         k3d 集群
 
 | 组件 | 文件 | 说明 |
 |------|------|------|
-| 策略 | `devops-platform-demo/policies/kyverno/*.yaml` | ClusterPolicy，`background: true` |
+| 策略 | `devops-platform-demo/policies/kyverno/{enforce,audit}/*.yaml` | `ValidatingPolicy`（`policies.kyverno.io/v1`），background 启用 |
 | 策略测试 | `policies/kyverno/tests/` | 每条策略 ≥ 1 个通过 + 1 个违规 fixture |
 | chart 修复 | `helm/qa-portfolio/values*.yaml`、`templates/job-*.yaml` | newman 固定 tag；init 容器 limits |
 | CI | `.github/workflows/dvp-pr.yml` | 新增 `policy-check` job |
 | 安装脚本 | `scripts/install-kyverno.sh` | Helm `--repo` + 重试 + 资源 values（参考 `install-eso.sh`） |
 | 验证脚本 | `scripts/verify-kyverno.sh` | apply 违规 Pod 期望拒绝；合规 Pod 期望通过 |
-| 监控 | `monitoring/` ServiceMonitor + Grafana 面板 | `kyverno_policy_results_total{result="fail"}` |
+| 监控 | `monitoring/` ServiceMonitor + Grafana 面板 | `kyverno_validating_policy_results_total{result="fail"}` |
 | 文档 | `docs/guides/POLICY-AS-CODE.md` | 策略说明、例外处理、排障 |
 
 ## 6. 测试策略

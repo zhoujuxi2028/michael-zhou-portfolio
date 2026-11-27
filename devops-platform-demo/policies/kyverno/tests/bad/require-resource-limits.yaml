@@ -1,0 +1,33 @@
+# 仅违反 require-resource-limits
+# 复刻 chart 现状：busybox init 容器无 resources
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: bad-init-no-limits
+  namespace: policy-test
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      securityContext: {runAsNonRoot: true}
+      initContainers:
+        - name: prepare-reports-dir
+          image: busybox:1.36
+      containers:
+        - name: newman
+          image: qa-newman-demo:6.2.3-node26
+          resources:
+            limits: {cpu: 500m, memory: 512Mi}
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bad-memory-only-limits
+  namespace: policy-test
+spec:
+  securityContext: {runAsNonRoot: true}
+  containers:
+    - name: app
+      image: nginx:1.25-alpine
+      resources:
+        limits: {memory: 64Mi}

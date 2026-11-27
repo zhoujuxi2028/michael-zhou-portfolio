@@ -29,6 +29,8 @@ spec:
               mkdir -p /test-results/newman
               chmod -R 777 /test-results/newman
               echo "Newman reports directory prepared"
+          resources:
+            {{- toYaml .Values.initContainer.resources | nindent 12 }}
           volumeMounts:
             - name: test-results
               mountPath: /test-results

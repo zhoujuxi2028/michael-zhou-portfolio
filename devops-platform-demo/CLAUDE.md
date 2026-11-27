@@ -22,6 +22,16 @@ bash tests/test-alertmanager-values.sh   # 无需集群
 ./scripts/verify-secret-rotation.sh      # 需 ExternalSecret Ready
 ```
 
+## Policy as Code（REQ-DVP-010）
+```bash
+bash tests/test-helm-policy-compliance.sh   # 无需集群 / CLI
+bash tests/test-kyverno-config.sh           # 需网络（helm --repo）
+bash scripts/policy-check.sh all            # 需 kyverno CLI（Dev Container / CI）
+./scripts/install-kyverno.sh operator       # 需 k3d；勿与其他 REQ 的 e2e 并行
+./scripts/install-kyverno.sh policies
+./scripts/verify-kyverno.sh                 # 需已安装 Kyverno + 策略
+```
+
 ## Dev Container
 ```bash
 npx -y @devcontainers/cli@0.90.0 up --workspace-folder .

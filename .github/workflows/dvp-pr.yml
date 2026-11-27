@@ -211,6 +211,52 @@ jobs:
           trivyignores: 'devops-platform-demo/.trivyignore'
 
   # ---------------------------------------------------------------------------
+  # Job: Policy Check —— Kyverno 策略即代码（REQ-DVP-010）
+  # kyverno test（策略正/反例）+ enforce 策略 × 4 份 values 渲染 + canary
+  # ---------------------------------------------------------------------------
+  policy-check:
+    name: DVP / Policy Check (Kyverno)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v5
+        with:
+          version: v3.14.0
+
+      - name: Install Kyverno CLI
+        uses: kyverno/action-install-cli@fcee92fca5c883169ef9927acf543e0b5fc58289 # v0.2.0
+        with:
+          release: v1.20.0
+
+      # action 用 curl -sL（无 -f）下载：显式断言版本，避免静默装坏
+      - name: Verify Kyverno CLI version
+        shell: bash
+        run: |
+          set -euo pipefail
+          out=$(kyverno version)
+          echo "$out"
+          grep -Eq 'Version: v?1\.20\.0' <<<"$out"
+
+      - name: Helm render compliance tests
+        run: bash tests/test-helm-policy-compliance.sh
+
+      - name: Kyverno config tests (values / ServiceMonitor / dashboard)
+        run: bash tests/test-kyverno-config.sh
+
+      - name: Kyverno policy unit tests
+        run: bash scripts/policy-check.sh test
+
+      - name: Kyverno apply on Helm renders (4 values)
+        run: bash scripts/policy-check.sh apply
+
+      - name: Gate canaries (injected violations must fail)
+        run: bash scripts/policy-check.sh canary
+
+  # ---------------------------------------------------------------------------
   # Job 5: Quality Gate —— 测试覆盖量化门控
   # 要求：Newman 断言数 ≥15 + Cypress 测试用例数 ≥15
   # 面试要点：CI 入口的量化质量门，防止测试数量缩水的代码进入主干
@@ -358,7 +404,7 @@ jobs:
   pr-gate:
     name: DVP / PR Gate
     runs-on: ubuntu-latest
-    needs: [lint, unit-tests, build, security-scan, quality-gate, e2e]
+    needs: [lint, unit-tests, build, security-scan, policy-check, quality-gate, e2e]
     if: always()
     timeout-minutes: 2
     # 覆盖 workflow 级 defaults.run.working-directory（=devops-platform-demo），
@@ -376,6 +422,7 @@ jobs:
           echo "Unit tests:    ${{ needs.unit-tests.result }}"
           echo "Build:         ${{ needs.build.result }}"
           echo "Security scan: ${{ needs.security-scan.result }}"
+          echo "Policy check:  ${{ needs.policy-check.result }}"
           echo "Quality gate:  ${{ needs.quality-gate.result }}"
           echo "E2E:           ${{ needs.e2e.result }}"
 
@@ -384,6 +431,7 @@ jobs:
             "${{ needs.unit-tests.result }}" \
             "${{ needs.build.result }}" \
             "${{ needs.security-scan.result }}" \
+            "${{ needs.policy-check.result }}" \
             "${{ needs.quality-gate.result }}" \
             "${{ needs.e2e.result }}"; do
             if [ "$result" != "success" ]; then
@@ -400,7 +448,7 @@ jobs:
   push-metrics:
     name: DVP / Push Metrics
     runs-on: ubuntu-latest
-    needs: [lint, unit-tests, build, security-scan, quality-gate, e2e, pr-gate]
+    needs: [lint, unit-tests, build, security-scan, policy-check, quality-gate, e2e, pr-gate]
     if: always()
     timeout-minutes: 3
     defaults:

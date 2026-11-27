@@ -45,7 +45,7 @@
 | `REQ-DVP-007` | Dependabot 依赖与补丁自动化 | NFR | P2 | 95% | — | ✅ Done（PR #56） |
 | `REQ-DVP-008` | Elastic 集成 / Loki vs Elastic 对比 | DEMO | P3 | 50%（部署）/ 100%（文档） | — | 🔲 Planned（设计已评审） |
 | `REQ-DVP-009` | 数据管道 / DB 备份自动化 | FR | P3 | 85% | 006 | 🔲 Planned（设计已评审） |
-| `REQ-DVP-010` | OPA/Kyverno 策略即代码 | FR | P3 | 90% | 013 | 🔲 Planned（设计已评审） |
+| `REQ-DVP-010` | OPA/Kyverno 策略即代码 | FR | P3 | 90% | 013 | 🔄 In Progress |
 | `REQ-DVP-011` | Dev Container 标准化开发环境 | NFR | P1 | 95% | — | ✅ Done |
 | `REQ-DVP-012` | Node 26 LTS 升级 + Cypress 16 修复 + PR 门禁 E2E | NFR | P1 | 100% | 011 | ✅ Done（PR #87） |
 | `REQ-DVP-013` | `qa-newman` 镜像自维护（上游停更 + alpine 3.18 / Node 16 EOL） | NFR | P2 | 100% | — | ✅ Done（PR #99） |
@@ -196,17 +196,17 @@
 
 | ID | 描述 |
 |----|------|
-| FR-DVP-010-01 | k3d 集群安装 Kyverno（Helm，1 副本 + 资源上限） |
-| FR-DVP-010-02 | 策略集（Enforce）：禁止 `latest` tag、必须设 resource limits、禁止 privileged、镜像仓库白名单；runAsNonRoot 为 Audit |
-| FR-DVP-010-03 | CI 中 `kyverno test`（策略正/反例）+ `kyverno apply` 校验 4 份 values 渲染结果，违规阻断 PR |
-| FR-DVP-010-04 | 策略违规报告（PolicyReport）接入 Prometheus/Grafana |
+| FR-DVP-010-01 | k3d 集群安装 Kyverno 1.20（Helm chart 3.10.0；admission + reports controller 各 1 副本，内存上限合计 ≤ 600Mi；排除 kube-system / kyverno / monitoring / external-secrets / portfolio） |
+| FR-DVP-010-02 | ValidatingPolicy 策略集：Deny —— 禁止 `latest`/无 tag、必须 cpu+memory limits、禁止 privileged、镜像仓库白名单；Audit —— runAsNonRoot |
+| FR-DVP-010-03 | PR CI `policy-check` job：`kyverno test`（good/bad fixture）+ `kyverno apply enforce/` 校验 4 份 values 渲染 + canary（注入违规必须失败），违规阻断 PR |
+| FR-DVP-010-04 | `kyverno_validating_policy_results_total` 经 ServiceMonitor 接入 Prometheus，Grafana “Policy Compliance” 面板 |
 
 **验收标准：**
 - [ ] 部署违规 manifest 被 admission 拒绝
 - [ ] PR 中违规 Helm 变更导致 CI 失败
 - [ ] Grafana 可见策略违规计数
 
-**可行性 90%（2026-11-26 静态检查）：** 4 份 values 渲染结果仅 3 处 Enforce 违规（newman `:latest` tag；2 个 busybox init 容器无 limits），修复成本低；runAsNonRoot 5 处违规 → Audit。CI 用 `kyverno/action-install-cli`；本机安装 CLI 需用户授权。依赖 013 提供固定版本的 newman 镜像 tag。
+**可行性 90%（2026-11-26 静态检查）：** 4 份 values 渲染结果仅 3 处 Enforce 违规（newman `:latest` tag；2 个 busybox init 容器无 limits），修复成本低；runAsNonRoot 5 处违规 → Audit。CI 用 `kyverno/action-install-cli`；本机安装 CLI 需用户授权。依赖 013 提供固定版本的 newman 镜像 tag。Stage 2 发现 1.20 不再执行 ClusterPolicy → 改用 ValidatingPolicy（D9）。
 
 **设计：** [2026-11-26-dvp-010-kyverno-policy-design.md](../../../docs/superpowers/specs/2026-11-26-dvp-010-kyverno-policy-design.md)
 

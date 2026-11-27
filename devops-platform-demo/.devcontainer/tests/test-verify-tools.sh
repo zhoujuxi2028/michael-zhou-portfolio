@@ -99,6 +99,17 @@ assert_exit "drift: one of two terraform steps unpinned" 1 drift \
 assert_exit "drift: second of two helm pins drifts" 1 drift \
   "$(make_wf h-second "$(printf '%s\n%s\n%s' "$H_PIN" "$H_BAD" "$T_PIN")")"
 
+K_PIN='      - uses: kyverno/action-install-cli@fcee92fca5c883169ef9927acf543e0b5fc58289 # v0.2.0
+        with:
+          release: v1.20.0'
+K_BAD='      - uses: kyverno/action-install-cli@fcee92fca5c883169ef9927acf543e0b5fc58289 # v0.2.0
+        with:
+          release: v1.19.0'
+assert_exit "drift: kyverno release pin matches" 0 drift \
+  "$(make_wf k-ok "$(printf '%s\n%s\n%s' "$H_PIN" "$T_PIN" "$K_PIN")")"
+assert_exit "drift: kyverno release pin drifts" 1 drift \
+  "$(make_wf k-bad "$(printf '%s\n%s\n%s' "$H_PIN" "$T_PIN" "$K_BAD")")"
+
 assert_exit "drift: real repository" 0 env -u DVP_ROOT -u VERSIONS_FILE bash "$SUT" --drift
 assert_exit "usage: unknown flag" 2 bash "$SUT" --bogus
 

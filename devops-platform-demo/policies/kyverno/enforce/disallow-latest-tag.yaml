@@ -1,0 +1,45 @@
+# 禁止 latest / 无 tag 镜像（REQ-DVP-010，Deny）
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: disallow-latest-tag
+  annotations:
+    policies.kyverno.io/title: Disallow latest tag
+    policies.kyverno.io/category: Best Practices
+    policies.kyverno.io/severity: medium
+spec:
+  validationActions: [Deny]
+  failurePolicy: Ignore  # demo：策略执行错误不阻断；生产改为 Fail
+  evaluation:
+    background:
+      enabled: true
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: [v1]
+        operations: [CREATE, UPDATE]
+        resources: [pods]
+      - apiGroups: [apps]
+        apiVersions: [v1]
+        operations: [CREATE, UPDATE]
+        resources: [deployments, statefulsets, daemonsets]
+      - apiGroups: [batch]
+        apiVersions: [v1]
+        operations: [CREATE, UPDATE]
+        resources: [jobs, cronjobs]
+  variables:
+    - name: podSpec
+      expression: >-
+        object.kind == 'Pod' ? object.spec :
+        (object.kind == 'CronJob' ? object.spec.jobTemplate.spec.template.spec : object.spec.template.spec)
+    - name: containers
+      expression: >-
+        variables.podSpec.containers +
+        (has(variables.podSpec.initContainers) ? variables.podSpec.initContainers : [])
+  validations:
+    # digest 放行；否则最后一个 '/' 之后必须有 ':tag'（排除 registry 端口），且不能是 latest
+    - expression: >-
+        variables.containers.all(c,
+          c.image.matches(r'@sha256:[a-f0-9]{64}$') ||
+          (c.image.matches(r':[^/:@]+$') && !c.image.endsWith(':latest')))
+      message: "[disallow-latest-tag] every container image must use a pinned tag or digest (no ':latest', no missing tag)"
