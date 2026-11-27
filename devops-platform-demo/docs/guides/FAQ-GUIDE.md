@@ -1110,7 +1110,7 @@ A: `helm rollback qa-portfolio -n qa-portfolio` reverts to previous revision. Ea
 A: `cicd_pipeline_duration_seconds{stage}`, `cicd_pipeline_status{result}`, `cicd_test_total{suite,result}` — all pushed to Prometheus Pushgateway via `scripts/push-metrics.sh` at the end of each pipeline run. Visualized in `monitoring/dashboards/cicd-pipeline.json`.
 
 **Q: How does Loki help debug production issues?**
-A: Promtail DaemonSet collects all pod logs and ships them to Loki. The `pipeline-logs` dashboard shows all qa-portfolio namespace logs. The `test-failure-investigation` dashboard filters for `AssertionError|Error:|FAILED` patterns across Cypress and Newman pods — finding root cause in seconds instead of hunting `kubectl logs`.
+A: Grafana Alloy DaemonSet collects all pod logs and ships them to Loki. The `pipeline-logs` dashboard shows all qa-portfolio namespace logs. The `test-failure-investigation` dashboard filters for `AssertionError|Error:|FAILED` patterns across Cypress and Newman pods — finding root cause in seconds instead of hunting `kubectl logs`.
 
 **Q: How do you handle flaky tests in CI?**
 A: `job-cypress.yaml` and `job-newman.yaml` have `backoffLimit: 2` — the Job retries twice before marking failure. `TestJobRunningTooLong` fires if a Job exceeds 1 hour (zombie detection). Long-term flakiness is tracked via `cicd_test_total{result="failed"}` rate in the CI/CD dashboard.

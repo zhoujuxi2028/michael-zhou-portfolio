@@ -44,6 +44,14 @@ monitoring/
 │                                    # - Namespace creation
 │                                    # - Pod readiness verification
 │
+├── loki/
+│   ├── deploy-loki.sh              # Loki + Alloy deployment
+│   ├── loki-values.yaml            # SingleBinary + 7-day retention
+│   └── alloy-values.yaml           # Grafana Alloy DaemonSet (pod logs → Loki)
+│
+├── kyverno/
+│   └── servicemonitor.yaml         # Kyverno policy metrics (REQ-DVP-010)
+│
 ├── dashboards/
 │   ├── cluster-overview.json       # Kubernetes cluster health dashboard
 │   │                                # - Node count, pod count, namespaces
@@ -171,6 +179,34 @@ nodeExporter: { enabled: true }        # Per-node metrics (CPU, memory, disk)
 kubeStateMetrics: { enabled: true }    # Cluster-wide object metrics
 alertmanager: { enabled: true }        # Alert routing (future use)
 ```
+
+### loki-values.yaml (log retention)
+
+| Setting | Value | Purpose |
+|---------|-------|---------|
+| `loki.limits_config.retention_period` | `168h` | Delete logs older than 7 days |
+| `loki.compactor.retention_enabled` | `true` | Compactor applies the retention policy |
+| `loki.compactor.delete_request_store` | `filesystem` | Required when retention is enabled |
+
+Dashboard queries filter by the `container` label (`container="cypress"` / `container="newman"`), not by `job_name`.
+
+Verify after deployment:
+
+```bash
+kubectl -n monitoring exec deploy/loki -- \
+  wget -qO- http://localhost:3100/config | grep retention_period
+```
+
+### alloy-values.yaml (log collection)
+
+| Setting | Value | Purpose |
+|---------|-------|---------|
+| `controller.type` | `daemonset` | One collector per node |
+| `alloy.mounts.varlog` | `true` | Access `/var/log` for pod logs |
+| `loki.source.kubernetes` | `pods` | Tail pod logs via the Kubernetes API |
+| `loki.write` | `loki:3100` | Push to Loki |
+
+Alloy replaces Promtail, which reached EOL on 2026-03-02 (#98). Labels `namespace`, `pod`, `container`, `node` are preserved so existing dashboards keep working.
 
 ### Customization
 

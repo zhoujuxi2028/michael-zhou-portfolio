@@ -62,7 +62,7 @@
       "datasource": { "type": "loki", "uid": "loki" },
       "targets": [
         {
-          "expr": "{namespace=\"$namespace\", job_name=~\"cypress.*\"}",
+          "expr": "{namespace=\"$namespace\", container=\"cypress\"}",
           "refId": "A"
         }
       ],
@@ -81,7 +81,7 @@
       "datasource": { "type": "loki", "uid": "loki" },
       "targets": [
         {
-          "expr": "{namespace=\"$namespace\", job_name=~\"newman.*\"}",
+          "expr": "{namespace=\"$namespace\", container=\"newman\"}",
           "refId": "A"
         }
       ],

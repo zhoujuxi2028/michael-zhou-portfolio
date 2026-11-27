@@ -31,7 +31,7 @@ Local demo → k3d / Kubernetes + ArgoCD configuration + Prometheus / Grafana
 | Phase | Scope | Status |
 |-------|-------|--------|
 | Phase 1 | 全栈 DevOps 演示（CI/CD + IaC + K8s + ArgoCD + 监控） | ✅ Done |
-| Phase 2 | 告警、日志、指标（AlertManager + Loki/Promtail + Pushgateway） | ✅ Done |
+| Phase 2 | 告警、日志、指标（AlertManager + Loki/Alloy + Pushgateway） | ✅ Done |
 | Dev Container | 版本固定的容器化工具链（REQ-DVP-011） | ✅ Done |
 | Phase 3 | 本地 DevSecOps 闭环（本地 registry + Trivy→Prometheus + ArgoCD/Helm） | ✅ Done |
 
@@ -307,7 +307,7 @@ The deploy workflow hands off build artifacts and validates the release path, bu
 ```
 Rendered manifests + reviewed artifact ──→ secured cluster deployment
 Pipeline metrics ──→ reachable Pushgateway ──→ Prometheus ──→ Grafana
-Pod logs ──→ Promtail ──→ Loki ──→ Grafana log explorer
+Pod logs ──→ Grafana Alloy ──→ Loki ──→ Grafana log explorer
 Actionable alerts ──→ AlertManager ──→ configured receiver
 ```
 
