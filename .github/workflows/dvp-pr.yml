@@ -139,7 +139,7 @@ jobs:
   build:
     name: DVP / Build
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -158,8 +158,19 @@ jobs:
           load: true
           tags: qa-newman-demo:pr-${{ github.event.pull_request.number || 'manual' }}
 
-      - name: Verify built image
-        run: docker image inspect qa-newman-demo:pr-${{ github.event.pull_request.number || 'manual' }}
+      - name: Assert image contents
+        working-directory: devops-platform-demo
+        run: bash tests/test-newman-image.sh qa-newman-demo:pr-${{ github.event.pull_request.number || 'manual' }}
+
+      - name: Trivy image scan (CRITICAL gate)
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: image
+          image-ref: qa-newman-demo:pr-${{ github.event.pull_request.number || 'manual' }}
+          scanners: vuln
+          severity: CRITICAL
+          ignore-unfixed: true
+          exit-code: '1'
 
   # ---------------------------------------------------------------------------
   # Job 4: Security Scan —— 快速安全检查（npm audit + Trivy fs HIGH/CRITICAL）
