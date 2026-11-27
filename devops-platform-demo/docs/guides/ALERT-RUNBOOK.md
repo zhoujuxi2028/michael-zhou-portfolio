@@ -13,6 +13,8 @@ Triage guide for alerts fired by Prometheus AlertManager.
 | `HighMemoryPressure` | warning | [→](#highmemorypressure) |
 | `HighCPUUsage` | warning | [→](#highcpuusage) |
 | `PVCUsageHigh` | warning | [→](#pvcusagehigh) |
+| `BackupFailed` | critical | [→](#backupfailed) |
+| `BackupStale` | warning | [→](#backupstale) |
 
 ---
 
@@ -119,6 +121,35 @@ kubectl exec -n qa-portfolio <pod-name> -- df -h
 ```
 
 **Resolution:** Clean old test reports from the PVC or expand storage.
+
+---
+
+## BackupFailed
+
+**Meaning:** The latest `db-backup` run in `data-pipeline` failed (`backup_last_status == 0`).
+
+**Triage steps:**
+```bash
+kubectl --context k3d-portfolio-dev -n data-pipeline get jobs -l app.kubernetes.io/name=db-backup
+kubectl --context k3d-portfolio-dev -n data-pipeline logs job/<job-name> -c dump
+kubectl --context k3d-portfolio-dev -n data-pipeline logs job/<job-name> -c upload
+```
+
+**Common causes:** wrong DB password in Secrets Manager, LocalStack restarted (bucket lost), `host.k3d.internal` missing. See [DB-BACKUP.md](DB-BACKUP.md#排障).
+
+---
+
+## BackupStale
+
+**Meaning:** No successful backup for more than 26 hours.
+
+**Triage steps:**
+```bash
+kubectl --context k3d-portfolio-dev -n data-pipeline get cronjob db-backup   # SUSPEND / LAST SCHEDULE
+kubectl --context k3d-portfolio-dev -n monitoring get pods -l app.kubernetes.io/name=prometheus-pushgateway
+```
+
+**Common causes:** CronJob suspended or never scheduled, Pushgateway unreachable, repeated `BackupFailed`.
 
 ---
 

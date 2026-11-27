@@ -22,6 +22,15 @@ bash tests/test-alertmanager-values.sh   # 无需集群
 ./scripts/verify-secret-rotation.sh      # 需 ExternalSecret Ready
 ```
 
+## DB 备份（REQ-DVP-009）
+```bash
+bash tests/test-backup-retention.sh       # 无需集群
+bash tests/test-backup-scripts.sh         # 无需集群
+bash tests/test-db-backup-manifests.sh    # 需 kubectl + jq
+bash tests/test-backup-alerts.sh          # 需 docker（promtool）
+kubectl --context k3d-portfolio-dev apply -k data-pipeline   # 需 k3d + LocalStack + ESO，见 docs/guides/DB-BACKUP.md
+```
+
 ## Policy as Code（REQ-DVP-010）
 ```bash
 bash tests/test-helm-policy-compliance.sh   # 无需集群 / CLI

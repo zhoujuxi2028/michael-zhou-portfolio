@@ -507,6 +507,7 @@ flowchart TD
 | [TROUBLESHOOTING.md](docs/guides/TROUBLESHOOTING.md) | 故障排查手册 |
 | [SECRETS-RBAC.md](docs/guides/SECRETS-RBAC.md) | Secrets Manager + External Secrets + RBAC（REQ-DVP-006） |
 | [LOGGING-LOKI-VS-ELASTIC.md](docs/guides/LOGGING-LOKI-VS-ELASTIC.md) | Loki vs Elastic 日志栈对比（REQ-DVP-008） |
+| [DB-BACKUP.md](docs/guides/DB-BACKUP.md) | PostgreSQL 备份 / 恢复演练 / 告警（REQ-DVP-009） |
 | Azure vs GitHub Actions | 跨平台 CI/CD 对比 FAQ |
 | [MONITORING.md](monitoring/MONITORING.md) | 监控架构与仪表盘配置 |
 
