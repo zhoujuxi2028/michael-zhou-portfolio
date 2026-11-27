@@ -44,6 +44,14 @@ monitoring/
 │                                    # - Namespace creation
 │                                    # - Pod readiness verification
 │
+├── loki/
+│   ├── deploy-loki.sh              # Loki + Alloy deployment
+│   ├── loki-values.yaml            # SingleBinary + 7-day retention
+│   └── alloy-values.yaml           # Grafana Alloy DaemonSet (pod logs → Loki)
+│
+├── kyverno/
+│   └── servicemonitor.yaml         # Kyverno policy metrics (REQ-DVP-010)
+│
 ├── dashboards/
 │   ├── cluster-overview.json       # Kubernetes cluster health dashboard
 │   │                                # - Node count, pod count, namespaces
@@ -188,6 +196,17 @@ Verify after deployment:
 kubectl -n monitoring exec deploy/loki -- \
   wget -qO- http://localhost:3100/config | grep retention_period
 ```
+
+### alloy-values.yaml (log collection)
+
+| Setting | Value | Purpose |
+|---------|-------|---------|
+| `controller.type` | `daemonset` | One collector per node |
+| `alloy.mounts.varlog` | `true` | Access `/var/log` for pod logs |
+| `loki.source.kubernetes` | `pods` | Tail pod logs via the Kubernetes API |
+| `loki.write` | `loki:3100` | Push to Loki |
+
+Alloy replaces Promtail, which reached EOL on 2026-03-02 (#98). Labels `namespace`, `pod`, `container`, `node` are preserved so existing dashboards keep working.
 
 ### Customization
 

@@ -23,9 +23,15 @@ check "loki retention period 168h"     "1" "$(grep_count '^ +retention_period: 1
 check "loki compactor retention on"    "1" "$(grep_count '^ +retention_enabled: true$' "$loki")"
 check "loki delete_request_store"      "1" "$(grep_count '^ +delete_request_store: filesystem$' "$loki")"
 
-# --- Promtail no job_name extraction (#96) ---
-promtail="$ROOT/monitoring/loki/promtail-values.yaml"
-check "promtail does not extract job_name" "0" "$(grep_count 'kubernetes_labels_job_name' "$promtail")"
+# --- Alloy log collection (#98) ---
+alloy="$ROOT/monitoring/loki/alloy-values.yaml"
+check "alloy values exists"                "yes" "$([ -f "$alloy" ] && echo yes || echo no)"
+check "alloy runs as daemonset"            "1" "$(grep_count '^  type: daemonset$' "$alloy")"
+check "alloy mounts varlog"                "1" "$(grep_count 'varlog: true' "$alloy")"
+check "alloy reads pod logs"               "1" "$(grep_count 'loki.source.kubernetes' "$alloy")"
+check "alloy pushes to loki"               "1" "$(grep_count 'loki.write \"default\"' "$alloy")"
+check "deploy script installs alloy"       "1" "$(grep_count 'upgrade --install alloy' "$ROOT/monitoring/loki/deploy-loki.sh")"
+check "promtail values removed"            "0" "$([ -f "$ROOT/monitoring/loki/promtail-values.yaml" ] && echo 1 || echo 0)"
 
 # --- Dashboard Loki queries use container label (#96) ---
 for dash in test-failure-investigation pipeline-logs; do
