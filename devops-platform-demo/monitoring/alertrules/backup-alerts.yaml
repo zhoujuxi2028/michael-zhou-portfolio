@@ -1,0 +1,47 @@
+# PrometheusRule — DB 备份告警（REQ-DVP-009 FR-04 / D7）
+# 部署到 monitoring namespace，由 kube-prometheus-stack 的 Prometheus Operator 加载。
+#
+# 数据来源：data-pipeline/scripts/backup.sh 经 Pushgateway 推送（job="db_backup"，honor_labels）
+#   backup_last_status{instance}            每次运行都推：1 成功 / 0 失败
+#   backup_last_success_timestamp{instance} 仅成功时推（POST 不覆盖旧值）
+#
+# 单元测试：bash tests/test-backup-alerts.sh（promtool test rules）
+# 使用：kubectl --context k3d-portfolio-dev apply -f monitoring/alertrules/backup-alerts.yaml
+
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: qa-portfolio-backup-alerts
+  namespace: monitoring
+  labels:
+    app: kube-prometheus-stack
+    release: prometheus
+    app.kubernetes.io/part-of: qa-portfolio
+spec:
+  groups:
+    - name: db-backup
+      interval: 1m
+      rules:
+        # 最近一次运行失败（含 pg_dump / 上传 / 保留清理 / 指标推送之外的任一步骤）
+        - alert: BackupFailed
+          expr: backup_last_status{job="db_backup"} == 0
+          for: 1m
+          labels:
+            severity: critical
+            team: platform
+            project: qa-portfolio
+          annotations:
+            summary: "数据库 {{ $labels.instance }} 最近一次备份失败"
+            description: "CronJob db-backup 最近一次运行失败（backup_last_status=0）。排查见 docs/guides/DB-BACKUP.md「排障」。"
+
+        # 静默失败：CronJob 未运行 / 被挂起 / Pushgateway 不可达时 BackupFailed 不会触发
+        - alert: BackupStale
+          expr: (time() - max by (instance) (backup_last_success_timestamp{job="db_backup"})) > 93600
+          for: 10m
+          labels:
+            severity: warning
+            team: platform
+            project: qa-portfolio
+          annotations:
+            summary: "数据库 {{ $labels.instance }} 超过 26 小时无成功备份"
+            description: "最近一次成功备份已超过 26 小时（每日 02:00 UTC + 2 小时宽限）：CronJob 未调度 / 被挂起、Pushgateway 不可达或连续失败。"

@@ -1,0 +1,67 @@
+# promtool unit tests for monitoring/alertrules/backup-alerts.yaml (REQ-DVP-009 FR-04)
+# rule file is extracted from the PrometheusRule by tests/test-backup-alerts.sh
+rule_files:
+  - backup-alerts.rules.yaml
+
+evaluation_interval: 1m
+
+tests:
+  - name: BackupFailed fires after a failed run
+    interval: 1m
+    input_series:
+      - series: 'backup_last_status{job="db_backup",instance="appdb"}'
+        values: '1 1 0 0 0 0'
+    alert_rule_test:
+      - eval_time: 1m
+        alertname: BackupFailed
+        exp_alerts: []
+      - eval_time: 5m
+        alertname: BackupFailed
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: platform
+              project: qa-portfolio
+              job: db_backup
+              instance: appdb
+            exp_annotations:
+              summary: "数据库 appdb 最近一次备份失败"
+              description: "CronJob db-backup 最近一次运行失败（backup_last_status=0）。排查见 docs/guides/DB-BACKUP.md「排障」。"
+
+  - name: BackupStale fires after 26h without success
+    interval: 1m
+    input_series:
+      # last success at epoch 0, never updated again
+      - series: 'backup_last_success_timestamp{job="db_backup",instance="appdb"}'
+        values: '0x1700'
+    alert_rule_test:
+      - eval_time: 25h
+        alertname: BackupStale
+        exp_alerts: []
+      - eval_time: 27h
+        alertname: BackupStale
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: platform
+              project: qa-portfolio
+              instance: appdb
+            exp_annotations:
+              summary: "数据库 appdb 超过 26 小时无成功备份"
+              description: "最近一次成功备份已超过 26 小时（每日 02:00 UTC + 2 小时宽限）：CronJob 未调度 / 被挂起、Pushgateway 不可达或连续失败。"
+
+  - name: Healthy daily backups stay silent
+    interval: 1m
+    input_series:
+      - series: 'backup_last_status{job="db_backup",instance="appdb"}'
+        values: '1x1700'
+      # success timestamp follows wall clock (60s per sample)
+      - series: 'backup_last_success_timestamp{job="db_backup",instance="appdb"}'
+        values: '0+60x1700'
+    alert_rule_test:
+      - eval_time: 27h
+        alertname: BackupFailed
+        exp_alerts: []
+      - eval_time: 27h
+        alertname: BackupStale
+        exp_alerts: []
