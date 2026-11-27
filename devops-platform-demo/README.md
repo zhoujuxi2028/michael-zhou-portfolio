@@ -260,6 +260,7 @@ devops-platform-demo/
 | `dvp-pr.yml` | `npm audit --omit=dev` | Fail on moderate or higher dependency findings |
 | `dvp-pr.yml` | Trivy filesystem scan | Fail on HIGH or CRITICAL findings |
 | `dvp-terraform.yml` | Terraform format and validation, Trivy IaC scan | Fail on format/validation errors or HIGH/CRITICAL findings |
+| `dvp-pr.yml` | Kyverno `policy-check` | Fail when rendered manifests violate Enforce policies |
 
 These workflows do not currently upload SARIF reports or scan the built container image with Trivy.
 
@@ -272,7 +273,24 @@ Add entries to `devops-platform-demo/.trivyignore`:
 CVE-2024-12345  # false positive - not exploitable in our context | expires: 2025-06-01
 ```
 
+### Policy as Code (Kyverno)
 
+| Policy | Action | Rule |
+|--------|--------|------|
+| `disallow-latest-tag` | Deny | Images need a pinned tag or digest |
+| `require-resource-limits` | Deny | Every container (incl. init) needs cpu + memory limits |
+| `disallow-privileged` | Deny | No `privileged: true` |
+| `restrict-image-registries` | Deny | Images must match the allowlist |
+| `require-run-as-non-root` | Audit | Records `runAsNonRoot` violations |
+
+| Command | Purpose |
+|---------|---------|
+| `bash tests/test-helm-policy-compliance.sh` | Render-based assertions, no CLI needed |
+| `bash scripts/policy-check.sh all` | `kyverno test` + `apply` × 4 values + canary |
+| `./scripts/install-kyverno.sh operator/policies` | Install Kyverno and apply policies to k3d |
+| `./scripts/verify-kyverno.sh` | Admission, exclusions, PolicyReport, metrics |
+
+See [docs/guides/POLICY-AS-CODE.md](docs/guides/POLICY-AS-CODE.md) for troubleshooting and production differences.
 
 ### Current: PR Gate and Deployment Dry-Run
 
