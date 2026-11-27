@@ -94,7 +94,7 @@
 
 **Files:** Modify `docs/superpowers/specs/2026-11-26-dvp-010-kyverno-policy-design.md`（§3 决策表末尾、§4 目录树、§5 组件表“策略”“监控”行）、`devops-platform-demo/docs/requirements/REQUIREMENTS.md`（第 193–211 行）
 
-- [ ] **Step 1:** spec §3 表末尾追加 D9–D15 七行（内容同本计划“Spec 偏差”表），§4 目录树改为：
+- [x] **Step 1:** spec §3 表末尾追加 D9–D15 七行（内容同本计划“Spec 偏差”表），§4 目录树改为：
 
 ```
 policies/kyverno/
@@ -105,7 +105,7 @@ policies/kyverno-values.yaml   (Kyverno Helm values)
 ```
 
   §5 “策略”行说明改为 `ValidatingPolicy（policies.kyverno.io/v1），background 启用`；“监控”行改为 `kyverno_validating_policy_results_total{result="fail"}`。
-- [ ] **Step 2:** REQUIREMENTS FR 表替换为：
+- [x] **Step 2:** REQUIREMENTS FR 表替换为：
 
 | ID | 描述 |
 |----|------|
@@ -115,7 +115,7 @@ policies/kyverno-values.yaml   (Kyverno Helm values)
 | FR-DVP-010-04 | `kyverno_validating_policy_results_total` 经 ServiceMonitor 接入 Prometheus，Grafana “Policy Compliance” 面板 |
 
   可行性段落末尾追加：`Stage 2 发现 1.20 不再执行 ClusterPolicy → 改用 ValidatingPolicy（D9）。`
-- [ ] **Step 3:** Commit
+- [x] **Step 3:** Commit
 
 ```bash
 git add docs/superpowers/specs/2026-11-26-dvp-010-kyverno-policy-design.md devops-platform-demo/docs/requirements/REQUIREMENTS.md
@@ -130,7 +130,7 @@ git commit -m "docs(dvp): align REQ-DVP-010 design with Kyverno 1.20 ValidatingP
 
 > 设计原则：good fixture 对 5 条策略全部 pass；每个 bad fixture **只违反一条**策略，其余字段合规。
 
-- [ ] **Step 1: `tests/good/workloads.yaml`**
+- [x] **Step 1: `tests/good/workloads.yaml`**
 
 ```yaml
 # 合规样例：5 条策略全部 pass（REQ-DVP-010）
@@ -227,7 +227,7 @@ spec:
                 limits: {cpu: 500m, memory: 512Mi}
 ```
 
-- [ ] **Step 2: `tests/bad/disallow-latest-tag.yaml`**
+- [x] **Step 2: `tests/bad/disallow-latest-tag.yaml`**
 
 ```yaml
 # 仅违反 disallow-latest-tag
@@ -275,7 +275,7 @@ spec:
             limits: {cpu: 500m, memory: 512Mi}
 ```
 
-- [ ] **Step 3: `tests/bad/require-resource-limits.yaml`**
+- [x] **Step 3: `tests/bad/require-resource-limits.yaml`**
 
 ```yaml
 # 仅违反 require-resource-limits
@@ -313,7 +313,7 @@ spec:
         limits: {memory: 64Mi}
 ```
 
-- [ ] **Step 4: `tests/bad/disallow-privileged.yaml`**
+- [x] **Step 4: `tests/bad/disallow-privileged.yaml`**
 
 ```yaml
 # 仅违反 disallow-privileged
@@ -357,7 +357,7 @@ spec:
         limits: {cpu: 100m, memory: 64Mi}
 ```
 
-- [ ] **Step 5: `tests/bad/restrict-image-registries.yaml`**
+- [x] **Step 5: `tests/bad/restrict-image-registries.yaml`**
 
 ```yaml
 # 仅违反 restrict-image-registries
@@ -403,7 +403,7 @@ spec:
         limits: {cpu: 100m, memory: 64Mi}
 ```
 
-- [ ] **Step 6: `tests/bad/require-run-as-non-root.yaml`**
+- [x] **Step 6: `tests/bad/require-run-as-non-root.yaml`**
 
 ```yaml
 # 仅违反 require-run-as-non-root（Audit）
@@ -435,7 +435,7 @@ spec:
         limits: {cpu: 100m, memory: 64Mi}
 ```
 
-- [ ] **Step 7: `tests/kyverno-test.yaml`**
+- [x] **Step 7: `tests/kyverno-test.yaml`**
 
 ```yaml
 # kyverno test policies/kyverno/tests（REQ-DVP-010）
@@ -493,11 +493,11 @@ results:
   - {policy: require-run-as-non-root, isValidatingPolicy: true, kind: Pod, resources: [bad-run-as-root, bad-run-as-root-override], result: fail}
 ```
 
-- [ ] **Step 8: 确认失败（策略文件不存在）**
+- [x] **Step 8: 确认失败（策略文件不存在）**
 
 Run (kyverno): `kyverno test policies/kyverno/tests`
 Expected: 非 0 退出，报错找不到 `../enforce/disallow-latest-tag.yaml`
-- [ ] **Step 9:** Commit `test(dvp): add Kyverno policy fixtures and expected results`
+- [x] **Step 9:** Commit `test(dvp): add Kyverno policy fixtures and expected results`
 
 ---
 
@@ -507,7 +507,7 @@ Expected: 非 0 退出，报错找不到 `../enforce/disallow-latest-tag.yaml`
 
 > 公共结构：显式匹配 Pod 与各控制器，`variables.podSpec` 统一取 PodSpec，`autogen` 关闭以免重复规则；`object.kind`（而非 `request.kind`）使 admission / 后台扫描 / CLI 行为一致。`failurePolicy: Ignore` 仅影响 CEL 执行错误，`validations` 为 false 时始终按 `Deny` 处理。
 
-- [ ] **Step 1: `disallow-latest-tag.yaml`**
+- [x] **Step 1: `disallow-latest-tag.yaml`**
 
 ```yaml
 # 禁止 latest / 无 tag 镜像（REQ-DVP-010，Deny）
@@ -560,7 +560,7 @@ spec:
       message: "[disallow-latest-tag] every container image must use a pinned tag or digest (no ':latest', no missing tag)"
 ```
 
-- [ ] **Step 2: `require-resource-limits.yaml`**（公共部分与 Step 1 相同，完整文件如下）
+- [x] **Step 2: `require-resource-limits.yaml`**（公共部分与 Step 1 相同，完整文件如下）
 
 ```yaml
 # 必须设置 cpu + memory limits（含 init 容器）（REQ-DVP-010，Deny）
@@ -612,7 +612,7 @@ spec:
       message: "[require-resource-limits] every container (including init containers) must set resources.limits.cpu and resources.limits.memory"
 ```
 
-- [ ] **Step 3: `disallow-privileged.yaml`**
+- [x] **Step 3: `disallow-privileged.yaml`**
 
 ```yaml
 # 禁止 privileged 容器（REQ-DVP-010，Deny）
@@ -664,7 +664,7 @@ spec:
       message: "[disallow-privileged] privileged containers are not allowed"
 ```
 
-- [ ] **Step 4: `restrict-image-registries.yaml`**（`variables` 追加 `allowedImages`）
+- [x] **Step 4: `restrict-image-registries.yaml`**（`variables` 追加 `allowedImages`）
 
 ```yaml
 # 镜像仓库白名单（REQ-DVP-010，Deny）
@@ -725,13 +725,13 @@ spec:
       message: "[restrict-image-registries] image registry/repository is not in the allowlist (see docs/guides/POLICY-AS-CODE.md)"
 ```
 
-- [ ] **Step 5: 运行测试**
+- [x] **Step 5: 运行测试**
 
 Run (kyverno): `kyverno test policies/kyverno/tests`
 Expected: 仍非 0 —— `../audit/require-run-as-non-root.yaml` 不存在（Task 4 变绿）。可临时用 `kyverno apply policies/kyverno/enforce --resource policies/kyverno/tests/bad/disallow-latest-tag.yaml` 确认 3 个 fail，`--resource policies/kyverno/tests/good/workloads.yaml` 确认 `fail: 0, error: 0`
 
-- [ ] **Step 6: 自检 CEL 编译** —— 若 Step 5 出现 `error`（而非 `fail`）结果：用 `kyverno apply policies/kyverno/enforce --resource policies/kyverno/tests/good/workloads.yaml --explain` 定位表达式；修正后重跑。**不得**通过放宽 fixture 让测试通过。
-- [ ] **Step 7:** Commit `feat(dvp): add Kyverno enforce policies for tags, limits, privileged, registries`
+- [x] **Step 6: 自检 CEL 编译** —— 若 Step 5 出现 `error`（而非 `fail`）结果：用 `kyverno apply policies/kyverno/enforce --resource policies/kyverno/tests/good/workloads.yaml --explain` 定位表达式；修正后重跑。**不得**通过放宽 fixture 让测试通过。
+- [x] **Step 7:** Commit `feat(dvp): add Kyverno enforce policies for tags, limits, privileged, registries`
 
 ---
 
@@ -739,7 +739,7 @@ Expected: 仍非 0 —— `../audit/require-run-as-non-root.yaml` 不存在（Ta
 
 **Files:** Create `policies/kyverno/audit/require-run-as-non-root.yaml`
 
-- [ ] **Step 1: 写策略**（公共部分与 Task 3 相同，`validationActions: [Audit]`）
+- [x] **Step 1: 写策略**（公共部分与 Task 3 相同，`validationActions: [Audit]`）
 
 ```yaml
 # runAsNonRoot（REQ-DVP-010，Audit：cypress / nginx 现以 root 运行，D4）
@@ -795,10 +795,10 @@ spec:
       message: "[require-run-as-non-root] containers should set runAsNonRoot: true (audit only)"
 ```
 
-- [ ] **Step 2:** Run (kyverno): `kyverno test policies/kyverno/tests`
+- [x] **Step 2:** Run (kyverno): `kyverno test policies/kyverno/tests`
 Expected: `Test Summary: 37 tests passed and 0 tests failed`，exit 0
-- [ ] **Step 3: 反证（证明测试不是“永远通过”）** —— 临时把 `good/workloads.yaml` 中 `good-pod` 的镜像改为 `nginx:latest`，重跑 → 期望 `disallow-latest-tag` 的 `good-pod` 条目 FAIL、exit 非 0；`git checkout -- policies/kyverno/tests/good/workloads.yaml` 还原
-- [ ] **Step 4:** Commit `feat(dvp): add runAsNonRoot audit policy`
+- [x] **Step 3: 反证（证明测试不是“永远通过”）** —— 临时把 `good/workloads.yaml` 中 `good-pod` 的镜像改为 `nginx:latest`，重跑 → 期望 `disallow-latest-tag` 的 `good-pod` 条目 FAIL、exit 非 0；`git checkout -- policies/kyverno/tests/good/workloads.yaml` 还原
+- [x] **Step 4:** Commit `feat(dvp): add runAsNonRoot audit policy`
 
 ---
 
@@ -806,7 +806,7 @@ Expected: `Test Summary: 37 tests passed and 0 tests failed`，exit 0
 
 **Files:** Create `tests/test-helm-policy-compliance.sh`；Modify `helm/qa-portfolio/values.yaml`、`templates/job-cypress.yaml`、`templates/job-newman.yaml`
 
-- [ ] **Step 1: 写测试 `tests/test-helm-policy-compliance.sh`**
+- [x] **Step 1: 写测试 `tests/test-helm-policy-compliance.sh`**
 
 ```bash
 #!/usr/bin/env bash
@@ -863,11 +863,11 @@ echo "passed=$passed failed=$failed"
 [ "$failed" -eq 0 ]
 ```
 
-- [ ] **Step 2: 确认失败**
+- [x] **Step 2: 确认失败**
 
 Run: `bash tests/test-helm-policy-compliance.sh`
 Expected: 每个 env 的 `every container has cpu+memory limits` FAIL（want 5, got 3）与 `no :latest image` FAIL；其余 PASS；`passed=16 failed=8`
-- [ ] **Step 3: values.yaml**（`# --- Newman Job ---` 之前插入）
+- [x] **Step 3: values.yaml**（`# --- Newman Job ---` 之前插入）
 
 ```yaml
 # --- Init Containers（busybox 目录准备）---
@@ -882,15 +882,15 @@ initContainer:
       cpu: "50m"
 ```
 
-- [ ] **Step 4: 模板** —— `job-cypress.yaml` 的 `prepare-results-dir`、`job-newman.yaml` 的 `prepare-reports-dir` 均在 `volumeMounts:` 之前插入：
+- [x] **Step 4: 模板** —— `job-cypress.yaml` 的 `prepare-results-dir`、`job-newman.yaml` 的 `prepare-reports-dir` 均在 `volumeMounts:` 之前插入：
 
 ```yaml
           resources:
             {{- toYaml .Values.initContainer.resources | nindent 12 }}
 ```
 
-- [ ] **Step 5:** Run: `bash tests/test-helm-policy-compliance.sh` → 仅 4 个 `no :latest image` FAIL（`passed=20 failed=4`，Task 6 修复）；`bash tests/test-helm-secrets-rbac.sh` → `failed=0`；`helm lint helm/qa-portfolio` → `0 chart(s) failed`
-- [ ] **Step 6:** Commit `fix(dvp): set resource limits on chart init containers`
+- [x] **Step 5:** Run: `bash tests/test-helm-policy-compliance.sh` → 仅 4 个 `no :latest image` FAIL（`passed=20 failed=4`，Task 6 修复）；`bash tests/test-helm-secrets-rbac.sh` → `failed=0`；`helm lint helm/qa-portfolio` → `0 chart(s) failed`
+- [x] **Step 6:** Commit `fix(dvp): set resource limits on chart init containers`
 
 ---
 
@@ -907,11 +907,11 @@ initContainer:
 
 **Files:** Modify `helm/qa-portfolio/values.yaml`、`values-registry.yaml`、`docs/guides/LOCAL-DEVSECOPS.md:81`
 
-- [ ] **Step 1:** 与 013 owner 确认：013 的构建/推送命令产出上述两个 tag（013 计划 Task 7 Step 2 的 `k3d image import qa-newman-demo:latest` 需改为 `:6.2.3-node26`）
-- [ ] **Step 2:** `values.yaml` `newman.image.tag: "6.2.3-node26"`，上一行加注释 `# 固定版本（REQ-DVP-010 禁止 latest）；与 Dockerfile.newman 的 newman / Node 版本同步`；`values-registry.yaml` 同样改为 `tag: "6.2.3-node26"`
-- [ ] **Step 3:** `LOCAL-DEVSECOPS.md` 兜底行改为 `` `qa-newman-demo:6.2.3-node26` + `pullPolicy: Never` ``
-- [ ] **Step 4:** Run: `bash tests/test-helm-policy-compliance.sh` → `passed=24 failed=0`
-- [ ] **Step 5:** Commit `fix(dvp): pin newman image tag to 6.2.3-node26`
+- [x] **Step 1:** 与 013 owner 确认：013 的构建/推送命令产出上述两个 tag（013 计划 Task 7 Step 2 的 `k3d image import qa-newman-demo:latest` 需改为 `:6.2.3-node26`）
+- [x] **Step 2:** `values.yaml` `newman.image.tag: "6.2.3-node26"`，上一行加注释 `# 固定版本（REQ-DVP-010 禁止 latest）；与 Dockerfile.newman 的 newman / Node 版本同步`；`values-registry.yaml` 同样改为 `tag: "6.2.3-node26"`
+- [x] **Step 3:** `LOCAL-DEVSECOPS.md` 兜底行改为 `` `qa-newman-demo:6.2.3-node26` + `pullPolicy: Never` ``
+- [x] **Step 4:** Run: `bash tests/test-helm-policy-compliance.sh` → `passed=24 failed=0`
+- [x] **Step 5:** Commit `fix(dvp): pin newman image tag to 6.2.3-node26`
 
 ---
 
@@ -919,7 +919,7 @@ initContainer:
 
 **Files:** Create `scripts/policy-check.sh`
 
-- [ ] **Step 1: 写脚本**
+- [x] **Step 1: 写脚本**
 
 ```bash
 #!/usr/bin/env bash
@@ -1006,14 +1006,14 @@ case "${1:-}" in
 esac
 ```
 
-- [ ] **Step 2:** `chmod +x scripts/policy-check.sh && shellcheck scripts/policy-check.sh` → 无输出
-- [ ] **Step 3: 红（Task 6 之前运行）** —— Run (kyverno): `bash scripts/policy-check.sh apply`
+- [x] **Step 2:** `chmod +x scripts/policy-check.sh && shellcheck scripts/policy-check.sh` → 无输出
+- [x] **Step 3: 红（Task 6 之前运行）** —— Run (kyverno): `bash scripts/policy-check.sh apply`
 Expected: 第一个 env 即 exit 1，输出含 `disallow-latest-tag` 与 `qa-portfolio-newman`
-- [ ] **Step 4: 绿（Task 6 之后）** —— Run (kyverno): `bash scripts/policy-check.sh all`
+- [x] **Step 4: 绿（Task 6 之后）** —— Run (kyverno): `bash scripts/policy-check.sh all`
 Expected: `test` 37/37；4 个 env 均 `fail: 0, error: 0`（pass 12 = 3 工作负载 × 4 策略）；3 个 `PASS canary`
-- [ ] **Step 5: 若 Step 3/4 因 CRD 类型（`SecretStore` / `ExternalSecret`）报资源加载错误** —— 将 `render` 改为仅渲染工作负载模板：追加 `--show-only templates/deployment.yaml --show-only templates/job-cypress.yaml --show-only templates/job-newman.yaml`（Task 5 的 “3 workloads rendered” 断言保证新增工作负载模板时同步更新），并在脚本注释记录原因
-- [ ] **Step 6: 若 canary 输出不含策略名** —— 给 `apply_enforce` 加 `--detailed-results` 后重跑；仍不含则改为 grep 策略 message 前缀 `[<policy>]`
-- [ ] **Step 7:** Commit `feat(dvp): add Kyverno policy-check script with canary self-test`
+- [x] **Step 5: 若 Step 3/4 因 CRD 类型（`SecretStore` / `ExternalSecret`）报资源加载错误** —— 将 `render` 改为仅渲染工作负载模板：追加 `--show-only templates/deployment.yaml --show-only templates/job-cypress.yaml --show-only templates/job-newman.yaml`（Task 5 的 “3 workloads rendered” 断言保证新增工作负载模板时同步更新），并在脚本注释记录原因
+- [x] **Step 6: 若 canary 输出不含策略名** —— 给 `apply_enforce` 加 `--detailed-results` 后重跑；仍不含则改为 grep 策略 message 前缀 `[<policy>]`
+- [x] **Step 7:** Commit `feat(dvp): add Kyverno policy-check script with canary self-test`
 
 ---
 
@@ -1021,7 +1021,7 @@ Expected: `test` 37/37；4 个 env 均 `fail: 0, error: 0`（pass 12 = 3 工作�
 
 **Files:** Modify `.github/workflows/dvp-pr.yml`、`devops-platform-demo/.devcontainer/verify-tools.sh`、`devops-platform-demo/.devcontainer/tests/test-verify-tools.sh`
 
-- [ ] **Step 1: drift 测试（先红）** —— `test-verify-tools.sh` 在 `assert_exit "drift: real repository"` 之前追加：
+- [x] **Step 1: drift 测试（先红）** —— `test-verify-tools.sh` 在 `assert_exit "drift: real repository"` 之前追加：
 
 ```bash
 K_PIN='      - uses: kyverno/action-install-cli@fcee92fca5c883169ef9927acf543e0b5fc58289 # v0.2.0
@@ -1037,7 +1037,7 @@ assert_exit "drift: kyverno release pin drifts" 1 drift \
 ```
 
   Run: `bash .devcontainer/tests/test-verify-tools.sh` → `drift: kyverno release pin drifts` FAIL（exit 0, want 1）
-- [ ] **Step 2: drift 实现** —— `verify-tools.sh` `check_drift()` 末尾（helm 段之后）追加：
+- [x] **Step 2: drift 实现** —— `verify-tools.sh` `check_drift()` 末尾（helm 段之后）追加：
 
 ```bash
   # kyverno: 'release:' within each 'uses: kyverno/action-install-cli' step（无该 action 时不报错）
@@ -1047,7 +1047,7 @@ assert_exit "drift: kyverno release pin drifts" 1 drift \
 ```
 
   Run: `bash .devcontainer/tests/test-verify-tools.sh` → `failed=0`
-- [ ] **Step 3: workflow job** —— `dvp-pr.yml` 在 `security-scan` job 之后插入：
+- [x] **Step 3: workflow job** —— `dvp-pr.yml` 在 `security-scan` job 之后插入：
 
 ```yaml
   # ---------------------------------------------------------------------------
@@ -1094,9 +1094,9 @@ assert_exit "drift: kyverno release pin drifts" 1 drift \
         run: bash scripts/policy-check.sh canary
 ```
 
-- [ ] **Step 4: pr-gate / push-metrics** —— 两个 job 的 `needs` 均加入 `policy-check`（放在 `security-scan` 之后）；pr-gate 汇总处加 `echo "Policy check:  ${{ needs.policy-check.result }}"`，`for result in` 列表加 `"${{ needs.policy-check.result }}" \`
-- [ ] **Step 5:** `actionlint .github/workflows/dvp-pr.yml` 无输出；`bash .devcontainer/verify-tools.sh --drift` 全部 ✅（含 `kyverno release expected=v1.20.0 actual=v1.20.0`）
-- [ ] **Step 6:** Commit `ci(dvp): gate PRs on Kyverno policy checks`
+- [x] **Step 4: pr-gate / push-metrics** —— 两个 job 的 `needs` 均加入 `policy-check`（放在 `security-scan` 之后）；pr-gate 汇总处加 `echo "Policy check:  ${{ needs.policy-check.result }}"`，`for result in` 列表加 `"${{ needs.policy-check.result }}" \`
+- [x] **Step 5:** `actionlint .github/workflows/dvp-pr.yml` 无输出；`bash .devcontainer/verify-tools.sh --drift` 全部 ✅（含 `kyverno release expected=v1.20.0 actual=v1.20.0`）
+- [x] **Step 6:** Commit `ci(dvp): gate PRs on Kyverno policy checks`
 
 ---
 
@@ -1104,7 +1104,7 @@ assert_exit "drift: kyverno release pin drifts" 1 drift \
 
 **Files:** Create `policies/kyverno-values.yaml`、`tests/test-kyverno-config.sh`、`scripts/install-kyverno.sh`；Modify `.github/workflows/dvp-pr.yml`
 
-- [ ] **Step 1: 写测试 `tests/test-kyverno-config.sh`（values 段；ServiceMonitor / 面板段在 Task 11 追加）**
+- [x] **Step 1: 写测试 `tests/test-kyverno-config.sh`（values 段；ServiceMonitor / 面板段在 Task 11 追加）**
 
 ```bash
 #!/usr/bin/env bash
@@ -1154,7 +1154,7 @@ echo "passed=$passed failed=$failed"
 ```
 
   Run: `bash tests/test-kyverno-config.sh` → 报错 `policies/kyverno-values.yaml: no such file`（红）
-- [ ] **Step 2: `policies/kyverno-values.yaml`**
+- [x] **Step 2: `policies/kyverno-values.yaml`**
 
 ```yaml
 # Kyverno Helm values — k3d demo（REQ-DVP-010）
@@ -1209,7 +1209,7 @@ upgrade:
     enabled: false
 ```
 
-- [ ] **Step 3:** Run: `bash tests/test-kyverno-config.sh` → `failed=0`；并在 `dvp-pr.yml` `policy-check` job 的 `Helm render compliance tests` 之后加入：
+- [x] **Step 3:** Run: `bash tests/test-kyverno-config.sh` → `failed=0`；并在 `dvp-pr.yml` `policy-check` job 的 `Helm render compliance tests` 之后加入：
 
 ```yaml
       - name: Kyverno config tests (values / ServiceMonitor / dashboard)
@@ -1217,7 +1217,7 @@ upgrade:
 ```
 
   `actionlint .github/workflows/dvp-pr.yml` 无输出。若 `forceFailurePolicyIgnore=true` 断言失败：`grep -n -i failurepolicy` 渲染结果确认 1.20 的实际参数名并更新断言（不得删除断言）
-- [ ] **Step 4: `scripts/install-kyverno.sh`**
+- [x] **Step 4: `scripts/install-kyverno.sh`**
 
 ```bash
 #!/usr/bin/env bash
@@ -1317,8 +1317,8 @@ case "${1:-}" in
 esac
 ```
 
-- [ ] **Step 5:** `chmod +x scripts/install-kyverno.sh && shellcheck scripts/install-kyverno.sh` → 无输出；`bash scripts/install-kyverno.sh` → 打印 usage，exit 2
-- [ ] **Step 6:** Commit `feat(dvp): add Kyverno install values and script`（含 `dvp-pr.yml` 新 step）
+- [x] **Step 5:** `chmod +x scripts/install-kyverno.sh && shellcheck scripts/install-kyverno.sh` → 无输出；`bash scripts/install-kyverno.sh` → 打印 usage，exit 2
+- [x] **Step 6:** Commit `feat(dvp): add Kyverno install values and script`（含 `dvp-pr.yml` 新 step）
 
 ---
 
@@ -1330,7 +1330,7 @@ esac
 
 **Files:** Create `scripts/verify-kyverno.sh`
 
-- [ ] **Step 1: 写验证脚本**
+- [x] **Step 1: 写验证脚本**
 
 ```bash
 #!/usr/bin/env bash
@@ -1502,9 +1502,9 @@ echo "passed=$passed failed=$failed"
 [ "$failed" -eq 0 ]
 ```
 
-- [ ] **Step 2:** `chmod +x scripts/verify-kyverno.sh && shellcheck scripts/verify-kyverno.sh` → 无输出
-- [ ] **Step 3: 红（Kyverno 未安装）** —— Run: `./scripts/verify-kyverno.sh` → `ERROR Kyverno not installed ...`，exit 2
-- [ ] **Step 4: 安装** —— 确认集群可用：`k3d cluster list`、`kubectl --context k3d-portfolio-dev get nodes`（NotReady → `k3d cluster stop portfolio-dev && k3d cluster start portfolio-dev`）；然后
+- [x] **Step 2:** `chmod +x scripts/verify-kyverno.sh && shellcheck scripts/verify-kyverno.sh` → 无输出
+- [x] **Step 3: 红（Kyverno 未安装）** —— Run: `./scripts/verify-kyverno.sh` → `ERROR Kyverno not installed ...`，exit 2
+- [x] **Step 4: 安装** —— 确认集群可用：`k3d cluster list`、`kubectl --context k3d-portfolio-dev get nodes`（NotReady → `k3d cluster stop portfolio-dev && k3d cluster start portfolio-dev`）；然后
 
 ```bash
 ./scripts/install-kyverno.sh operator
@@ -1512,9 +1512,9 @@ echo "passed=$passed failed=$failed"
 kubectl --context k3d-portfolio-dev -n kyverno top pods
 ```
 Expected: 2 个 Pod Running（admission / reports）；5 条 policy `READY=true`；`top` 内存合计 < 576Mi（记录实测值）。镜像拉取慢（reg.kyverno.io）时 `--timeout 10m` 内完成；超时则重跑 `operator`。
-- [ ] **Step 5: 绿** —— Run: `./scripts/verify-kyverno.sh`
+- [x] **Step 5: 绿** —— Run: `./scripts/verify-kyverno.sh`
 Expected: `failed=0`。若 `metric ... not found`：`kubectl --context k3d-portfolio-dev get --raw /api/v1/namespaces/kyverno/services/kyverno-reports-controller-metrics:8000/proxy/metrics | grep -i validating_policy` 确认实际指标名 / 标签，同步修改本脚本、Task 11 面板与 spec D14（不得删除检查）
-- [ ] **Step 6:** 将 Step 4/5 输出（内存实测、PASS 列表）记入 PR 描述草稿；Commit `feat(dvp): add Kyverno cluster verification script`
+- [x] **Step 6:** 将 Step 4/5 输出（内存实测、PASS 列表）记入 PR 描述草稿；Commit `feat(dvp): add Kyverno cluster verification script`
 
 ---
 
@@ -1524,7 +1524,7 @@ Expected: `failed=0`。若 `metric ... not found`：`kubectl --context k3d-portf
 
 **Files:** Create `monitoring/kyverno/servicemonitor.yaml`、`monitoring/dashboards/policy-compliance.json`；Modify `tests/test-kyverno-config.sh`
 
-- [ ] **Step 1: 测试（先红）** —— `tests/test-kyverno-config.sh` 在 `echo "---"` 之前追加：
+- [x] **Step 1: 测试（先红）** —— `tests/test-kyverno-config.sh` 在 `echo "---"` 之前追加：
 
 ```bash
 # --- ServiceMonitor ---
@@ -1551,7 +1551,7 @@ print(0 if exprs and all("kyverno_validating_policy_results_total" in e for e in
 ```
 
   Run: `bash tests/test-kyverno-config.sh` → ServiceMonitor / dashboard 断言 FAIL
-- [ ] **Step 2: `monitoring/kyverno/servicemonitor.yaml`**
+- [x] **Step 2: `monitoring/kyverno/servicemonitor.yaml`**
 
 ```yaml
 # ServiceMonitor — Kyverno 策略结果指标（REQ-DVP-010）
@@ -1584,7 +1584,7 @@ spec:
       scrapeTimeout: 25s
 ```
 
-- [ ] **Step 3: `monitoring/dashboards/policy-compliance.json`**
+- [x] **Step 3: `monitoring/dashboards/policy-compliance.json`**
 
 ```json
 {
@@ -1695,8 +1695,8 @@ spec:
 }
 ```
 
-- [ ] **Step 4:** Run: `bash tests/test-kyverno-config.sh` → `failed=0`
-- [ ] **Step 5: 集群验证（串行）**
+- [x] **Step 4:** Run: `bash tests/test-kyverno-config.sh` → `failed=0`
+- [x] **Step 5: 集群验证（串行）**
 
 ```bash
 ./monitoring/deploy-monitoring.sh          # 若 monitoring 未安装
@@ -1707,7 +1707,7 @@ kubectl --context k3d-portfolio-dev get --raw \
   '/api/v1/namespaces/monitoring/services/prometheus-kube-prometheus-prometheus:9090/proxy/api/v1/query?query=sum(kyverno_validating_policy_results_total%7Bresult%3D%22fail%22%7D)'
 ```
 Expected: 返回 JSON `"result":[{...,"value":[<ts>,"<n>"]}]` 且 n > 0；Prometheus Targets 页 `serviceMonitor/kyverno/kyverno/0` 2 个 target UP；Grafana `http://localhost:3000/d/policy-compliance`（`kubectl --context k3d-portfolio-dev -n monitoring port-forward svc/prometheus-grafana 3000:80`）“Audit 违规（累计）” > 0 → 截图存 PR
-- [ ] **Step 6:** Commit `feat(dvp): add Kyverno ServiceMonitor and policy compliance dashboard`
+- [x] **Step 6:** Commit `feat(dvp): add Kyverno ServiceMonitor and policy compliance dashboard`
 
 ---
 
@@ -1715,7 +1715,7 @@ Expected: 返回 JSON `"result":[{...,"value":[<ts>,"<n>"]}]` 且 n > 0；Promet
 
 **Files:** Create `devops-platform-demo/docs/guides/POLICY-AS-CODE.md`；Modify `devops-platform-demo/CLAUDE.md`
 
-- [ ] **Step 1: `POLICY-AS-CODE.md`**（章节与要点，全部用表格）
+- [x] **Step 1: `POLICY-AS-CODE.md`**（章节与要点，全部用表格）
 
 | 章节 | 内容 |
 |------|------|
@@ -1728,7 +1728,7 @@ Expected: 返回 JSON `"result":[{...,"value":[<ts>,"<n>"]}]` 且 n > 0；Promet
 | 7. 生产差异 | admission 3 副本 + PDB；`forceFailurePolicyIgnore=false` 与策略 `failurePolicy: Fail`；镜像签名校验（ImageValidatingPolicy）；Policy Reporter；runAsNonRoot 改 Deny |
 | 8. 版本说明 | Kyverno 1.20 不再执行 `ClusterPolicy`（D9）；`--audit-warn` 对 VPOL 无效（D10） |
 
-- [ ] **Step 2: CLAUDE.md** —— 在 “Secrets & RBAC” 段后追加：
+- [x] **Step 2: CLAUDE.md** —— 在 “Secrets & RBAC” 段后追加：
 
 ````markdown
 ## Policy as Code（REQ-DVP-010）
@@ -1742,7 +1742,7 @@ bash scripts/policy-check.sh all            # 需 kyverno CLI（Dev Container / 
 ```
 ````
 
-- [ ] **Step 3:** Commit `docs(dvp): add policy-as-code guide`
+- [x] **Step 3:** Commit `docs(dvp): add policy-as-code guide`
 
 ---
 
@@ -1761,10 +1761,10 @@ bash scripts/policy-check.sh all            # 需 kyverno CLI（Dev Container / 
 
 ## Stage 4 / 5
 
-| 阶段 | 内容 |
-|------|------|
-| 4 | push `feature/dvp-010-kyverno`，开 PR，CI 全绿（需 013 已合入，见 Task 6）；另开临时分支（基于本分支）将 `newman.image.tag` 改为 `latest`，确认 `DVP / Policy Check (Kyverno)` 失败后关闭该 PR，记录 run 链接 |
-| 5 | REQUIREMENTS / INDEX 标 Done、勾验收；README（devops-platform-demo）加 Policy as Code 小节；更新 memory |
+| 阶段 | 内容 | 状态 |
+|------|------|------|
+| 4 | push `feature/dvp-010-kyverno`，开 PR，CI 全绿（需 013 已合入，见 Task 6）；另开临时分支（基于本分支）将 `newman.image.tag` 改为 `latest`，确认 `DVP / Policy Check (Kyverno)` 失败后关闭该 PR，记录 run 链接 | ✅ PR #101，19/19 checks pass；canary 由 CI 每轮注入，未单独开违规 PR |
+| 5 | REQUIREMENTS / INDEX 标 Done、勾验收；README（devops-platform-demo）加 Policy as Code 小节；更新 memory | ✅ |
 
 ## 待决问题 / 假设
 
