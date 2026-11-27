@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Fake wget (Pushgateway): appends "URL <url>" + posted body to $FAKE_METRICS. FAKE_WGET_FAIL=1 → HTTP 500.
+set -euo pipefail
+echo "wget $*" >> "$FAKE_LOG"
+file="" url=""
+for a in "$@"; do
+  case "$a" in
+    --post-file=*) file=${a#--post-file=} ;;
+    http://*|https://*) url=$a ;;
+  esac
+done
+if [ -n "${FAKE_WGET_FAIL:-}" ]; then
+  echo "wget: server returned error: HTTP/1.1 500 Internal Server Error" >&2
+  exit 1
+fi
+{ echo "URL $url"; cat "$file"; } >> "$FAKE_METRICS"

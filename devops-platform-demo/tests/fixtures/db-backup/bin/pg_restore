@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Fake pg_restore. FAKE_PG_RESTORE_FAIL=1 → error.
+set -euo pipefail
+echo "pg_restore $*" >> "$FAKE_LOG"
+if [ -n "${FAKE_PG_RESTORE_FAIL:-}" ]; then
+  echo 'pg_restore: error: could not execute query: ERROR:  relation "customers" already exists' >&2
+  exit 1
+fi

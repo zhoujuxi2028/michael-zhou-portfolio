@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Fake psql: answers the table-count query with $FAKE_COUNTS. FAKE_PSQL_FAIL=1 → error.
+set -euo pipefail
+echo "psql $*" >> "$FAKE_LOG"
+if [ -n "${FAKE_PSQL_FAIL:-}" ]; then
+  echo 'psql: error: connection to server failed' >&2
+  exit 2
+fi
+cat "$FAKE_COUNTS"
