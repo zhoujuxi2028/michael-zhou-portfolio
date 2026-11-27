@@ -1,0 +1,5 @@
+# AWS CLI config for LocalStack (REQ-DVP-009): path-style S3 addressing.
+# Real AWS: drop AWS_CONFIG_FILE / AWS_ENDPOINT_URL from db-backup-config.
+[default]
+s3 =
+  addressing_style = path
