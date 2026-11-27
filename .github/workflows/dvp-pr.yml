@@ -65,7 +65,7 @@ jobs:
   unit-tests:
     name: DVP / Unit Tests
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -114,6 +114,22 @@ jobs:
       - name: Alertmanager values tests
         run: bash tests/test-alertmanager-values.sh
 
+      - name: DB backup script tests (REQ-DVP-009)
+        run: |
+          bash tests/test-backup-retention.sh
+          bash tests/test-backup-scripts.sh
+
+      - name: DB backup script tests in postgres:16-alpine (busybox userland)
+        run: |
+          docker run --rm --user "$(id -u):$(id -g)" -v "$PWD:/w" -w /w postgres:16-alpine \
+            bash tests/test-backup-scripts.sh
+
+      - name: Data pipeline render tests (kustomize + dashboard)
+        run: bash tests/test-db-backup-manifests.sh
+
+      - name: Backup alert rule tests (promtool)
+        run: bash tests/test-backup-alerts.sh
+
       - name: Helm template render (dev values)
         run: helm template qa-portfolio helm/qa-portfolio > /tmp/helm-rendered.yaml
 
@@ -133,8 +149,10 @@ jobs:
 
       - name: Validate rendered Helm output
         run: |
+          kubectl kustomize data-pipeline > /tmp/data-pipeline.yaml
           /tmp/kubeconform -summary -ignore-missing-schemas -skip Ingress \
-            /tmp/helm-rendered.yaml /tmp/helm-rendered-registry.yaml monitoring/eso/
+            /tmp/helm-rendered.yaml /tmp/helm-rendered-registry.yaml monitoring/eso/ \
+            /tmp/data-pipeline.yaml monitoring/pushgateway/pushgateway-lite.yaml
 
   # ---------------------------------------------------------------------------
   # Job 3: Build —— Docker image 构建（不 push）
