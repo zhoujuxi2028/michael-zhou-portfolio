@@ -99,6 +99,18 @@ docker run --rm \
 
 已知风险：`@faker-js/faker` 5.5.3（HIGH，CVE-2026-73231）。修复版 10.x 跨 5 个大版本，Newman `$random*` 动态变量依赖其 5.x API，暂不升级。
 
+验证（2026-11-27）：
+
+| 项 | 命令 | 结果 |
+|----|------|------|
+| 镜像断言 | `bash tests/test-newman-image.sh` | 8/8 PASS |
+| Trivy | `trivy image --severity CRITICAL --ignore-unfixed --exit-code 1` | CRITICAL 0，HIGH 1（faker） |
+| 容器功能 | `docker run ... newman run postman/api-collection.json` | 7 请求 / 18 断言 / 0 失败，HTML + JUnit 生成 |
+| docker compose | `docker compose build newman && docker compose run --rm newman` | 0 失败，`newman/api-report.html`、`junit.xml` 生成 |
+| Helm (k3d) | `helm install ... --set cypress.enabled=false` + `kubectl wait --for=condition=complete job` | Job Complete，18 断言 0 失败 |
+
+> 本地 Trivy DB 使用 2026-11-25 缓存（镜像源网络受限时 `--skip-db-update`）；CI 每次拉取最新 DB。
+
 ### 4. Trivy IaC Scan
 
 Scans Infrastructure as Code for security misconfigurations.
