@@ -48,7 +48,7 @@
 | `REQ-DVP-010` | OPA/Kyverno 策略即代码 | FR | P3 | 90% | 013 | 🔲 Planned（设计已评审） |
 | `REQ-DVP-011` | Dev Container 标准化开发环境 | NFR | P1 | 95% | — | ✅ Done |
 | `REQ-DVP-012` | Node 26 LTS 升级 + Cypress 16 修复 + PR 门禁 E2E | NFR | P1 | 100% | 011 | ✅ Done（PR #87） |
-| `REQ-DVP-013` | `qa-newman` 镜像自维护（上游停更 + alpine 3.18 / Node 16 EOL） | NFR | P2 | 95% | — | 🔄 In Progress |
+| `REQ-DVP-013` | `qa-newman` 镜像自维护（上游停更 + alpine 3.18 / Node 16 EOL） | NFR | P2 | 100% | — | ✅ Done（PR #99） |
 
 **整体风险：** k3d 同时运行 Prometheus 栈 + Loki + ArgoCD + Kyverno + Postgres（+ Elastic）约 8–12 GB，超出 OrbStack 8 GB 上限 → 按 REQ 分开演示、不用的组件缩到 0；必要时调高 `memory_mib`（宿主机仅剩 ~4 GB）或改用 Azure VM。
 
@@ -265,11 +265,11 @@
 | FR-DVP-013-03 | PR CI Build job：镜像断言脚本 + Trivy image CRITICAL 门禁（`ignore-unfixed`） |
 
 **验收标准：**
-- [ ] 镜像构建成功，collection 运行 0 failed
-- [ ] Trivy CRITICAL = 0（基线 10）
-- [ ] docker-compose 与 Helm job 可运行
-- [ ] 已知风险记录在案：`@faker-js/faker` 5.5.3（HIGH，修复版 10.x 跨大版本，不 override）
+- [x] 镜像构建成功，collection 运行 0 failed（compose / Helm job 均 18 断言 0 失败）
+- [x] Trivy CRITICAL = 0（基线 10）
+- [x] docker-compose 与 Helm job 可运行（Helm job 同时修复 collection 挂载）
+- [x] 已知风险记录在案：`@faker-js/faker` 5.5.3（HIGH，修复版 10.x 跨大版本，不 override；`.trivyignore` 有期限抑制）
 
-**可行性 95%：** spike 已验证（CRITICAL 10 → 0，HIGH 91 → 1，7 请求 / 18 断言 0 失败）；不在范围：非 root 运行。
+**可行性 100%：** spike 已验证（CRITICAL 10 → 0，HIGH 91 → 1，7 请求 / 18 断言 0 失败）；不在范围：非 root 运行。
 
 **设计：** [2026-11-26-dvp-013-newman-image-design.md](../../../docs/superpowers/specs/2026-11-26-dvp-013-newman-image-design.md) · **计划：** [2026-11-26-dvp-013-newman-image.md](../../../docs/superpowers/plans/2026-11-26-dvp-013-newman-image.md)
