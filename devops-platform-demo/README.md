@@ -310,6 +310,7 @@ Pipeline metrics ──→ reachable Pushgateway ──→ Prometheus ──→ 
 Pod logs ──→ Grafana Alloy ──→ Loki ──→ Grafana log explorer
 Actionable alerts ──→ AlertManager ──→ configured receiver
 ```
+> 与 Elastic 的取舍见 [LOGGING-LOKI-VS-ELASTIC.md](docs/guides/LOGGING-LOKI-VS-ELASTIC.md)
 
 ## Infrastructure Overview
 
@@ -505,6 +506,7 @@ flowchart TD
 | [CI-CD-GUIDE.md](docs/guides/CI-CD-GUIDE.md) | CI/CD 管道搭建与集成 |
 | [TROUBLESHOOTING.md](docs/guides/TROUBLESHOOTING.md) | 故障排查手册 |
 | [SECRETS-RBAC.md](docs/guides/SECRETS-RBAC.md) | Secrets Manager + External Secrets + RBAC（REQ-DVP-006） |
+| [LOGGING-LOKI-VS-ELASTIC.md](docs/guides/LOGGING-LOKI-VS-ELASTIC.md) | Loki vs Elastic 日志栈对比（REQ-DVP-008） |
 | Azure vs GitHub Actions | 跨平台 CI/CD 对比 FAQ |
 | [MONITORING.md](monitoring/MONITORING.md) | 监控架构与仪表盘配置 |
 
