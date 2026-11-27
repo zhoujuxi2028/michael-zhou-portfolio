@@ -86,6 +86,19 @@ docker run --rm \
 **Images scanned:**
 - `qa-newman-demo:latest` (Dockerfile.newman)
 
+**qa-newman 镜像自维护（REQ-DVP-013）**
+
+上游 `postman/newman` 镜像自 2024-06 停更（alpine 3.18 / Node 16 EOL），改为 `node:26.13.1-alpine3.24` + 锁定依赖树（`docker/newman/package.json` + lockfile，`npm ci` 安装，运行时删除 npm/npx）。PR CI 对镜像做内容断言 + Trivy CRITICAL 门禁。
+
+| 指标 | 旧（postman/newman:6-alpine） | 新 |
+|------|------|------|
+| Node / newman | 16.20.2 / 6.1.3 | 26.13.1 / 6.2.3 |
+| 镜像大小 | 251MB | 234MB |
+| CRITICAL | 10 | 0 |
+| HIGH | 91 | 1 |
+
+已知风险：`@faker-js/faker` 5.5.3（HIGH，CVE-2026-73231）。修复版 10.x 跨 5 个大版本，Newman `$random*` 动态变量依赖其 5.x API，暂不升级。
+
 ### 4. Trivy IaC Scan
 
 Scans Infrastructure as Code for security misconfigurations.

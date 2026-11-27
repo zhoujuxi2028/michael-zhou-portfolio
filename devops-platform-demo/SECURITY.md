@@ -67,7 +67,8 @@ This project implements the following security practices:
 
 ### 4. Container Security
 
-- Official base images (node:18-alpine, postman/newman)
+- Official base images (node:26-alpine, cypress/included)
+- Self-maintained `qa-newman` image with pinned dependency tree (`docker/newman/package.json`)
 - Non-root user where possible
 - Minimal image size (alpine-based)
 - Regular base image updates
