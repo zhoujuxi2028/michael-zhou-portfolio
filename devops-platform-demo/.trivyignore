@@ -11,10 +11,16 @@
 # Reviewed by: Security Team
 
 # =============================================================================
-# Currently no ignored vulnerabilities
+# Ignored vulnerabilities
 # =============================================================================
 # When adding entries:
 # 1. Document the reason for ignoring
 # 2. Set an expiration/review date
 # 3. Get security team approval for HIGH/CRITICAL
 # 4. Link to tracking ticket (Jira, GitHub issue)
+
+# @faker-js/faker 5.5.3 (HIGH) — newman 6.2.3 transitive dependency in docker/newman/package-lock.json
+# Reason: image-only test dependency; fix requires faker 10.x (5 majors), incompatible with Newman $random* variables
+# Scope: qa-newman image; see security/README.md 已知风险
+# Tracking: REQ-DVP-013
+CVE-2026-73231 exp:2027-06-30
