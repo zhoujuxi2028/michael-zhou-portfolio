@@ -70,7 +70,8 @@ REQ-DVP-010：同一份策略 YAML 同时用于 PR CI 与 k3d 集群准入。
 | `kyverno` | 同上 | 自身 |
 | `monitoring` | 同上 | 第三方 chart |
 | `external-secrets` | 同上 | 第三方 chart |
-| `portfolio` | 同上 | legacy release `portfolio-demo`，迁移到合规 values 后移除 |
+
+`portfolio` namespace 已纳入策略范围；legacy release `portfolio-demo` 的 Job 模板仍使用 `:latest`，重新运行时会被拒绝。
 
 单资源例外：使用 `PolicyException`（`policies.kyverno.io`），必须 PR 评审并写明原因与到期日。
 

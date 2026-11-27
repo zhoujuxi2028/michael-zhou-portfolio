@@ -75,10 +75,10 @@ fi
 
 # Check dashboard files
 DASHBOARD_COUNT=$(ls -1 dashboards/*.json 2>/dev/null | wc -l)
-if [ "$DASHBOARD_COUNT" -eq 2 ]; then
-    check_pass "2 Grafana dashboards exist (cluster-overview.json, test-metrics.json)"
+if [ "$DASHBOARD_COUNT" -ge 2 ]; then
+    check_pass "$DASHBOARD_COUNT Grafana dashboards exist in monitoring/dashboards/"
 else
-    check_fail "Expected 2 dashboards, found $DASHBOARD_COUNT"
+    check_fail "Expected at least 2 dashboards, found $DASHBOARD_COUNT"
 fi
 
 echo ""

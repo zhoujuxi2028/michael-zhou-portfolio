@@ -52,7 +52,7 @@ spec:
         - name: newman
           # Using custom image with htmlextra reporter (built from Dockerfile.newman)
           # In production, push this to a container registry (DockerHub, ECR, GCR, etc.)
-          image: qa-newman-demo:latest
+          image: qa-newman-demo:6.2.3-node26
           imagePullPolicy: Never  # Use locally built image (for demo)
 
           workingDir: /etc/newman

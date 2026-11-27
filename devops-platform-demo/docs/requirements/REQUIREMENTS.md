@@ -196,7 +196,7 @@
 
 | ID | 描述 |
 |----|------|
-| FR-DVP-010-01 | k3d 集群安装 Kyverno 1.20（Helm chart 3.10.0；admission + reports controller 各 1 副本，内存上限合计 ≤ 600Mi；排除 kube-system / kyverno / monitoring / external-secrets / portfolio） |
+| FR-DVP-010-01 | k3d 集群安装 Kyverno 1.20（Helm chart 3.10.0；admission + reports controller 各 1 副本，内存上限合计 ≤ 600Mi；排除 kube-system / kyverno / monitoring / external-secrets） |
 | FR-DVP-010-02 | ValidatingPolicy 策略集：Deny —— 禁止 `latest`/无 tag、必须 cpu+memory limits、禁止 privileged、镜像仓库白名单；Audit —— runAsNonRoot |
 | FR-DVP-010-03 | PR CI `policy-check` job：`kyverno test`（good/bad fixture）+ `kyverno apply enforce/` 校验 4 份 values 渲染 + canary（注入违规必须失败），违规阻断 PR |
 | FR-DVP-010-04 | `kyverno_validating_policy_results_total` 经 ServiceMonitor 接入 Prometheus，Grafana “Policy Compliance” 面板 |

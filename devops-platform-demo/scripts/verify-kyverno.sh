@@ -11,7 +11,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 KUBE_CONTEXT="${KUBE_CONTEXT:-k3d-portfolio-dev}"
 NS="${VERIFY_NS:-policy-verify}"
-EXCLUDED="kube-system kyverno monitoring external-secrets portfolio"
+EXCLUDED="kube-system kyverno monitoring external-secrets"
 passed=0
 failed=0
 
