@@ -172,6 +172,23 @@ kubeStateMetrics: { enabled: true }    # Cluster-wide object metrics
 alertmanager: { enabled: true }        # Alert routing (future use)
 ```
 
+### loki-values.yaml (log retention)
+
+| Setting | Value | Purpose |
+|---------|-------|---------|
+| `loki.limits_config.retention_period` | `168h` | Delete logs older than 7 days |
+| `loki.compactor.retention_enabled` | `true` | Compactor applies the retention policy |
+| `loki.compactor.delete_request_store` | `filesystem` | Required when retention is enabled |
+
+Dashboard queries filter by the `container` label (`container="cypress"` / `container="newman"`), not by `job_name`.
+
+Verify after deployment:
+
+```bash
+kubectl -n monitoring exec deploy/loki -- \
+  wget -qO- http://localhost:3100/config | grep retention_period
+```
+
 ### Customization
 
 **To modify configuration:**

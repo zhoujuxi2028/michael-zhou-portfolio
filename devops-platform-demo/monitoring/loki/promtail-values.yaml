@@ -8,14 +8,13 @@ config:
   snippets:
     pipelineStages:
       - cri: {}
+      # 仪表盘按 container 标签（cypress / newman）过滤；
+      # 不再从 Job 的 job-name 标签提取 job_name（该标签不稳定，见 issue #96）
       - match:
           selector: '{namespace=~"qa-portfolio.*"}'
           stages:
             - labeldrop:
                 - filename
-            - labels:
-                job_name:
-                  source: kubernetes_labels_job_name
 
 resources:
   requests:

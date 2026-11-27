@@ -19,7 +19,7 @@
       "datasource": { "type": "loki", "uid": "loki" },
       "targets": [
         {
-          "expr": "{namespace=\"qa-portfolio\", job_name=~\"cypress.*\"} |~ \"(AssertionError|Error:|expected|failing)\"",
+          "expr": "{namespace=\"qa-portfolio\", container=\"cypress\"} |~ \"(AssertionError|Error:|expected|failing)\"",
           "refId": "A"
         }
       ],
@@ -39,7 +39,7 @@
       "datasource": { "type": "loki", "uid": "loki" },
       "targets": [
         {
-          "expr": "{namespace=\"qa-portfolio\", job_name=~\"newman.*\"} |~ \"(AssertionError|FAILED|Error:)\"",
+          "expr": "{namespace=\"qa-portfolio\", container=\"newman\"} |~ \"(AssertionError|FAILED|Error:)\"",
           "refId": "A"
         }
       ],

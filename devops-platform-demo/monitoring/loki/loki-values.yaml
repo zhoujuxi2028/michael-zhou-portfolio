@@ -8,6 +8,12 @@ loki:
     replication_factor: 1
   storage:
     type: filesystem
+  limits_config:
+    # 日志保留 7 天（issue #97）；compactor 负责实际删除
+    retention_period: 168h
+  compactor:
+    retention_enabled: true
+    delete_request_store: filesystem
   schemaConfig:
     configs:
       - from: "2024-01-01"
