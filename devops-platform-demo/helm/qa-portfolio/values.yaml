@@ -57,7 +57,8 @@ newman:
   enabled: true
   image:
     repository: qa-newman-demo
-    tag: "latest"
+    # 固定版本（REQ-DVP-010 禁止 latest）；与 Dockerfile.newman 的 newman / Node 版本同步
+    tag: "6.2.3-node26"
     pullPolicy: Never  # Locally built image for demo
   imagePullSecrets: []  # 从私有 registry 拉取时配置，如 [{name: qa-registry-pull-secret}]
   backoffLimit: 2

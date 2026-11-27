@@ -78,7 +78,7 @@ kubectl -n monitoring port-forward svc/prometheus-grafana 3000:80
 |------|---------|------|
 | k3d 托管 registry（推荐） | `k3d-qa-registry:5000/qa-newman` | `k3d registry create qa-registry --port 5000`，集群以 `--registry-use` 创建 |
 | 宿主 registry:2 | `host.k3d.internal:5000/qa-newman` | k3s 允许 HTTP insecure registry |
-| 兜底（无 registry pull） | `qa-newman-demo:latest` + `pullPolicy: Never` | `k3d image import` 导入镜像 |
+| 兜底（无 registry pull） | `qa-newman-demo:6.2.3-node26` + `pullPolicy: Never` | `k3d image import` 导入镜像 |
 
 ## 生产级差距
 
