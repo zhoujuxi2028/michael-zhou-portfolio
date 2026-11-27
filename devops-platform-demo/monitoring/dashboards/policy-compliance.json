@@ -1,0 +1,106 @@
+{
+  "annotations": { "list": [] },
+  "description": "Kyverno ValidatingPolicy results (REQ-DVP-010). Counters reset when Kyverno pods restart.",
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": "Prometheus",
+      "description": "Enforce 策略在 admission 阶段拒绝的请求数（累计）",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "orange", "value": 1 } ] },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 6, "w": 8, "x": 0, "y": 0 },
+      "id": 1,
+      "options": { "colorMode": "value", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "targets": [
+        { "expr": "sum(kyverno_validating_policy_results_total{result=\"fail\",policy_validation_mode=\"Deny\",execution_cause=\"admission_request\"}) or vector(0)", "refId": "A" }
+      ],
+      "title": "Admission 拒绝（Enforce）",
+      "type": "stat"
+    },
+    {
+      "datasource": "Prometheus",
+      "description": "Audit 策略违规次数（admission + 后台扫描，累计）",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "yellow", "value": 1 } ] },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 6, "w": 8, "x": 8, "y": 0 },
+      "id": 2,
+      "options": { "colorMode": "value", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "targets": [
+        { "expr": "sum(kyverno_validating_policy_results_total{result=\"fail\",policy_validation_mode=\"Audit\"}) or vector(0)", "refId": "A" }
+      ],
+      "title": "Audit 违规（累计）",
+      "type": "stat"
+    },
+    {
+      "datasource": "Prometheus",
+      "description": "后台扫描发现的违规（含 Enforce 策略对存量资源的结果）",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "red", "value": 1 } ] },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 6, "w": 8, "x": 16, "y": 0 },
+      "id": 3,
+      "options": { "colorMode": "value", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "targets": [
+        { "expr": "sum(kyverno_validating_policy_results_total{result=\"fail\",execution_cause=\"background_scan\"}) or vector(0)", "refId": "A" }
+      ],
+      "title": "后台扫描违规（累计）",
+      "type": "stat"
+    },
+    {
+      "datasource": "Prometheus",
+      "description": "按策略统计的违规次数",
+      "fieldConfig": { "defaults": { "unit": "short" }, "overrides": [] },
+      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 6 },
+      "id": 4,
+      "options": { "displayMode": "gradient", "orientation": "horizontal", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "showUnfilled": true },
+      "targets": [
+        { "expr": "sum by (policy_name, policy_validation_mode) (kyverno_validating_policy_results_total{result=\"fail\"})", "legendFormat": "{{policy_name}} ({{policy_validation_mode}})", "refId": "A" }
+      ],
+      "title": "违规次数（按策略）",
+      "type": "bargauge"
+    },
+    {
+      "datasource": "Prometheus",
+      "description": "违规速率（5 分钟窗口）",
+      "fieldConfig": { "defaults": { "unit": "ops" }, "overrides": [] },
+      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 6 },
+      "id": 5,
+      "targets": [
+        { "expr": "sum by (policy_name) (rate(kyverno_validating_policy_results_total{result=\"fail\"}[5m]))", "legendFormat": "{{policy_name}}", "refId": "A" }
+      ],
+      "title": "违规速率",
+      "type": "timeseries"
+    }
+  ],
+  "schemaVersion": 27,
+  "style": "dark",
+  "tags": ["kyverno", "policy", "security"],
+  "templating": { "list": [] },
+  "time": { "from": "now-6h", "to": "now" },
+  "timepicker": {},
+  "timezone": "",
+  "title": "Policy Compliance (Kyverno)",
+  "uid": "policy-compliance",
+  "version": 1
+}

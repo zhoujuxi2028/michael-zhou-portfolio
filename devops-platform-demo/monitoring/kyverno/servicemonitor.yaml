@@ -1,0 +1,28 @@
+# ServiceMonitor — Kyverno 策略结果指标（REQ-DVP-010）
+# 指标：kyverno_validating_policy_results_total{policy_name, policy_validation_mode, execution_cause, result}
+#   admission-controller：admission_request；reports-controller：background_scan
+# 前置：kube-prometheus-stack（serviceMonitorSelectorNilUsesHelmValues: false）
+# 部署：scripts/install-kyverno.sh monitoring
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: kyverno
+  namespace: kyverno
+  labels:
+    app.kubernetes.io/part-of: qa-portfolio
+spec:
+  namespaceSelector:
+    matchNames: [kyverno]
+  selector:
+    matchLabels:
+      app.kubernetes.io/part-of: kyverno
+      app.kubernetes.io/instance: kyverno
+    matchExpressions:
+      - key: app.kubernetes.io/component
+        operator: In
+        values: [admission-controller, reports-controller]
+  endpoints:
+    # webhook Service 无 metrics-port，只有 *-metrics Service 产生 target
+    - port: metrics-port
+      interval: 30s
+      scrapeTimeout: 25s

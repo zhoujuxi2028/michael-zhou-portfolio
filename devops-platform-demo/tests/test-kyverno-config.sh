@@ -39,6 +39,28 @@ for ns in monitoring external-secrets portfolio; do
   check "resourceFilters exclude $ns"        "1" "$(count "^    \[\*/\*,$ns,\*\]$" "$cm")"
 done
 
+# --- ServiceMonitor ---
+SM="$ROOT/monitoring/kyverno/servicemonitor.yaml"
+check "ServiceMonitor file exists"            "yes" "$([ -f "$SM" ] && echo yes || echo no)"
+if [ -f "$SM" ]; then
+  sm=$(cat "$SM")
+  check "ServiceMonitor kind"                 "1" "$(count '^kind: ServiceMonitor$' "$sm")"
+  check "ServiceMonitor in kyverno ns"        "1" "$(count '^  namespace: kyverno$' "$sm")"
+  check "scrapes metrics-port"                "1" "$(count 'port: metrics-port$' "$sm")"
+  check "selects admission + reports"         "1" "$(count 'values: \[admission-controller, reports-controller\]' "$sm")"
+fi
+
+# --- Grafana dashboard ---
+DB="$ROOT/monitoring/dashboards/policy-compliance.json"
+check "dashboard is valid JSON"               "0" "$(python3 -m json.tool "$DB" >/dev/null 2>&1; echo $?)"
+check "dashboard uid"                         "policy-compliance" "$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["uid"])' "$DB" 2>/dev/null || echo missing)"
+check "every panel queries VPOL results metric" "0" "$(python3 -c '
+import json, sys
+d = json.load(open(sys.argv[1]))
+exprs = [t["expr"] for p in d["panels"] for t in p.get("targets", [])]
+print(0 if exprs and all("kyverno_validating_policy_results_total" in e for e in exprs) else 1)
+' "$DB" 2>/dev/null || echo 1)"
+
 echo "---"
 echo "passed=$passed failed=$failed"
 [ "$failed" -eq 0 ]
