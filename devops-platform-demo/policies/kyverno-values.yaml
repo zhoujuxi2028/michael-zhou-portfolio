@@ -1,0 +1,50 @@
+# Kyverno Helm values — k3d demo（REQ-DVP-010）
+# chart kyverno 3.10.0 / app v1.20.0
+# 内存上限：admission 384Mi + reports 192Mi = 576Mi（OrbStack 8 GiB，目标 ≤ 600Mi）
+# 生产差异见 docs/guides/POLICY-AS-CODE.md：3 副本、forceFailurePolicyIgnore=false（Fail）
+
+admissionController:
+  replicas: 1
+  container:
+    resources:
+      requests: {cpu: 100m, memory: 128Mi}
+      limits: {memory: 384Mi}
+
+reportsController:
+  replicas: 1
+  resources:
+    requests: {cpu: 50m, memory: 64Mi}
+    limits: {memory: 192Mi}
+
+# 仅 generate / mutate-existing 需要
+backgroundController:
+  enabled: false
+# 无 CleanupPolicy
+cleanupController:
+  enabled: false
+
+features:
+  # demo：Kyverno 不可用时不阻断集群（webhook failurePolicy=Ignore）；生产必须为 false
+  forceFailurePolicyIgnore:
+    enabled: true
+  backgroundScan:
+    backgroundScanInterval: 10m
+    # 1.20 默认 true（后台扫描忽略 resourceFilters）→ 关闭，使排除名单对 PolicyReport 同样生效
+    skipResourceFilters: false
+
+config:
+  # admission 排除（kyverno 由 excludeKyvernoNamespace 默认追加；此处显式列出，便于断言）
+  # portfolio：legacy release portfolio-demo，迁移到合规 values 后移除
+  webhooks:
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: NotIn
+          values: [kube-system, kyverno, monitoring, external-secrets, portfolio]
+  # 后台扫描排除（kube-system 已在默认 resourceFilters 中）
+  resourceFiltersIncludeNamespaces: [monitoring, external-secrets, portfolio]
+
+# 新集群无 legacy ClusterPolicy；关闭 hook Job，少拉一个 kyverno-cli 镜像
+upgrade:
+  legacyPolicyCheck:
+    enabled: false

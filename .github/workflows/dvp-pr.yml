@@ -244,6 +244,9 @@ jobs:
       - name: Helm render compliance tests
         run: bash tests/test-helm-policy-compliance.sh
 
+      - name: Kyverno config tests (values / ServiceMonitor / dashboard)
+        run: bash tests/test-kyverno-config.sh
+
       - name: Kyverno policy unit tests
         run: bash scripts/policy-check.sh test
 
