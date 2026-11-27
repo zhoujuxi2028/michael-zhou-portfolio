@@ -1,0 +1,50 @@
+# DB 备份数据管道（REQ-DVP-009）
+# 部署：kubectl --context k3d-portfolio-dev apply -k data-pipeline
+# 放在 data-pipeline/ 根：configMapGenerator 只能引用本目录及子目录文件（scripts/、sql/）
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: data-pipeline
+labels:
+  - pairs:
+      app.kubernetes.io/part-of: qa-portfolio
+    includeSelectors: false
+resources:
+  - k8s/namespace.yaml
+  - k8s/secretstore.yaml
+  - k8s/externalsecrets.yaml
+  - k8s/postgres.yaml
+  - k8s/backup-cronjob.yaml
+  - k8s/restore-drill-cronjob.yaml
+generatorOptions:
+  disableNameSuffixHash: true
+configMapGenerator:
+  - name: db-seed
+    files:
+      - sql/seed.sql
+  - name: db-backup-scripts
+    files:
+      - scripts/lib.sh
+      - scripts/backup.sh
+      - scripts/s3-backup.sh
+      - scripts/retention.sh
+      - scripts/restore-drill.sh
+      - scripts/aws-config
+  # 环境相关值（真实 AWS 用 overlay 覆盖：去掉 AWS_ENDPOINT_URL / AWS_CONFIG_FILE）
+  # RETENTION_DAYS / BACKUP_INSTANCE 与 terraform/variables.tf 默认值一致（测试校验）
+  - name: db-backup-config
+    literals:
+      - AWS_ENDPOINT_URL=http://host.k3d.internal:4566
+      - AWS_REGION=us-east-1
+      - AWS_CONFIG_FILE=/scripts/aws-config
+      - S3_BUCKET=portfolio-dev-db-backups
+      - BACKUP_PREFIX=backups/
+      - RETENTION_DAYS=7
+      - KEEP_MIN=1
+      - BACKUP_INSTANCE=appdb
+      - PUSHGATEWAY_URL=http://prometheus-pushgateway.monitoring.svc:9091
+      - WORK_DIR=/work
+      - RC_WAIT_TIMEOUT=600
+
+images:
+  - name: amazon/aws-cli
+    newTag: "2.42.4"
