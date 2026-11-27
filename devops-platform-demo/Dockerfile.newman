@@ -1,25 +1,18 @@
-# Custom Newman Dockerfile with htmlextra reporter
-# Extends official Newman Alpine image to add HTML report generation capabilities
-#
-# Interview Talking Point:
-# "The official Newman image lacks the htmlextra reporter, so I created a custom
-# Dockerfile that extends it. This demonstrates understanding of Docker layering and
-# how to customize official images to meet project requirements."
+# qa-newman: Newman CLI + htmlextra reporter (REQ-DVP-013)
+# 上游 postman/newman 镜像自 2024-06 停更（alpine 3.18 / Node 16 EOL）→ 自维护依赖树
+# 依赖版本与 overrides 见 docker/newman/package.json
+FROM node:26.13.1-alpine3.24
 
-FROM postman/newman:6-alpine
+WORKDIR /opt/newman
+COPY docker/newman/package.json docker/newman/package-lock.json ./
 
-# Install newman-reporter-htmlextra globally
-# This provides beautiful HTML reports with request timings, response visualizations,
-# and assertion statistics - essential for debugging and stakeholder communication
-RUN npm install -g newman-reporter-htmlextra
+# npm ci 严格按 lockfile 安装；运行时不需要 npm/npx，删除以减少攻击面与扫描告警
+RUN npm ci --omit=dev --no-audit --no-fund \
+ && npm cache clean --force \
+ && rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx \
+ && mkdir -p /etc/newman/newman-reports \
+ && chmod 777 /etc/newman/newman-reports
 
-# Create reports directory with proper permissions
-RUN mkdir -p /etc/newman/newman-reports && \
-    chmod 777 /etc/newman/newman-reports
-
+ENV PATH=/opt/newman/node_modules/.bin:$PATH
 WORKDIR /etc/newman
-
-# Interview Talking Point:
-# "By using multi-stage or extended builds, we keep the image size minimal while
-# adding only the dependencies we need. This image is ~180MB vs the base 150MB,
-# adding just 30MB for the reporter functionality."
+ENTRYPOINT ["newman"]
