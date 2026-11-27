@@ -1,0 +1,39 @@
+# 仅违反 disallow-privileged
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bad-privileged
+  namespace: policy-test
+spec:
+  selector:
+    matchLabels: {app: bad-privileged}
+  template:
+    metadata:
+      labels: {app: bad-privileged}
+    spec:
+      securityContext: {runAsNonRoot: true}
+      containers:
+        - name: app
+          image: nginx:1.25-alpine
+          securityContext: {privileged: true}
+          resources:
+            limits: {cpu: 100m, memory: 64Mi}
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bad-privileged-init
+  namespace: policy-test
+spec:
+  securityContext: {runAsNonRoot: true}
+  initContainers:
+    - name: init
+      image: busybox:1.36
+      securityContext: {privileged: true}
+      resources:
+        limits: {cpu: 50m, memory: 32Mi}
+  containers:
+    - name: app
+      image: nginx:1.25-alpine
+      resources:
+        limits: {cpu: 100m, memory: 64Mi}

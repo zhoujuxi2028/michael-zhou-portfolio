@@ -1,0 +1,27 @@
+# 仅违反 require-run-as-non-root（Audit）
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bad-run-as-root
+  namespace: policy-test
+spec:
+  containers:
+    - name: app
+      image: nginx:1.25-alpine
+      resources:
+        limits: {cpu: 100m, memory: 64Mi}
+---
+# 容器级 false 覆盖 Pod 级 true
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bad-run-as-root-override
+  namespace: policy-test
+spec:
+  securityContext: {runAsNonRoot: true}
+  containers:
+    - name: app
+      image: nginx:1.25-alpine
+      securityContext: {runAsNonRoot: false}
+      resources:
+        limits: {cpu: 100m, memory: 64Mi}

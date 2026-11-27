@@ -1,0 +1,41 @@
+# 仅违反 restrict-image-registries
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bad-untrusted-registry
+  namespace: policy-test
+spec:
+  securityContext: {runAsNonRoot: true}
+  containers:
+    - name: app
+      image: ghcr.io/example/app:1.0.0
+      resources:
+        limits: {cpu: 100m, memory: 64Mi}
+---
+# 前缀仿冒：k3d-qa-registry:5000 后不是 '/'
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bad-registry-lookalike
+  namespace: policy-test
+spec:
+  securityContext: {runAsNonRoot: true}
+  containers:
+    - name: app
+      image: k3d-qa-registry:5000.evil.example/qa-newman:1.0.0
+      resources:
+        limits: {cpu: 100m, memory: 64Mi}
+---
+# 名称前缀仿冒：nginx-evil ≠ nginx
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bad-name-prefix
+  namespace: policy-test
+spec:
+  securityContext: {runAsNonRoot: true}
+  containers:
+    - name: app
+      image: nginx-evil:1.0.0
+      resources:
+        limits: {cpu: 100m, memory: 64Mi}
