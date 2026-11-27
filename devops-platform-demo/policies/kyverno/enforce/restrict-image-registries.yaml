@@ -1,0 +1,56 @@
+# 镜像仓库白名单（REQ-DVP-010，Deny）
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: restrict-image-registries
+  annotations:
+    policies.kyverno.io/title: Restrict image registries
+    policies.kyverno.io/category: Supply Chain
+    policies.kyverno.io/severity: high
+spec:
+  validationActions: [Deny]
+  failurePolicy: Ignore  # demo：策略执行错误不阻断；生产改为 Fail
+  evaluation:
+    background:
+      enabled: true
+  autogen:
+    podControllers:
+      enabled: false
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: [v1]
+        operations: [CREATE, UPDATE]
+        resources: [pods]
+      - apiGroups: [apps]
+        apiVersions: [v1]
+        operations: [CREATE, UPDATE]
+        resources: [deployments, statefulsets, daemonsets]
+      - apiGroups: [batch]
+        apiVersions: [v1]
+        operations: [CREATE, UPDATE]
+        resources: [jobs, cronjobs]
+  variables:
+    - name: podSpec
+      expression: >-
+        object.kind == 'Pod' ? object.spec :
+        (object.kind == 'CronJob' ? object.spec.jobTemplate.spec.template.spec : object.spec.template.spec)
+    - name: containers
+      expression: >-
+        variables.podSpec.containers +
+        (has(variables.podSpec.initContainers) ? variables.podSpec.initContainers : [])
+    # 新增仓库：在此追加正则，并同步 good/bad fixture 与 tests/test-helm-policy-compliance.sh 的 ALLOWED
+    - name: allowedImages
+      expression: >-
+        [
+          r'^(docker\.io/)?(library/)?(nginx|busybox)(:|@|$)',
+          r'^(docker\.io/)?cypress/',
+          r'^(docker\.io/)?(library/)?qa-newman-demo(:|@|$)',
+          r'^k3d-qa-registry:5000/',
+          r'^host\.k3d\.internal:5000/'
+        ]
+  validations:
+    - expression: >-
+        variables.containers.all(c,
+          variables.allowedImages.exists(p, c.image.matches(p)))
+      message: "[restrict-image-registries] image registry/repository is not in the allowlist (see docs/guides/POLICY-AS-CODE.md)"
