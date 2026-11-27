@@ -104,7 +104,7 @@
 | `REQ-DVP-010` | OPA/Kyverno 策略即代码 | 🔲 |
 | `REQ-DVP-011` | Dev Container 标准化开发环境（#50） | ✅ |
 | `REQ-DVP-012` | Node 26 LTS 升级 + Cypress 16 修复 + PR 门禁 E2E（#87） | ✅ |
-| `REQ-DVP-013` | `qa-newman` 镜像自维护（上游停更 + alpine 3.18 / Node 16 EOL） | 🔄 |
+| `REQ-DVP-013` | `qa-newman` 镜像自维护（上游停更 + alpine 3.18 / Node 16 EOL）（#99） | ✅ |
 
 ---
 

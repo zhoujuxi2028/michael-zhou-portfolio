@@ -50,8 +50,8 @@
 
 **Files:** Modify `devops-platform-demo/docs/requirements/REQUIREMENTS.md`（第 51 行总表、第 249–262 行章节）
 
-- [ ] **Step 1:** 总表行改为 `| \`REQ-DVP-013\` | \`qa-newman\` 镜像自维护（上游停更 + alpine 3.18 / Node 16 EOL） | NFR | P2 | 95% | — | 🔄 In Progress |`
-- [ ] **Step 2:** 章节 FR 表替换为：
+- [x] **Step 1:** 总表行改为 `| \`REQ-DVP-013\` | \`qa-newman\` 镜像自维护（上游停更 + alpine 3.18 / Node 16 EOL） | NFR | P2 | 95% | — | 🔄 In Progress |`
+- [x] **Step 2:** 章节 FR 表替换为：
 
 | ID | 描述 |
 |----|------|
@@ -60,13 +60,13 @@
 | FR-DVP-013-03 | PR CI Build job：镜像断言 + Trivy image CRITICAL 门禁（`ignore-unfixed`） |
 
   验收标准：镜像构建成功且 `npm run test:newman` 等价运行 0 failed；Trivy CRITICAL = 0；docker-compose / Helm job 可运行；已知风险 faker HIGH 记录在案。
-- [ ] **Step 3:** Commit `docs(dvp): refine REQ-DVP-013 scope after spike`
+- [x] **Step 3:** Commit `docs(dvp): refine REQ-DVP-013 scope after spike`
 
 ### Task 2: 镜像断言测试（先红）
 
 **Files:** Create `devops-platform-demo/tests/test-newman-image.sh`
 
-- [ ] **Step 1: 写测试**
+- [x] **Step 1: 写测试**
 
 ```bash
 #!/usr/bin/env bash
@@ -103,17 +103,17 @@ echo "passed=$passed failed=$failed"
 [ "$failed" -eq 0 ]
 ```
 
-- [ ] **Step 2: 对旧镜像运行，确认失败**
+- [x] **Step 2: 对旧镜像运行，确认失败**
 
 Run: `docker build -t qa-newman-demo:test -f Dockerfile.newman . && bash tests/test-newman-image.sh`
 Expected: FAIL — Node（v16.20.2）、newman（6.1.3）、npm present、handlebars 2 个旧版本；entrypoint / workdir / 777 PASS
-- [ ] **Step 3:** shellcheck 通过后 commit `test(dvp): add qa-newman image assertions`
+- [x] **Step 3:** shellcheck 通过后 commit `test(dvp): add qa-newman image assertions`
 
 ### Task 3: 镜像依赖清单
 
 **Files:** Create `devops-platform-demo/docker/newman/package.json` + `package-lock.json`
 
-- [ ] **Step 1: 写 package.json**
+- [x] **Step 1: 写 package.json**
 
 ```json
 {
@@ -134,15 +134,15 @@ Expected: FAIL — Node（v16.20.2）、newman（6.1.3）、npm present、handle
 }
 ```
 
-- [ ] **Step 2:** 生成 lockfile：`cd docker/newman && npm install --package-lock-only --no-audit --no-fund`（本机 Node 26.13.1 / npm 11.20）
-- [ ] **Step 3:** 校验：`npm ls handlebars lodash flatted node-forge underscore --package-lock-only` 全部为 override 后版本
-- [ ] **Step 4:** Commit `build(dvp): add pinned dependency manifest for newman image`
+- [x] **Step 2:** 生成 lockfile：`cd docker/newman && npm install --package-lock-only --no-audit --no-fund`（本机 Node 26.13.1 / npm 11.20）
+- [x] **Step 3:** 校验：`npm ls handlebars lodash flatted node-forge underscore --package-lock-only` 全部为 override 后版本
+- [x] **Step 4:** Commit `build(dvp): add pinned dependency manifest for newman image`
 
 ### Task 4: 重写 Dockerfile.newman（变绿）
 
 **Files:** Modify `devops-platform-demo/Dockerfile.newman`
 
-- [ ] **Step 1: 替换为**
+- [x] **Step 1: 替换为**
 
 ```dockerfile
 # qa-newman: Newman CLI + htmlextra reporter (REQ-DVP-013)
@@ -165,16 +165,16 @@ WORKDIR /etc/newman
 ENTRYPOINT ["newman"]
 ```
 
-- [ ] **Step 2:** `docker build -t qa-newman-demo:test -f Dockerfile.newman . && bash tests/test-newman-image.sh` → `passed=8 failed=0`
-- [ ] **Step 3:** Trivy：`trivy image -q --scanners vuln --severity CRITICAL --ignore-unfixed --exit-code 1 qa-newman-demo:test` → exit 0；记录全量计数（期望 CRITICAL=0，HIGH=1 faker）
-- [ ] **Step 4:** 功能：`docker run --rm -v "$PWD/postman:/etc/newman/postman:ro" qa-newman-demo:test run postman/api-collection.json -e postman/environment.json -r cli,htmlextra,junit --reporter-htmlextra-export newman-reports/r.html --reporter-junit-export newman-reports/j.xml` → 0 failed，报告生成
-- [ ] **Step 5:** Commit `build(dvp): rebuild newman image on node 26 alpine with pinned deps`
+- [x] **Step 2:** `docker build -t qa-newman-demo:test -f Dockerfile.newman . && bash tests/test-newman-image.sh` → `passed=8 failed=0`
+- [x] **Step 3:** Trivy：`trivy image -q --scanners vuln --severity CRITICAL --ignore-unfixed --exit-code 1 qa-newman-demo:test` → exit 0；记录全量计数（期望 CRITICAL=0，HIGH=1 faker）
+- [x] **Step 4:** 功能：`docker run --rm -v "$PWD/postman:/etc/newman/postman:ro" qa-newman-demo:test run postman/api-collection.json -e postman/environment.json -r cli,htmlextra,junit --reporter-htmlextra-export newman-reports/r.html --reporter-junit-export newman-reports/j.xml` → 0 failed，报告生成
+- [x] **Step 5:** Commit `build(dvp): rebuild newman image on node 26 alpine with pinned deps`
 
 ### Task 5: PR CI 门禁
 
 **Files:** Modify `.github/workflows/dvp-pr.yml`（Build job，约 160 行 `Verify built image` step）
 
-- [ ] **Step 1:** 将 `Verify built image` 替换为：
+- [x] **Step 1:** 将 `Verify built image` 替换为：
 
 ```yaml
       - name: Assert image contents
@@ -192,28 +192,28 @@ ENTRYPOINT ["newman"]
           exit-code: '1'
 ```
 
-- [ ] **Step 2:** `actionlint .github/workflows/dvp-pr.yml` 通过
-- [ ] **Step 3:** Commit `ci(dvp): gate newman image on Trivy CRITICAL findings`
+- [x] **Step 2:** `actionlint .github/workflows/dvp-pr.yml` 通过
+- [x] **Step 3:** Commit `ci(dvp): gate newman image on Trivy CRITICAL findings`
 
 ### Task 6: 现行文档同步
 
 **Files:** `devops-platform-demo/SECURITY.md:70`、`devops-platform-demo/security/README.md`（镜像说明处）、`devops-platform-demo/docker-compose.yml:186` 注释
 
-- [ ] **Step 1:** 将 "postman/newman 官方镜像" 描述改为 "`node:26-alpine` + 锁定依赖（`docker/newman/package.json`）"；`security/README.md` 增加前后对比表（10 → 0 CRITICAL）与 faker 已知风险说明
-- [ ] **Step 2:** `grep -rn "postman/newman" devops-platform-demo --exclude-dir=node_modules` 仅剩历史文档
-- [ ] **Step 3:** Commit `docs(dvp): document self-maintained newman image`
+- [x] **Step 1:** 将 "postman/newman 官方镜像" 描述改为 "`node:26-alpine` + 锁定依赖（`docker/newman/package.json`）"；`security/README.md` 增加前后对比表（10 → 0 CRITICAL）与 faker 已知风险说明
+- [x] **Step 2:** `grep -rn "postman/newman" devops-platform-demo --exclude-dir=node_modules` 仅剩历史文档
+- [x] **Step 3:** Commit `docs(dvp): document self-maintained newman image`
 
 ### Task 7: 运行时验证（compose / Helm）
 
-- [ ] **Step 1:** `docker compose build newman && docker compose run --rm newman` → 0 failed，`./newman/` 下生成报告
-- [ ] **Step 2:** Helm job：`k3d image import qa-newman-demo:latest -c portfolio-dev` 后 `helm --kube-context k3d-portfolio-dev upgrade --install ... --set ingressClass.enabled=false`，`kubectl --context k3d-portfolio-dev wait --for=condition=complete job/... --timeout=180s`；结束后清理 release / namespace
-- [ ] **Step 3:** 结果写入 `security/README.md` 验证小节，commit `docs(dvp): record REQ-DVP-013 runtime verification`
+- [x] **Step 1:** `docker compose build newman && docker compose run --rm newman` → 0 failed，`./newman/` 下生成报告
+- [x] **Step 2:** Helm job：`k3d image import qa-newman-demo:latest -c portfolio-dev` 后 `helm --kube-context k3d-portfolio-dev upgrade --install ... --set ingressClass.enabled=false`，`kubectl --context k3d-portfolio-dev wait --for=condition=complete job/... --timeout=180s`；结束后清理 release / namespace
+- [x] **Step 3:** 结果写入 `security/README.md` 验证小节，commit `docs(dvp): record REQ-DVP-013 runtime verification`
 
 ---
 
 ## Stage 4 / 5
 
-| 阶段 | 内容 |
-|------|------|
-| 4 | push `feature/dvp-013-newman-image`，开 PR，CI 全绿（含新门禁） |
-| 5 | REQUIREMENTS / INDEX / register 标 Done、勾验收、更新 memory |
+| 阶段 | 内容 | 状态 |
+|------|------|------|
+| 4 | push `feature/dvp-013-newman-image`，开 PR，CI 全绿（含新门禁） | ✅ PR #99，15/15 checks pass |
+| 5 | REQUIREMENTS / INDEX / register 标 Done、勾验收、更新 memory | ✅ |

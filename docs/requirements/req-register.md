@@ -36,7 +36,6 @@
 | REQ-DVP-008 | Elastic 集成 / Loki vs Elastic 对比 | devops-platform-demo | DEMO | P3 | 2026-11-12 | Open |
 | REQ-DVP-009 | 数据管道 / DB 备份自动化 | devops-platform-demo | FR | P3 | 2026-11-12 | Open |
 | REQ-DVP-010 | OPA/Kyverno 策略即代码 | devops-platform-demo | FR | P3 | 2026-11-12 | Open |
-| REQ-DVP-013 | `qa-newman` 镜像自维护（上游停更 + alpine 3.18 / Node 16 EOL，10 CRITICAL） | devops-platform-demo | NFR | P2 | 2026-11-18 | In Progress |
 | REQ-ADAS-01 | ADAS 日志工具链：TS 解析 + 用例生成 + 数据采集 + 场景回放 + 分析看板（#69） | adas-log-toolchain-lab | DEMO | P1 | 2026-11-20 | Done |
 | REQ-ADAS-02 | PySpark 聚合示例：byRule / byModule → Parquet + CI（Java 17），0.3.0（#80、#81、#85） | adas-log-toolchain-lab | DEMO | P3 | 2026-11-21 | Done |
 
@@ -81,6 +80,7 @@
 | REQ-DVP-003 | Phase 3：本地 DevSecOps 闭环（本地 registry + Trivy→Prometheus，替代 Azure） | devops-platform-demo | FR | P1 | 2026-11-18 | #65 |
 | REQ-DVP-012 | Node 26 LTS 升级 + Cypress 16 修复 + PR 门禁 E2E | devops-platform-demo | NFR | P1 | 2026-11-23 | #87 |
 | REQ-DVP-006 | Secrets Manager（LocalStack）+ External Secrets + K8s RBAC（替代 Azure Key Vault） | devops-platform-demo | FR | P2 | 2026-11-26 | #90 |
+| REQ-DVP-013 | `qa-newman` 镜像自维护（Node 26 + 锁定依赖，Trivy CRITICAL 10 → 0） | devops-platform-demo | NFR | P2 | 2026-11-27 | #99 |
 
 ---
 
@@ -114,6 +114,7 @@
 
 | 日期 | 操作 | 内容 | 操作人 |
 |------|------|------|--------|
+| 2026-11-27 | 关闭 | REQ-DVP-013 Done：newman 镜像自维护（Node 26 + 锁定依赖，CRITICAL 10 → 0；含 Helm collection 挂载修复，CI 全绿 #99） | Michael Zhou |
 | 2026-11-26 | 变更 | REQ-DVP-013 改名「镜像自维护」→ In Progress；REQ-DVP-008/009/010 完成可行性复评并补设计 spec（已评审） | Michael Zhou |
 | 2026-11-26 | 关闭 | REQ-DVP-006 Done：LocalStack Secrets Manager + ESO + K8s RBAC，本地 e2e 验收 4/4（#90） | Michael Zhou |
 | 2026-11-23 | 关闭 | REQ-DVP-012 Done：Node 26 LTS + Cypress 16 + PR 门禁 E2E（#87） | Michael Zhou |
