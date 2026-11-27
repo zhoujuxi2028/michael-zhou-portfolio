@@ -41,6 +41,17 @@ cypress:
       memory: "2Gi"
       cpu: "1000m"
 
+# --- Init Containers（busybox 目录准备）---
+# REQ-DVP-010 require-resource-limits：init 容器同样需要 cpu + memory limits
+initContainer:
+  resources:
+    requests:
+      memory: "16Mi"
+      cpu: "10m"
+    limits:
+      memory: "32Mi"
+      cpu: "50m"
+
 # --- Newman Job ---
 newman:
   enabled: true

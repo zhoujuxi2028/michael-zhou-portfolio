@@ -26,6 +26,8 @@ spec:
               mkdir -p /test-results/cypress/videos
               chmod -R 777 /test-results
               echo "Test results directory prepared"
+          resources:
+            {{- toYaml .Values.initContainer.resources | nindent 12 }}
           volumeMounts:
             - name: test-results
               mountPath: /test-results
