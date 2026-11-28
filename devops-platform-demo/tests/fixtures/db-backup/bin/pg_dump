@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Fake pg_dump: writes a deterministic file to -f <path>. FAKE_PG_DUMP_FAIL=1 → auth error.
+set -euo pipefail
+echo "pg_dump $*" >> "$FAKE_LOG"
+if [ -n "${FAKE_PG_DUMP_FAIL:-}" ]; then
+  echo 'pg_dump: error: connection to server failed: FATAL:  password authentication failed for user "app"' >&2
+  exit 1
+fi
+out=""
+while [ $# -gt 0 ]; do
+  if [ "$1" = -f ]; then out=$2; shift; fi
+  shift
+done
+if [ -z "$out" ]; then echo "fake pg_dump: -f required" >&2; exit 2; fi
+printf 'PGDMP fake custom-format dump of %s\n' "${PGDATABASE:-?}" > "$out"

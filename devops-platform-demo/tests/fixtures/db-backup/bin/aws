@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+# Fake aws CLI for DB backup tests: directory $FAKE_S3_DIR plays bucket $S3_BUCKET.
+# Every call is appended to $FAKE_LOG. FAKE_AWS_FAIL="<service> <op>" forces that op to fail.
+set -euo pipefail
+echo "aws $*" >> "$FAKE_LOG"
+op="${1:-} ${2:-}"
+if [ "${FAKE_AWS_FAIL:-}" = "$op" ]; then
+  echo "fake aws: forced failure: $op" >&2
+  exit 255
+fi
+
+key_of() {  # s3://<bucket>/<key> → <key>; bucket must be $S3_BUCKET
+  local rest=${1#s3://}
+  if [ "${rest%%/*}" != "$S3_BUCKET" ]; then
+    echo "fake aws: unexpected bucket in $1" >&2
+    exit 3
+  fi
+  printf '%s' "${rest#*/}"
+}
+
+case "$op" in
+  "s3api list-objects-v2")
+    bucket="" prefix=""
+    while [ $# -gt 0 ]; do
+      case "$1" in
+        --bucket) bucket=$2; shift ;;
+        --prefix) prefix=$2; shift ;;
+      esac
+      shift
+    done
+    if [ "$bucket" != "$S3_BUCKET" ]; then echo "fake aws: unexpected bucket $bucket" >&2; exit 3; fi
+    keys=$(cd "$FAKE_S3_DIR" && find . -type f | sed 's#^\./##' | LC_ALL=C sort \
+           | awk -v p="$prefix" 'index($0, p) == 1')
+    # real CLI: --output text prints tab-separated keys, or "None" for an empty result
+    if [ -z "$keys" ]; then echo None; else printf '%s\n' "$keys" | paste -s -; fi
+    ;;
+  "s3 cp")
+    src=$3 dst=$4
+    case "$src" in
+      s3://*) k=$(key_of "$src"); cp "$FAKE_S3_DIR/$k" "$dst" ;;
+      *)      k=$(key_of "$dst"); mkdir -p "$FAKE_S3_DIR/$(dirname "$k")"; cp "$src" "$FAKE_S3_DIR/$k" ;;
+    esac
+    ;;
+  "s3 rm")
+    k=$(key_of "$3")
+    rm -rf "${FAKE_S3_DIR:?}/$k"
+    ;;
+  *)
+    echo "fake aws: unsupported call: aws $*" >&2
+    exit 2
+    ;;
+esac

@@ -1,0 +1,149 @@
+# 每周日 04:00 UTC 恢复演练（REQ-DVP-009 FR-03 / D5 / D6）
+#   scratch-db (postgres, native sidecar) 临时实例：仅 127.0.0.1、trust、emptyDir，Job 结束即销毁
+#   fetch      (aws-cli)  s3-backup.sh fetch-latest  最新完整备份 → /work/restore → fetch.rc
+#   verify     (postgres) restore-drill.sh           sha256 → pg_restore → 行数比对 → 推指标
+# 手动触发：kubectl --context k3d-portfolio-dev -n data-pipeline create job --from=cronjob/db-restore-drill db-restore-drill-manual-1
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: db-restore-drill
+  labels:
+    app.kubernetes.io/name: db-restore-drill
+spec:
+  schedule: "0 4 * * 0"
+  timeZone: Etc/UTC
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 3600
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 900
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: db-restore-drill
+        spec:
+          restartPolicy: Never
+          automountServiceAccountToken: false
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 70
+            runAsGroup: 70
+            fsGroup: 70
+            seccompProfile:
+              type: RuntimeDefault
+          initContainers:
+            - name: scratch-db
+              image: postgres:16-alpine
+              restartPolicy: Always
+              args: ["-c", "listen_addresses=127.0.0.1"]
+              env:
+                - name: POSTGRES_USER
+                  value: drill
+                - name: POSTGRES_DB
+                  value: drill
+                # Pod 内回环、随 Job 销毁 → trust，无需凭据
+                - name: POSTGRES_HOST_AUTH_METHOD
+                  value: trust
+                - name: PGDATA
+                  value: /var/lib/postgresql/data/pgdata
+              startupProbe:
+                exec:
+                  command: ["pg_isready", "-h", "127.0.0.1", "-U", "drill", "-d", "drill"]
+                periodSeconds: 2
+                failureThreshold: 60
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+                limits:
+                  cpu: 500m
+                  memory: 256Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: ["ALL"]
+              volumeMounts:
+                - name: scratch-data
+                  mountPath: /var/lib/postgresql/data
+                - name: pg-run
+                  mountPath: /var/run/postgresql
+          containers:
+            - name: fetch
+              image: amazon/aws-cli
+              command: ["bash", "/scripts/s3-backup.sh", "fetch-latest"]
+              envFrom:
+                - configMapRef:
+                    name: db-backup-config
+                - secretRef:
+                    name: backup-s3-creds
+              env:
+                - name: HOME
+                  value: /tmp
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+                limits:
+                  cpu: 500m
+                  memory: 256Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop: ["ALL"]
+              volumeMounts:
+                - name: work
+                  mountPath: /work
+                - name: scripts
+                  mountPath: /scripts
+                  readOnly: true
+                - name: tmp
+                  mountPath: /tmp
+            - name: verify
+              image: postgres:16-alpine
+              command: ["bash", "/scripts/restore-drill.sh"]
+              envFrom:
+                - configMapRef:
+                    name: db-backup-config
+              env:
+                - name: PGHOST
+                  value: 127.0.0.1
+                - name: PGUSER
+                  value: drill
+                - name: PGDATABASE
+                  value: drill
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+                limits:
+                  cpu: 500m
+                  memory: 256Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop: ["ALL"]
+              volumeMounts:
+                - name: work
+                  mountPath: /work
+                - name: scripts
+                  mountPath: /scripts
+                  readOnly: true
+          volumes:
+            - name: work
+              emptyDir:
+                sizeLimit: 1Gi
+            - name: tmp
+              emptyDir: {}
+            - name: scratch-data
+              emptyDir:
+                sizeLimit: 1Gi
+            - name: pg-run
+              emptyDir: {}
+            - name: scripts
+              configMap:
+                name: db-backup-scripts

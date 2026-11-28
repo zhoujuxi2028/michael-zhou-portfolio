@@ -1,0 +1,8 @@
+# data-pipeline namespace（REQ-DVP-009）— Pod Security Admission restricted
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: data-pipeline
+  labels:
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/enforce-version: latest

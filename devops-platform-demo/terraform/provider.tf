@@ -20,9 +20,11 @@ provider "aws" {
 
   # Localstack Configuration (for local development)
   # These settings are enabled when use_localstack = true
-  skip_credentials_validation = var.use_localstack
-  skip_requesting_account_id  = var.use_localstack
-  skip_metadata_api_check     = var.use_localstack
+  # skip_aws_provider_checks keeps `terraform test` (mock_provider) offline-safe; it only
+  # skips the STS/IMDS pre-flight, real API calls still require credentials.
+  skip_credentials_validation = var.use_localstack || var.skip_aws_provider_checks
+  skip_requesting_account_id  = var.use_localstack || var.skip_aws_provider_checks
+  skip_metadata_api_check     = var.use_localstack || var.skip_aws_provider_checks
   s3_use_path_style           = var.use_localstack
 
   # Dynamic endpoint configuration for Localstack

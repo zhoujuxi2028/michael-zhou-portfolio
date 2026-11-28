@@ -44,7 +44,7 @@
 | `REQ-DVP-006` | Secrets Manager（LocalStack）+ External Secrets + K8s RBAC（替代 Azure Key Vault） | FR | P2 | 100% | 003 | ✅ Done（PR #90） |
 | `REQ-DVP-007` | Dependabot 依赖与补丁自动化 | NFR | P2 | 95% | — | ✅ Done（PR #56） |
 | `REQ-DVP-008` | Elastic 集成 / Loki vs Elastic 对比 | DEMO | P3 | 100%（文档） | — | ✅ Done（PR #105） |
-| `REQ-DVP-009` | 数据管道 / DB 备份自动化 | FR | P3 | 85% | 006 | 🔲 Planned（设计已评审） |
+| `REQ-DVP-009` | 数据管道 / DB 备份自动化 | FR | P3 | 85% | 006 | 🔄 In Progress |
 | `REQ-DVP-010` | OPA/Kyverno 策略即代码 | FR | P3 | 100% | 013 | ✅ Done（PR #101） |
 | `REQ-DVP-011` | Dev Container 标准化开发环境 | NFR | P1 | 95% | — | ✅ Done |
 | `REQ-DVP-012` | Node 26 LTS 升级 + Cypress 16 修复 + PR 门禁 E2E | NFR | P1 | 100% | 011 | ✅ Done（PR #87） |

@@ -140,3 +140,61 @@ variable "slack_webhook_url" {
   default     = ""
   sensitive   = true
 }
+
+# ==============================================================================
+# DB 备份（REQ-DVP-009）— 凭据通过 TF_VAR_* 传入，tfvars 中不写明文
+# ==============================================================================
+
+variable "backup_retention_days" {
+  description = "Days to keep DB backups (enforced by retention.sh); the AWS lifecycle rule expires after this + 7 days"
+  type        = number
+  default     = 7
+
+  validation {
+    condition     = var.backup_retention_days >= 1 && var.backup_retention_days <= 365
+    error_message = "backup_retention_days must be between 1 and 365."
+  }
+}
+
+variable "postgres_username" {
+  description = "PostgreSQL application user stored in the postgres secret"
+  type        = string
+  default     = "app"
+}
+
+variable "postgres_database" {
+  description = "PostgreSQL application database stored in the postgres secret"
+  type        = string
+  default     = "appdb"
+}
+
+variable "postgres_password" {
+  description = "PostgreSQL application password (TF_VAR_postgres_password)"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "backup_s3_access_key_id" {
+  description = "Access key for the DB backup CronJob (TF_VAR_backup_s3_access_key_id; LocalStack: test)"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "backup_s3_secret_access_key" {
+  description = "Secret key for the DB backup CronJob (TF_VAR_backup_s3_secret_access_key; LocalStack: test)"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+# ==============================================================================
+# Offline provider checks — terraform test 用 mock_provider 在无凭据环境运行
+# ==============================================================================
+
+variable "skip_aws_provider_checks" {
+  description = "Skip the AWS provider credential/account-ID pre-flight checks (offline terraform test only; API calls still need credentials)"
+  type        = bool
+  default     = false
+}

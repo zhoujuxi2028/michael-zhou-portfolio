@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Fake pg_isready: always ready.
+set -euo pipefail
+echo "pg_isready $*" >> "$FAKE_LOG"
+echo "127.0.0.1:5432 - accepting connections"

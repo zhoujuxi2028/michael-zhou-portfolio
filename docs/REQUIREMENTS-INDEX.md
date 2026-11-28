@@ -100,7 +100,7 @@
 | `REQ-DVP-006` | Secrets Manager（LocalStack）+ External Secrets + K8s RBAC（#90） | ✅ |
 | `REQ-DVP-007` | Dependabot 依赖与补丁自动化 | ✅ |
 | `REQ-DVP-008` | Elastic 集成 / Loki vs Elastic 对比（#105） | ✅ |
-| `REQ-DVP-009` | 数据管道 / DB 备份自动化 | 🔲 |
+| `REQ-DVP-009` | 数据管道 / DB 备份自动化 | 🔄 |
 | `REQ-DVP-010` | OPA/Kyverno 策略即代码（#101） | ✅ |
 | `REQ-DVP-011` | Dev Container 标准化开发环境（#50） | ✅ |
 | `REQ-DVP-012` | Node 26 LTS 升级 + Cypress 16 修复 + PR 门禁 E2E（#87） | ✅ |

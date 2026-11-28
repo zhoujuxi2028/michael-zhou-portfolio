@@ -68,6 +68,9 @@ jobs:
       - name: Terraform validate
         run: terraform validate
 
+      - name: Terraform test (mock provider)
+        run: terraform test
+
   # ---------------------------------------------------------------------------
   # Job 3: Security —— Trivy 扫描 Terraform IaC 配置（HIGH/CRITICAL 失败）
   # ---------------------------------------------------------------------------
