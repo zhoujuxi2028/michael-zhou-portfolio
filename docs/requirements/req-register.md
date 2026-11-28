@@ -33,7 +33,6 @@
 
 | REQ ID | 标题摘要 | 项目 / 范围 | 类型 | 优先级 | 提出日期 | 状态 |
 |--------|----------|-------------|------|--------|----------|------|
-| REQ-DVP-009 | 数据管道 / DB 备份自动化 | devops-platform-demo | FR | P3 | 2026-11-12 | Open |
 | REQ-ADAS-01 | ADAS 日志工具链：TS 解析 + 用例生成 + 数据采集 + 场景回放 + 分析看板（#69） | adas-log-toolchain-lab | DEMO | P1 | 2026-11-20 | Done |
 | REQ-ADAS-02 | PySpark 聚合示例：byRule / byModule → Parquet + CI（Java 17），0.3.0（#80、#81、#85） | adas-log-toolchain-lab | DEMO | P3 | 2026-11-21 | Done |
 
@@ -81,6 +80,7 @@
 | REQ-DVP-013 | `qa-newman` 镜像自维护（Node 26 + 锁定依赖，Trivy CRITICAL 10 → 0） | devops-platform-demo | NFR | P2 | 2026-11-27 | #99 |
 | REQ-DVP-010 | OPA/Kyverno 策略即代码（4 Deny + 1 Audit，CI + 集群准入） | devops-platform-demo | FR | P3 | 2026-11-27 | #101 |
 | REQ-DVP-008 | Elastic 集成 / Loki vs Elastic 对比（Loki 实测 + 官方来源） | devops-platform-demo | DEMO | P3 | 2026-11-28 | #105 |
+| REQ-DVP-009 | 数据管道 / DB 备份自动化（Postgres → S3 + 恢复演练 + 告警） | devops-platform-demo | FR | P3 | 2026-11-28 | #106 |
 
 ---
 
@@ -114,6 +114,7 @@
 
 | 日期 | 操作 | 内容 | 操作人 |
 |------|------|------|--------|
+| 2026-11-28 | 关闭 | REQ-DVP-009 Done：Postgres → S3 备份 + 恢复演练 + 告警（测试 165 项通过，terraform test 3/3；#106） | Michael Zhou |
 | 2026-11-28 | 关闭 | REQ-DVP-008 Done：Loki vs Elastic 对比文档（Loki 实测 116Mi / 5 查询；Elastic 未部署；#105） | Michael Zhou |
 | 2026-11-27 | 关闭 | REQ-DVP-010 Done：Kyverno 策略即代码（4 Deny + 1 Audit，CI + k3d 准入，verify 23/23；#101） | Michael Zhou |
 | 2026-11-27 | 关闭 | REQ-DVP-013 Done：newman 镜像自维护（Node 26 + 锁定依赖，CRITICAL 10 → 0；含 Helm collection 挂载修复，CI 全绿 #99） | Michael Zhou |
