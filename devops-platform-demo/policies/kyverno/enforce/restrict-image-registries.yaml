@@ -43,6 +43,9 @@ spec:
           r'^(docker\.io/)?(library/)?(nginx|busybox)(:|@|$)',
           r'^(docker\.io/)?cypress/',
           r'^(docker\.io/)?(library/)?qa-newman-demo(:|@|$)',
+          r'^(docker\.io/)?(library/)?postgres(:|@|$)',
+          r'^amazon/aws-cli(:|@|$)',
+          r'^prom/pushgateway(:|@|$)',
           r'^k3d-qa-registry:5000/',
           r'^host\.k3d\.internal:5000/'
         ]

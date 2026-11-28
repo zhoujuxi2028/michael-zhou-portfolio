@@ -182,11 +182,11 @@
 | FR-DVP-009-04 | 备份成功/失败、耗时指标推送 Pushgateway；`BackupFailed` / `BackupStale` 告警 |
 
 **验收标准：**
-- [x] CronJob / 脚本生成备份与 manifest（单测 + kustomize 渲染；k3d e2e 待补）
-- [x] 恢复演练脚本：sha256 + 行数校验（单测；k3d e2e 待补）
-- [x] `BackupFailed` / `BackupStale` 规则 Promtool 验证；Grafana 面板已入库（监控栈 e2e 待补）
+- [x] CronJob / 脚本生成备份与 manifest（k3d e2e 2026-11-28 通过：`20261128T072953Z`）
+- [x] 恢复演练脚本：sha256 + 行数校验（k3d e2e：`PASS restore drill: 2 tables match manifest`）
+- [x] `BackupFailed` / `BackupStale` 规则 Promtool 验证；Pushgateway 指标与故障注入实测通过；Grafana 面板已入库（完整监控栈 e2e 未执行）
 
-**可行性 100%（2026-11-28 完成）：** 13 个 commit；retention 39、scripts 79、manifests 47 项测试通过；`terraform test` 3/3；Trivy config 0 发现。k3d e2e（Task 15）与 LocalStack apply 未执行，见 `docs/guides/DB-BACKUP.md` 已知限制。原 spike：`pg_dump -Fc` / `pg_restore` 10 万行验证通过；LocalStack 3.8 lifecycle 不执行过期删除。
+**可行性 100%（2026-11-28 完成，含 e2e）：** 13 个 commit；retention 39、scripts 79、manifests 47 项测试通过；`terraform test` 3/3；k3d e2e 覆盖备份、恢复、保留、调度、指标、故障注入与明文扫描；Trivy config 0 发现。Step 9（完整监控栈）为可选，未执行。原 spike：`pg_dump -Fc` / `pg_restore` 10 万行验证通过；LocalStack 3.8 lifecycle 不执行过期删除。
 
 **设计：** [2026-11-26-dvp-009-db-backup-design.md](../../../docs/superpowers/specs/2026-11-26-dvp-009-db-backup-design.md)
 
