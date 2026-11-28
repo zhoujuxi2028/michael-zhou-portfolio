@@ -157,3 +157,18 @@ output "slack_webhook_secret_name" {
   description = "Secrets Manager name for the Slack webhook (ESO remote key)"
   value       = aws_secretsmanager_secret.slack_webhook.name
 }
+
+output "db_backups_bucket_name" {
+  description = "S3 bucket for DB backups (data-pipeline S3_BUCKET)"
+  value       = aws_s3_bucket.db_backups.id
+}
+
+output "postgres_secret_name" {
+  description = "Secrets Manager name for PostgreSQL credentials (ESO remote key)"
+  value       = aws_secretsmanager_secret.postgres.name
+}
+
+output "db_backup_s3_secret_name" {
+  description = "Secrets Manager name for DB backup S3 credentials (ESO remote key)"
+  value       = aws_secretsmanager_secret.db_backup_s3.name
+}
