@@ -19,6 +19,9 @@ REQ-DVP-010：同一份策略 YAML 同时用于 PR CI 与 k3d 集群准入。
 | `^(docker\.io/)?(library/)?(nginx\|busybox)(:@\|$)` | nginx / busybox 短名与全名 |
 | `^(docker\.io/)?cypress/` | Cypress 镜像 |
 | `^(docker\.io/)?(library/)?qa-newman-demo(:@\|$)` | 本地 newman 镜像 |
+| `^(docker\.io/)?(library/)?postgres(:@\|$)` | PostgreSQL（REQ-DVP-009） |
+| `^amazon/aws-cli(:@\|$)` | 备份上传容器（REQ-DVP-009） |
+| `^prom/pushgateway(:@\|$)` | 轻量 Pushgateway（REQ-DVP-009） |
 | `^k3d-qa-registry:5000/` | k3d 托管 registry |
 | `^host\.k3d\.internal:5000/` | 宿主 registry |
 
