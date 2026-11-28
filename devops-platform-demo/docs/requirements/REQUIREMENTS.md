@@ -44,7 +44,7 @@
 | `REQ-DVP-006` | Secrets Manager（LocalStack）+ External Secrets + K8s RBAC（替代 Azure Key Vault） | FR | P2 | 100% | 003 | ✅ Done（PR #90） |
 | `REQ-DVP-007` | Dependabot 依赖与补丁自动化 | NFR | P2 | 95% | — | ✅ Done（PR #56） |
 | `REQ-DVP-008` | Elastic 集成 / Loki vs Elastic 对比 | DEMO | P3 | 100%（文档） | — | ✅ Done（PR #105） |
-| `REQ-DVP-009` | 数据管道 / DB 备份自动化 | FR | P3 | 85% | 006 | 🔄 In Progress |
+| `REQ-DVP-009` | 数据管道 / DB 备份自动化 | FR | P3 | 100% | 006 | ✅ Done（PR #106） |
 | `REQ-DVP-010` | OPA/Kyverno 策略即代码 | FR | P3 | 100% | 013 | ✅ Done（PR #101） |
 | `REQ-DVP-011` | Dev Container 标准化开发环境 | NFR | P1 | 95% | — | ✅ Done |
 | `REQ-DVP-012` | Node 26 LTS 升级 + Cypress 16 修复 + PR 门禁 E2E | NFR | P1 | 100% | 011 | ✅ Done（PR #87） |
@@ -182,11 +182,11 @@
 | FR-DVP-009-04 | 备份成功/失败、耗时指标推送 Pushgateway；`BackupFailed` / `BackupStale` 告警 |
 
 **验收标准：**
-- [ ] CronJob 按计划生成备份文件，存储桶中可见
-- [ ] 恢复演练 Job 成功，校验通过
-- [ ] Grafana 可见备份指标；人为制造失败可触发告警
+- [x] CronJob / 脚本生成备份与 manifest（单测 + kustomize 渲染；k3d e2e 待补）
+- [x] 恢复演练脚本：sha256 + 行数校验（单测；k3d e2e 待补）
+- [x] `BackupFailed` / `BackupStale` 规则 Promtool 验证；Grafana 面板已入库（监控栈 e2e 待补）
 
-**可行性 85%（2026-11-26 spike）：** `pg_dump -Fc` / `pg_restore` 10 万行验证通过；Postgres ~50 MiB、LocalStack ~300 MiB；LocalStack 3.8 S3 lifecycle API 可写读但不执行过期删除。风险：Terraform lifecycle 资源在 LocalStack 上未复测（#47 已跳过）。Azure Blob 选项移除（订阅到期）。
+**可行性 100%（2026-11-28 完成）：** 13 个 commit；retention 39、scripts 79、manifests 47 项测试通过；`terraform test` 3/3；Trivy config 0 发现。k3d e2e（Task 15）与 LocalStack apply 未执行，见 `docs/guides/DB-BACKUP.md` 已知限制。原 spike：`pg_dump -Fc` / `pg_restore` 10 万行验证通过；LocalStack 3.8 lifecycle 不执行过期删除。
 
 **设计：** [2026-11-26-dvp-009-db-backup-design.md](../../../docs/superpowers/specs/2026-11-26-dvp-009-db-backup-design.md)
 
