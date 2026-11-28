@@ -35,7 +35,10 @@ trap 'rm -rf "$tmp"' EXIT
 
 list_keys "$tmp/keys"
 backup_ts_all "$tmp/keys" > "$tmp/all"
-backup_ts_complete "$tmp/keys" | tail -n "$KEEP_MIN" > "$tmp/protected"
+# tail reads a file, not a pipe: `tail -n 0` exits immediately on GNU coreutils and would
+# SIGPIPE the producer under `set -o pipefail` (KEEP_MIN=0).
+backup_ts_complete "$tmp/keys" > "$tmp/complete"
+tail -n "$KEEP_MIN" "$tmp/complete" > "$tmp/protected"
 
 kept=0
 deleted=0
