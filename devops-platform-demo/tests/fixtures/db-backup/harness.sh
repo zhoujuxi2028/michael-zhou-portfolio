@@ -1,5 +1,6 @@
 # Shared harness for DB backup script tests (REQ-DVP-009). Source only.
 # shellcheck shell=bash
+# shellcheck disable=SC2034  # SCRIPTS / NOW_EPOCH are used by the test files that source this
 # Each case gets a sandbox: $FAKE_S3_DIR plays the bucket, fake CLIs come first on PATH.
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 SCRIPTS="$ROOT/data-pipeline/scripts"
