@@ -88,6 +88,24 @@ kc wait --for=condition=Complete job/db-restore-drill-manual-1 --timeout=300s
 kc logs job/db-restore-drill-manual-1 -c verify | grep 'PASS restore drill'
 ```
 
+### 实测（2026-11-28，k3d portfolio-dev）
+
+| 项 | 结果 |
+|----|------|
+| 种子数据 | `orders=5000`、`customers=1000` |
+| 手动备份 | `20261128T072953Z`，`db.dump` 39,812 B + `manifest.json` 291 B |
+| 恢复演练 | `PASS restore drill: 2 tables match manifest` |
+| 保留策略 | 删除 `20260101T000000Z/`；`retention: kept=2 deleted=1` |
+| 按计划调度 | `db-backup-29930854` 完成；schedule 还原为 `0 2 * * *` |
+| 指标（成功） | `backup_last_status=1`、`restore_last_status=1` |
+| 指标（故障注入） | `backup_last_status=0`，`backup_last_success_timestamp` 保持不变 |
+| 明文扫描 | Trivy fs exit 0；Secret 仅 `aws-localstack-creds`、`backup-s3-creds`、`pg-credentials` |
+
+实施期间发现并修复：
+
+- Kyverno 镜像白名单缺少 `postgres`、`amazon/aws-cli`、`prom/pushgateway` → 已补 `restrict-image-registries` 与文档。
+- 集群重启后 CoreDNS 未注入 `host.k3d.internal` → 补 `192.168.117.1 host.k3d.internal` 到 `kube-system/coredns` NodeHosts。
+
 ### 故障注入（触发 BackupFailed）
 
 ```bash
